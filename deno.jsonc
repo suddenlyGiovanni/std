@@ -1,0 +1,30 @@
+{
+	"name": "@suddenly-giovanni/std",
+	"version": "0.0.1",
+	"fmt": {
+		"useTabs": true,
+		"lineWidth": 100,
+		"indentWidth": 4,
+		"semiColons": false,
+		"singleQuote": true,
+		"proseWrap": "preserve"
+	},
+	"lint": {
+		"include": [
+			"src/"
+		],
+		"rules": {
+			"tags": [
+				"recommended"
+			]
+		},
+		"report": "pretty",
+		"files": {},
+		"exclude": []
+	},
+	"tasks": {
+		"format": "deno run -A npm:@biomejs/biome format --write ./src",
+		"lint": "deno run -A npm:@biomejs/biome lint ./src",
+		"test": "deno test --allow-all --unstable ./src"
+	}
+}
