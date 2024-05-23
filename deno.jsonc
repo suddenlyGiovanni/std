@@ -1,7 +1,8 @@
 {
 	"name": "@suddenly-giovanni/std",
 	"version": "0.0.1",
-	"fmt": {
+  "exports": "./src/mod.ts",
+  "fmt": {
 		"useTabs": true,
 		"lineWidth": 100,
 		"indentWidth": 4,
