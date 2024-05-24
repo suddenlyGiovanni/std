@@ -11,7 +11,6 @@ export interface Inspectable {
 	 *
 	 * Object.prototype.toString.call(new BoxedV1()); // '[object Object]'
 	 *
-	 *
 	 * class BoxedV2 implements Inspectable {
 	 *  toString(): string {
 	 *    throw new Error('Method not implemented.')

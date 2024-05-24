@@ -77,7 +77,7 @@ export abstract class Option<A> {
 	 *
 	 * assertStrictEquals(Option.isSome(Option.Some(1)), true)
 	 * assertStrictEquals(Option.isSome(Option.None()), false)
-	 *```
+	 * ```
 	 * @category guards
 	 */
 	static isSome<T>(self: Option<T>): self is Some<T> {
