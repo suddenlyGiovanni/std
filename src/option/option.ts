@@ -39,7 +39,7 @@ export abstract class Option<A> {
 	 * @category guards
 	 */
 	static isOption(input: unknown): input is Option<unknown> {
-		return (input instanceof None || input instanceof Some)
+		return input instanceof None || input instanceof Some
 	}
 
 	/**
@@ -48,17 +48,36 @@ export abstract class Option<A> {
 	 * @param self - The `Option` to check.
 	 *
 	 * @example
-   * ```ts
-   * import { Option } from  '@suddenly-giovanni/std/option'
-   * import { assertStrictEquals } from '@std/assert'
+	 * ```ts
+	 * import { Option } from  '@suddenly-giovanni/std/option'
+	 * import { assertStrictEquals } from '@std/assert'
 	 *
 	 * assertStrictEquals(Option.isNone(Option.Some(1)), false)
 	 * assertStrictEquals(Option.isNone(Option.None()), true)
-	 *```
+	 * ```
 	 * @category guards
 	 */
 	static isNone<T>(self: Option<T>): self is None<T> {
-		return  self instanceof None || self._tag === 'None'
+		return self instanceof None || self._tag === 'None'
+	}
+
+	/**
+	 * Determine if a `Option` is a `Some`.
+	 *
+	 * @param self - The `Option` to check.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  '@suddenly-giovanni/std/option'
+	 * import { assertStrictEquals } from '@std/assert'
+	 *
+	 * assertStrictEquals(Option.isSome(Option.Some(1)), true)
+	 * assertStrictEquals(Option.isSome(Option.None()), false)
+	 *```
+	 * @category guards
+	 */
+	static isSome<T>(self: Option<T>): self is Some<T> {
+		return self instanceof Some || self._tag === 'Some'
 	}
 }
 
@@ -70,12 +89,11 @@ class Some<out A> implements Option<A> {
 	readonly #value: A
 	readonly _tag = 'Some' as const
 
-
 	get value(): A {
 		return this.#value
 	}
 
-	 constructor(value: A) {
+	constructor(value: A) {
 		this.#value = value
 	}
 }
