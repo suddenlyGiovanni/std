@@ -2,7 +2,8 @@
 	"name": "@suddenly-giovanni/std",
 	"version": "0.0.1",
 	"exports": {
-    "predicate": "./src/predicate/mod.ts"
+    "predicate": "./src/predicate/mod.ts",
+    "option": "./src/option/mod.ts"
   },
 	"fmt": {
 		"useTabs": true,
