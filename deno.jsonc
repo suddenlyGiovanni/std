@@ -1,6 +1,6 @@
 {
 	"name": "@suddenly-giovanni/std",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"exports": {
 		"./predicate": "./src/predicate/mod.ts",
 		"./option": "./src/option/mod.ts"
