@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   test:
@@ -23,7 +23,7 @@ jobs:
           deno-version: canary
 
       - name: Run tests (simulate Deno 2)
-        run: deno task test
+        run: deno task test:ci
         env:
           DENO_FUTURE: 1
 
@@ -34,6 +34,8 @@ jobs:
         uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          slug: suddenlyGiovanni/std
 
   lint:
     runs-on: ubuntu-latest
@@ -44,6 +46,22 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: 🧬 Setup Biome
+        uses: biomejs/setup-biome@v2
+
+      - name: 🧬 check code for errors (with Biome)
+        continue-on-error: true
+        run: |
+          biome ci                            \
+            --formatter-enabled=false         \
+            --linter-enabled=true             \
+            --organize-imports-enabled=false  \
+            --vcs-enabled=true                \
+            --vcs-use-ignore-file=true        \
+            --no-errors-on-unmatched          \
+            --diagnostic-level=error          \
+            .
+
       - name: Set up Deno
         uses: denoland/setup-deno@v1
         with:
@@ -53,7 +71,13 @@ jobs:
         run: deno fmt --check
 
       - name: Lint
-        run: deno task lint
+        run: deno lint --check
+
+      - name: Lint Docs
+        run: deno task doc:lint
+
+      - name: Test Docs
+        run: deno task doc:test
 
       - name: Spell-check
         uses: crate-ci/typos@master
