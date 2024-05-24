@@ -6,5 +6,24 @@
  * @internal
  */
 export function isRecordOrArray(input: unknown): boolean {
-  return typeof input === 'object' && input !== null
+	return typeof input === 'object' && input !== null
+}
+
+/**
+ * Tests if a value is a `function`.
+ *
+ * @param input - The value to test.
+ *
+ * @example
+ * ```ts
+ * import { isFunction } from '@suddenly-giovanni/std/predicate'
+ * import { assertEquals } from '@std/assert'
+ *
+ * assertEquals(isFunction(isFunction), true)
+ * assertEquals(isFunction('function'), false)
+ *```
+ * @category guards
+ */
+export function isFunction(input: unknown): input is Function {
+	return typeof input === 'function'
 }
