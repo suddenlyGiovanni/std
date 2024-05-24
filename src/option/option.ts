@@ -2,6 +2,10 @@ export abstract class Option<A> {
 	abstract readonly _tag: 'None' | 'Some'
 	abstract readonly value?: A
 
+	get [Symbol.toStringTag](): string {
+		return this._tag
+	}
+
 	/**
 	 * Creates a new `Option` that represents the absence of a value.
 	 *
@@ -20,6 +24,25 @@ export abstract class Option<A> {
 	 */
 	static Some<T>(value: T): Option<T> {
 		return new Some(value)
+	}
+
+	/**
+	 * Determine if a `Option` is a `None`.
+	 *
+	 * @param self - The `Option` to check.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  '@suddenly-giovanni/std/option'
+	 * import { assertStrictEquals } from '@std/assert'
+	 *
+	 * assertStrictEquals(Option.isNone(Option.Some(1)), false)
+	 * assertStrictEquals(Option.isNone(Option.None()), true)
+	 * ```
+	 * @category guards
+	 */
+	static isNone<T>(self: Option<T>): self is None<T> {
+		return self instanceof None || self._tag === 'None'
 	}
 
 	/**
@@ -43,25 +66,6 @@ export abstract class Option<A> {
 	}
 
 	/**
-	 * Determine if a `Option` is a `None`.
-	 *
-	 * @param self - The `Option` to check.
-	 *
-	 * @example
-	 * ```ts
-	 * import { Option } from  '@suddenly-giovanni/std/option'
-	 * import { assertStrictEquals } from '@std/assert'
-	 *
-	 * assertStrictEquals(Option.isNone(Option.Some(1)), false)
-	 * assertStrictEquals(Option.isNone(Option.None()), true)
-	 * ```
-	 * @category guards
-	 */
-	static isNone<T>(self: Option<T>): self is None<T> {
-		return self instanceof None || self._tag === 'None'
-	}
-
-	/**
 	 * Determine if a `Option` is a `Some`.
 	 *
 	 * @param self - The `Option` to check.
@@ -81,19 +85,21 @@ export abstract class Option<A> {
 	}
 }
 
-class None<out A> implements Option<A> {
+class None<out A> extends Option<A> {
 	readonly _tag = 'None' as const
+	value?: never
 }
 
-class Some<out A> implements Option<A> {
-	readonly #value: A
+class Some<out A> extends Option<A> {
 	readonly _tag = 'Some' as const
+	readonly #value: A
+
+	constructor(value: A) {
+		super()
+		this.#value = value
+	}
 
 	get value(): A {
 		return this.#value
-	}
-
-	constructor(value: A) {
-		this.#value = value
 	}
 }

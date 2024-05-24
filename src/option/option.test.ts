@@ -33,4 +33,11 @@ describe('Option', () => {
 			assertStrictEquals(Option.isSome(Option.Some(1)), true)
 		})
 	})
+
+	describe('serialize', () => {
+		it('toStringTag', () => {
+			assertStrictEquals(String(Option.Some(1)), '[object Some]')
+			assertStrictEquals(String(Option.None()), '[object None]')
+		})
+	})
 })
