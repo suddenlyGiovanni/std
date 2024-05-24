@@ -24,6 +24,7 @@ export function isRecordOrArray(input: unknown): boolean {
  * ```
  * @category guards
  */
+// deno-lint-ignore ban-types
 export function isFunction(input: unknown): input is Function {
 	return typeof input === 'function'
 }
