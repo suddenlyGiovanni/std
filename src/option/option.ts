@@ -1,7 +1,20 @@
+/**
+ * FIXME: exported symbol is missing JSDoc documentation
+ */
 export abstract class Option<A> {
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
 	abstract readonly _tag: 'None' | 'Some'
+
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
 	abstract readonly value?: A
 
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
 	get [Symbol.toStringTag](): string {
 		return this._tag
 	}
