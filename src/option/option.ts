@@ -1,7 +1,46 @@
+import type { Inspectable } from '../internal/inspectable.ts'
+
+function format(x: unknown): string {
+	return JSON.stringify(x, null, 2)
+}
+
 /**
  * FIXME: exported symbol is missing JSDoc documentation
  */
-export abstract class Option<A> {
+export abstract class Option<A> implements Inspectable {
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
+	get [Symbol.toStringTag](): string {
+		return `${this.constructor.name}.${this._tag}`
+	}
+
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
+	toString(): string {
+		return format(this.toJSON())
+	}
+
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
+	toJSON() {
+		switch (this._tag) {
+			case 'Some':
+				return {
+					_id: 'Option',
+					_tag: this._tag,
+					value: this.value,
+				}
+			case 'None':
+				return {
+					_id: 'Option',
+					_tag: this._tag,
+				}
+		}
+	}
+
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
@@ -11,13 +50,6 @@ export abstract class Option<A> {
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
 	abstract readonly value?: A
-
-	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
-	 */
-	get [Symbol.toStringTag](): string {
-		return this._tag
-	}
 
 	/**
 	 * Creates a new `Option` that represents the absence of a value.
