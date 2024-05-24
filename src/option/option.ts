@@ -1,7 +1,20 @@
+/**
+ * FIXME: exported symbol is missing JSDoc documentation
+ */
 export abstract class Option<A> {
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
 	abstract readonly _tag: 'None' | 'Some'
+
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
 	abstract readonly value?: A
 
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
 	get [Symbol.toStringTag](): string {
 		return this._tag
 	}
@@ -77,7 +90,7 @@ export abstract class Option<A> {
 	 *
 	 * assertStrictEquals(Option.isSome(Option.Some(1)), true)
 	 * assertStrictEquals(Option.isSome(Option.None()), false)
-	 *```
+	 * ```
 	 * @category guards
 	 */
 	static isSome<T>(self: Option<T>): self is Some<T> {

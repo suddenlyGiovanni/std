@@ -43,7 +43,10 @@ describe('isObject', () => {
 	it('should return true when input is an object', () => {
 		assertStrictEquals(isObject({}), true)
 		assertStrictEquals(isObject([]), true)
-		assertStrictEquals(isObject(() => 1), true)
+		assertStrictEquals(
+			isObject(() => 1),
+			true,
+		)
 	})
 
 	it('should return false when input is not an object', () => {

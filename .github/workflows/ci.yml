@@ -1,0 +1,105 @@
+name: ci
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: canary
+
+      - name: Run tests (simulate Deno 2)
+        run: deno task test:ci
+        env:
+          DENO_FUTURE: 1
+
+      - name: Generate lcov
+        run: deno task cov:gen
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          slug: suddenlyGiovanni/std
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: 🧬 Setup Biome
+        uses: biomejs/setup-biome@v2
+
+      - name: 🧬 check code for errors (with Biome)
+        continue-on-error: true
+        run: |
+          biome ci                            \
+            --formatter-enabled=false         \
+            --linter-enabled=true             \
+            --organize-imports-enabled=false  \
+            --vcs-enabled=true                \
+            --vcs-use-ignore-file=true        \
+            --no-errors-on-unmatched          \
+            --diagnostic-level=error          \
+            .
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: canary
+
+      - name: Format
+        run: deno fmt --check
+
+      - name: Lint
+        run: deno lint
+
+      - name: Lint Docs
+        run: deno task doc:lint
+
+      - name: Test Docs
+        continue-on-error: true
+        run: deno task doc:test
+
+      - name: Spell-check
+        uses: crate-ci/typos@master
+        with:
+          config: ./.github/typos.toml
+
+  publish-dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: canary
+
+      - name: Publish (dry run)
+        run: deno publish --dry-run

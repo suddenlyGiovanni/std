@@ -21,13 +21,13 @@ export function isRecordOrArray(input: unknown): boolean {
  *
  * assertEquals(isFunction(isFunction), true)
  * assertEquals(isFunction('function'), false)
- *```
+ * ```
  * @category guards
  */
+// deno-lint-ignore ban-types
 export function isFunction(input: unknown): input is Function {
 	return typeof input === 'function'
 }
-
 
 /**
  * Tests if a value is an `object`.
@@ -39,15 +39,14 @@ export function isFunction(input: unknown): input is Function {
  * import { isObject } from '@suddenly-giovanni/std/predicate'
  * import { assertEquals } from '@std/ assert'
  *
- *
  * assertEquals(isObject({}), true)
  * assertEquals(isObject([]), true)
  *
  * assertEquals(isObject(null), false)
  * assertEquals(isObject(undefined), false)
- *```
+ * ```
  * @category guards
  */
 export function isObject(input: unknown): input is object {
-  return isRecordOrArray(input) || isFunction(input)
+	return isRecordOrArray(input) || isFunction(input)
 }

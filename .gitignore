@@ -57,3 +57,10 @@ Icon
 
 # Thumbnails
 ._*
+
+# Deno specific
+**/cov/
+html_cov/
+cov.lcov
+coverage/
+docs/

@@ -1,0 +1,15 @@
+[default]
+check-filename = false
+
+[default.extend-identifiers]
+# variable name used by node-semver
+_fpr = "_fpr"
+
+[default.extend-words]
+ws = "ws"
+
+[files]
+extend-exclude = [
+  "*.json",
+  "*.test.ts",
+]
