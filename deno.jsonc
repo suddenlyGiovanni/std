@@ -39,11 +39,13 @@
 	},
 	"exclude": [
 		".git",
-		"crypto/_wasm/target",
+		".idea",
+		"biome.jsonc",
 		"cov",
-		"jsonc/testdata",
-		"front_matter/testdata",
 		"coverage",
-		"docs"
+		"crypto/_wasm/target",
+		"docs",
+		"front_matter/testdata",
+		"jsonc/testdata"
 	]
 }
