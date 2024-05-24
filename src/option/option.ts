@@ -22,24 +22,43 @@ export abstract class Option<A> {
 		return new Some(value)
 	}
 
-  /**
-   * Tests if a value is a `Option`.
-   *
-   * @param input - The value to check.
-   *
-   * @example
+	/**
+	 * Tests if a value is a `Option`.
+	 *
+	 * @param input - The value to check.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  '@suddenly-giovanni/std/option'
+	 * import { assertStrictEquals } from '@std/assert'
+	 *
+	 * assertStrictEquals(Option.isOption(Option.Some(1)), true)
+	 * assertStrictEquals(Option.isOption(Option.None()), true)
+	 * assertStrictEquals(Option.isOption({}), false)
+	 * ```
+	 * @category guards
+	 */
+	static isOption(input: unknown): input is Option<unknown> {
+		return (input instanceof None || input instanceof Some)
+	}
+
+	/**
+	 * Determine if a `Option` is a `None`.
+	 *
+	 * @param self - The `Option` to check.
+	 *
+	 * @example
    * ```ts
    * import { Option } from  '@suddenly-giovanni/std/option'
    * import { assertStrictEquals } from '@std/assert'
-   *
-   * assertStrictEquals(Option.isOption(Option.Some(1)), true)
-   * assertStrictEquals(Option.isOption(Option.None()), true)
-   * assertStrictEquals(Option.isOption({}), false)
-   * ```
-   * @category guards
-   */
-  static isOption(input: unknown): input is Option<unknown> {
-		return (input instanceof None || input instanceof Some)
+	 *
+	 * assertStrictEquals(Option.isNone(Option.Some(1)), false)
+	 * assertStrictEquals(Option.isNone(Option.None()), true)
+	 *```
+	 * @category guards
+	 */
+	static isNone<T>(self: Option<T>): self is None<T> {
+		return  self instanceof None || self._tag === 'None'
 	}
 }
 
@@ -51,11 +70,12 @@ class Some<out A> implements Option<A> {
 	readonly #value: A
 	readonly _tag = 'Some' as const
 
+
 	get value(): A {
 		return this.#value
 	}
 
-	constructor(value: A) {
+	 constructor(value: A) {
 		this.#value = value
 	}
 }

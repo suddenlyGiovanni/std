@@ -23,5 +23,10 @@ describe('Option', () => {
       assertStrictEquals(Option.isOption(Option.None()), true)
       assertStrictEquals(Option.isOption({}), false)
     })
+
+    it("isNone", () => {
+      assertStrictEquals(Option.isNone(Option.None()), true)
+      assertStrictEquals(Option.isNone(Option.Some(1)), false)
+    })
   })
 })
