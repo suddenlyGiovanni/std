@@ -27,3 +27,27 @@ export function isRecordOrArray(input: unknown): boolean {
 export function isFunction(input: unknown): input is Function {
 	return typeof input === 'function'
 }
+
+
+/**
+ * Tests if a value is an `object`.
+ *
+ * @param input - The value to test.
+ *
+ * @example
+ * ```ts
+ * import { isObject } from '@suddenly-giovanni/std/predicate'
+ * import { assertEquals } from '@std/ assert'
+ *
+ *
+ * assertEquals(isObject({}), true)
+ * assertEquals(isObject([]), true)
+ *
+ * assertEquals(isObject(null), false)
+ * assertEquals(isObject(undefined), false)
+ *```
+ * @category guards
+ */
+export function isObject(input: unknown): input is object {
+  return isRecordOrArray(input) || isFunction(input)
+}

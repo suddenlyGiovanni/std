@@ -1,7 +1,7 @@
 import { describe, it } from '@std/testing/bdd'
-import { assertEquals } from '@std/assert'
+import { assertEquals, assertStrictEquals } from '@std/assert'
 
-import { isFunction, isRecordOrArray } from './predicate.ts'
+import { isFunction, isObject, isRecordOrArray } from './predicate.ts'
 
 describe('isRecordOrArray', () => {
 	it('should return true when input is an object', () => {
@@ -36,5 +36,23 @@ describe('isFunction', () => {
 		assertEquals(isFunction([1, 'string']), false)
 		assertEquals(isFunction(1), false)
 		assertEquals(isFunction('function'), false)
+	})
+})
+
+describe('isObject', () => {
+	it('should return true when input is an object', () => {
+		assertStrictEquals(isObject({}), true)
+		assertStrictEquals(isObject([]), true)
+		assertStrictEquals(isObject(() => 1), true)
+	})
+
+	it('should return false when input is not an object', () => {
+		assertStrictEquals(isObject(null), false)
+		assertStrictEquals(isObject(undefined), false)
+		assertStrictEquals(isObject('a'), false)
+		assertStrictEquals(isObject(1), false)
+		assertStrictEquals(isObject(true), false)
+		assertStrictEquals(isObject(1n), false)
+		assertStrictEquals(isObject(Symbol.for('a')), false)
 	})
 })
