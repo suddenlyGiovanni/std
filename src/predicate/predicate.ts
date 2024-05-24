@@ -23,11 +23,11 @@ export function isRecordOrArray(input: unknown): boolean {
  * assertEquals(isFunction('function'), false)
  *```
  * @category guards
+ *
  */
 export function isFunction(input: unknown): input is Function {
 	return typeof input === 'function'
 }
-
 
 /**
  * Tests if a value is an `object`.
@@ -49,5 +49,5 @@ export function isFunction(input: unknown): input is Function {
  * @category guards
  */
 export function isObject(input: unknown): input is object {
-  return isRecordOrArray(input) || isFunction(input)
+	return isRecordOrArray(input) || isFunction(input)
 }
