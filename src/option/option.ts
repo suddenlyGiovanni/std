@@ -56,7 +56,7 @@ export abstract class Option<A> implements Inspectable {
 	 *
 	 * @category constructors
 	 */
-	static None<T = never>(): Option<T> {
+	static None<T = never>(): None<T> | Some<T> {
 		return new None()
 	}
 
@@ -67,7 +67,7 @@ export abstract class Option<A> implements Inspectable {
 	 *
 	 * @category constructors
 	 */
-	static Some<T>(value: T): Option<T> {
+	static Some<T>(value: T): None<T> | Some<T> {
 		return new Some(value)
 	}
 
