@@ -8,15 +8,11 @@ function format(x: unknown): string {
 /**
  * FIXME: exported symbol is missing JSDoc documentation
  */
-export abstract class Option<A> implements Inspectable, Equals {
+export abstract class Option<out A> implements Inspectable, Equals {
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
 	public abstract readonly _tag: 'None' | 'Some'
-	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
-	 */
-	public abstract readonly value?: A
 
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
@@ -28,21 +24,7 @@ export abstract class Option<A> implements Inspectable, Equals {
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
-	public toJSON() {
-		switch (this._tag) {
-			case 'Some':
-				return {
-					_id: 'Option',
-					_tag: this._tag,
-					value: this.value,
-				}
-			case 'None':
-				return {
-					_id: 'Option',
-					_tag: this._tag,
-				}
-		}
-	}
+	public abstract toJSON(): unknown
 
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
@@ -152,20 +134,34 @@ export abstract class Option<A> implements Inspectable, Equals {
 
 class None<out A> extends Option<A> {
 	public readonly _tag = 'None' as const
-	public readonly value?: never
+
+	public toJSON() {
+		return {
+			_id: 'Option',
+			_tag: this._tag,
+		}
+	}
 }
 
 class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
 
+	readonly #value: A
+
 	public get value(): A {
 		return this.#value
 	}
 
-	readonly #value: A
-
 	public constructor(value: A) {
 		super()
 		this.#value = value
+	}
+
+	public toJSON() {
+		return {
+			_id: 'Option',
+			_tag: this._tag,
+			value: this.value,
+		}
 	}
 }
