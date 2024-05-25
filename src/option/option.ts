@@ -12,14 +12,23 @@ export abstract class Option<A> implements Inspectable, Equals {
 	/**
 	 *  FIXME: exported symbol is missing JSDoc documentation
 	 */
-	equals<This, That>(this: Some<This> | None<This>, that: That): boolean {
+	equals<That>(
+		this: Some<A> | None<A>,
+		that: That,
+		predicateStrategy: (self: A, that: That) => boolean = Object.is,
+	): boolean {
 		switch (this._tag) {
 			case 'Some':
-				return Option.isOption(that) && Option.isSome(that) && this.value === that.value
+				return (
+					Option.isOption(that) &&
+					Option.isSome(that) &&
+					predicateStrategy(this.value, that.value as That)
+				)
 			case 'None':
 				return Option.isOption(that) && Option.isNone(that)
 		}
 	}
+
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */

@@ -1,4 +1,4 @@
-import { assertStrictEquals } from '@std/assert'
+import { assertStrictEquals, equal } from '@std/assert'
 import { describe, it } from '@std/testing/bdd'
 import { Option } from './option.ts'
 
@@ -62,11 +62,47 @@ describe('Option', () => {
 		})
 	})
 
-	it('Equal', () => {
-		assertStrictEquals(Option.Some(1).equals(Option.Some(1)), true)
-		assertStrictEquals(Option.Some([]).equals(Option.Some([])), false)
-		assertStrictEquals(Option.Some([1, 2, 3]).equals(Option.Some([1, 2, 3])), false)
-		assertStrictEquals(Option.Some(1).equals(Option.Some(2)), false)
-		assertStrictEquals(Option.None().equals(Option.None()), true)
+	describe('Equal', () => {
+		it('None ', () => {
+			assertStrictEquals(Option.None().equals(Option.None()), true)
+			assertStrictEquals(Option.None().equals(Option.Some('a')), false)
+		})
+
+		it('Some', () => {
+			assertStrictEquals(Option.Some('a').equals(Option.None()), false)
+			assertStrictEquals(Option.Some(1).equals(Option.Some(2)), false)
+			assertStrictEquals(Option.Some(1).equals(Option.Some(1)), true)
+
+			assertStrictEquals(Option.Some([]).equals(Option.Some([])), false)
+			assertStrictEquals(Option.Some([]).equals(Option.Some([])), false)
+
+			const arr = [1, 2, 3]
+			assertStrictEquals(Option.Some(arr).equals(Option.Some(arr)), true)
+			assertStrictEquals(Option.Some(arr).equals(Option.Some([1, 2, 3])), false)
+		})
+
+		it('should use the custom comparison predicate strategy', () => {
+			assertStrictEquals(Option.Some([]).equals(Option.Some([]), equal), true)
+			assertStrictEquals(Option.Some([1, 2, 3]).equals(Option.Some([1, 2, 3]), equal), true)
+			assertStrictEquals(
+				Option.Some({
+					foo: {
+						bar: {
+							baz: 1,
+						},
+					},
+				}).equals(
+					Option.Some({
+						foo: {
+							bar: {
+								baz: 1,
+							},
+						},
+					}),
+					equal,
+				),
+				true,
+			)
+		})
 	})
 })
