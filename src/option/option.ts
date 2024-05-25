@@ -10,43 +10,25 @@ function format(x: unknown): string {
  */
 export abstract class Option<A> implements Inspectable, Equals {
 	/**
-	 *  FIXME: exported symbol is missing JSDoc documentation
+	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
-	equals<That>(
-		this: Some<A> | None<A>,
-		that: That,
-		predicateStrategy: (self: A, that: That) => boolean = Object.is,
-	): boolean {
-		switch (this._tag) {
-			case 'Some':
-				return (
-					Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.value, that.value as That)
-				)
-			case 'None':
-				return Option.isOption(that) && Option.isNone(that)
-		}
-	}
+	public abstract readonly _tag: 'None' | 'Some'
+	/**
+	 * FIXME: exported symbol is missing JSDoc documentation
+	 */
+	public abstract readonly value?: A
 
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
-	get [Symbol.toStringTag](): string {
+	public get [Symbol.toStringTag](): string {
 		return `${this.constructor.name}.${this._tag}`
 	}
 
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
-	toString(): string {
-		return format(this.toJSON())
-	}
-
-	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
-	 */
-	toJSON() {
+	public toJSON() {
 		switch (this._tag) {
 			case 'Some':
 				return {
@@ -65,19 +47,16 @@ export abstract class Option<A> implements Inspectable, Equals {
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
-	abstract readonly _tag: 'None' | 'Some'
-
-	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
-	 */
-	abstract readonly value?: A
+	public toString(): string {
+		return format(this.toJSON())
+	}
 
 	/**
 	 * Creates a new `Option` that represents the absence of a value.
 	 *
 	 * @category constructors
 	 */
-	static None<T = never>(): None<T> | Some<T> {
+	public static None<T = never>(): None<T> | Some<T> {
 		return new None()
 	}
 
@@ -88,7 +67,7 @@ export abstract class Option<A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	static Some<T>(value: T): None<T> | Some<T> {
+	public static Some<T>(value: T): None<T> | Some<T> {
 		return new Some(value)
 	}
 
@@ -107,7 +86,7 @@ export abstract class Option<A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	static isNone<T>(self: Option<T>): self is None<T> {
+	public static isNone<T>(self: Option<T>): self is None<T> {
 		return self instanceof None || self._tag === 'None'
 	}
 
@@ -127,7 +106,7 @@ export abstract class Option<A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	static isOption(input: unknown): input is Option<unknown> {
+	public static isOption(input: unknown): input is Option<unknown> {
 		return input instanceof None || input instanceof Some
 	}
 
@@ -146,26 +125,47 @@ export abstract class Option<A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	static isSome<T>(self: Option<T>): self is Some<T> {
+	public static isSome<T>(self: Option<T>): self is Some<T> {
 		return self instanceof Some || self._tag === 'Some'
+	}
+
+	/**
+	 *  FIXME: exported symbol is missing JSDoc documentation
+	 */
+	public equals<That>(
+		this: Some<A> | None<A>,
+		that: That,
+		predicateStrategy: (self: A, that: That) => boolean = Object.is,
+	): boolean {
+		switch (this._tag) {
+			case 'Some':
+				return (
+					Option.isOption(that) &&
+					Option.isSome(that) &&
+					predicateStrategy(this.value, that.value as That)
+				)
+			case 'None':
+				return Option.isOption(that) && Option.isNone(that)
+		}
 	}
 }
 
 class None<out A> extends Option<A> {
-	readonly _tag = 'None' as const
-	value?: never
+	public readonly _tag = 'None' as const
+	public readonly value?: never
 }
 
 class Some<out A> extends Option<A> {
-	readonly _tag = 'Some' as const
-	readonly #value: A
+	public readonly _tag = 'Some' as const
 
-	constructor(value: A) {
-		super()
-		this.#value = value
+	public get value(): A {
+		return this.#value
 	}
 
-	get value(): A {
-		return this.#value
+	readonly #value: A
+
+	public constructor(value: A) {
+		super()
+		this.#value = value
 	}
 }
