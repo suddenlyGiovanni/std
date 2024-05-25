@@ -1,5 +1,5 @@
-import { describe, it } from '@std/testing/bdd'
 import { assertStrictEquals } from '@std/assert'
+import { describe, it } from '@std/testing/bdd'
 import { Option } from './option.ts'
 
 describe('Option', () => {
@@ -36,8 +36,29 @@ describe('Option', () => {
 
 	describe('serialize', () => {
 		it('toStringTag', () => {
-			assertStrictEquals(String(Option.Some(1)), '[object Some]')
-			assertStrictEquals(String(Option.None()), '[object None]')
+			assertStrictEquals(
+				String(Option.Some(1)),
+				JSON.stringify(
+					{
+						_id: 'Option',
+						_tag: 'Some',
+						value: 1,
+					},
+					null,
+					2,
+				),
+			)
+			assertStrictEquals(
+				String(Option.None()),
+				JSON.stringify(
+					{
+						_id: 'Option',
+						_tag: 'None',
+					},
+					null,
+					2,
+				),
+			)
 		})
 	})
 })
