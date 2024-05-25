@@ -1,3 +1,4 @@
+import type { Equals } from '../internal/equals.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
 
 function format(x: unknown): string {
@@ -7,7 +8,18 @@ function format(x: unknown): string {
 /**
  * FIXME: exported symbol is missing JSDoc documentation
  */
-export abstract class Option<A> implements Inspectable {
+export abstract class Option<A> implements Inspectable, Equals {
+	/**
+	 *  FIXME: exported symbol is missing JSDoc documentation
+	 */
+	equals<This, That>(this: Some<This> | None<This>, that: That): boolean {
+		switch (this._tag) {
+			case 'Some':
+				return Option.isOption(that) && Option.isSome(that) && this.value === that.value
+			case 'None':
+				return Option.isOption(that) && Option.isNone(that)
+		}
+	}
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */

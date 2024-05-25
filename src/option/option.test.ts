@@ -61,4 +61,12 @@ describe('Option', () => {
 			)
 		})
 	})
+
+	it('Equal', () => {
+		assertStrictEquals(Option.Some(1).equals(Option.Some(1)), true)
+		assertStrictEquals(Option.Some([]).equals(Option.Some([])), false)
+		assertStrictEquals(Option.Some([1, 2, 3]).equals(Option.Some([1, 2, 3])), false)
+		assertStrictEquals(Option.Some(1).equals(Option.Some(2)), false)
+		assertStrictEquals(Option.None().equals(Option.None()), true)
+	})
 })
