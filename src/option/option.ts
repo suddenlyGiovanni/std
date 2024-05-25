@@ -38,8 +38,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static None<T = never>(): None<T> | Some<T> {
-		return new None()
+	public static None<T = never>(): None | Some<T> {
+		return None.getInstance()
 	}
 
 	/**
@@ -49,7 +49,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static Some<T>(value: T): None<T> | Some<T> {
+	public static Some<T>(value: T): None | Some<T> {
 		return new Some(value)
 	}
 
@@ -68,7 +68,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	public static isNone<T>(self: Option<T>): self is None<T> {
+	public static isNone<T>(self: Option<T>): self is None {
 		return self instanceof None || self._tag === 'None'
 	}
 
@@ -115,7 +115,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *  FIXME: exported symbol is missing JSDoc documentation
 	 */
 	public equals<That>(
-		this: Some<A> | None<A>,
+		this: Some<A> | None,
 		that: That,
 		predicateStrategy: (self: A, that: That) => boolean = Object.is,
 	): boolean {
@@ -132,8 +132,22 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 }
 
-class None<out A> extends Option<A> {
+/** Case class representing the absence of a value. */
+class None extends Option<never> {
 	public readonly _tag = 'None' as const
+	static #instance: undefined | None = undefined
+
+	private constructor() {
+		super()
+		Object.freeze(this)
+	}
+
+	public static getInstance(): None {
+		if (!None.#instance) {
+			None.#instance = new None()
+		}
+		return None.#instance
+	}
 
 	public toJSON() {
 		return {
@@ -143,6 +157,7 @@ class None<out A> extends Option<A> {
 	}
 }
 
+/** Case class representing the presence of a value. */
 class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
 
@@ -155,6 +170,7 @@ class Some<out A> extends Option<A> {
 	public constructor(value: A) {
 		super()
 		this.#value = value
+		Object.freeze(this)
 	}
 
 	public toJSON() {
