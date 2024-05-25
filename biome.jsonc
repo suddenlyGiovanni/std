@@ -26,6 +26,11 @@
 			"all": true,
 			"complexity": {
 				"noBannedTypes": "warn"
+			},
+			"performance": {
+				"noBarrelFile": {
+					"level": "off"
+				}
 			}
 		}
 	},
