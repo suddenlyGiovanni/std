@@ -38,7 +38,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static None<T = never>(): None | Some<T> {
+	public static None<T = never>(): None<T> | Some<T> {
 		return None.getInstance()
 	}
 
@@ -49,7 +49,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static Some<T>(value: T): None | Some<T> {
+	public static Some<T>(value: T): None<T> | Some<T> {
 		return new Some(value)
 	}
 
@@ -68,7 +68,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	public static isNone<T>(self: Option<T>): self is None {
+	public static isNone<T>(self: Option<T>): self is None<T> {
 		return self instanceof None || self._tag === 'None'
 	}
 
@@ -115,7 +115,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *  FIXME: exported symbol is missing JSDoc documentation
 	 */
 	public equals<That>(
-		this: Some<A> | None,
+		this: Some<A> | None<A>,
 		that: That,
 		predicateStrategy: (self: A, that: That) => boolean = Object.is,
 	): boolean {
@@ -133,20 +133,20 @@ export abstract class Option<out A> implements Inspectable, Equals {
 }
 
 /** Case class representing the absence of a value. */
-class None extends Option<never> {
+class None<A> extends Option<A> {
 	public readonly _tag = 'None' as const
-	static #instance: undefined | None = undefined
+	static #instance: undefined | None<unknown> = undefined
 
 	private constructor() {
 		super()
 		Object.freeze(this)
 	}
 
-	public static getInstance(): None {
+	public static getInstance<A>(): None<A> {
 		if (!None.#instance) {
 			None.#instance = new None()
 		}
-		return None.#instance
+		return None.#instance as None<A>
 	}
 
 	public toJSON() {
