@@ -14,6 +14,16 @@ describe('Option', () => {
 			const none = Option.None()
 			assertStrictEquals(none._tag, 'None')
 		})
+
+		it('fromNullable', () => {
+			assertStrictEquals(Option.fromNullable(2).equals(Option.Some(2)), true)
+			assertStrictEquals(Option.fromNullable(0).equals(Option.Some(0)), true)
+			assertStrictEquals(Option.fromNullable('').equals(Option.Some('')), true)
+			assertStrictEquals(Option.fromNullable([]).equals(Option.Some([]), equal), true)
+
+			assertStrictEquals(Option.isNone(Option.fromNullable(null)), true)
+			assertStrictEquals(Option.fromNullable(undefined)._tag, 'None')
+		})
 	})
 
 	describe('guards', () => {

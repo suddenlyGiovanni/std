@@ -54,6 +54,22 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
+	 * Constructs a new `Option` from a nullable type. If the value is `null` or
+	 * `undefined`, returns `None`, otherwise returns the value wrapped in a `Some`
+	 *
+	 * @category Constructors
+	 * @example
+	 *   assert.deepStrictEqual(Option.fromNullable(undefined), Option.None())
+	 *   assert.deepStrictEqual(Option.fromNullable(null), Option.None())
+	 *   assert.deepStrictEqual(Option.fromNullable(1), Option.Some(1))
+	 *
+	 * @param value - An nullable value
+	 */
+	public static fromNullable<T>(value: undefined | null | T): None<T> | Some<NonNullable<T>> {
+		return value === undefined || value === null ? None.getInstance() : new Some(value)
+	}
+
+	/**
 	 * Determine if a `Option` is a `None`.
 	 *
 	 * @param self - The `Option` to check.
@@ -133,20 +149,14 @@ export abstract class Option<out A> implements Inspectable, Equals {
 }
 
 /** Case class representing the absence of a value. */
-class None<A> extends Option<A> {
-	public readonly _tag = 'None' as const
+export class None<A> extends Option<A> {
 	static #instance: undefined | None<unknown> = undefined
+
+	public readonly _tag = 'None' as const
 
 	private constructor() {
 		super()
 		Object.freeze(this)
-	}
-
-	public static getInstance<A>(): None<A> {
-		if (!None.#instance) {
-			None.#instance = new None()
-		}
-		return None.#instance as None<A>
 	}
 
 	public toJSON() {
@@ -155,12 +165,18 @@ class None<A> extends Option<A> {
 			_tag: this._tag,
 		}
 	}
+
+	public static getInstance<A>(): None<A> {
+		if (!None.#instance) {
+			None.#instance = new None()
+		}
+		return None.#instance as None<A>
+	}
 }
 
 /** Case class representing the presence of a value. */
-class Some<out A> extends Option<A> {
+export class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
-
 	readonly #value: A
 
 	public get value(): A {
