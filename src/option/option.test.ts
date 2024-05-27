@@ -1,9 +1,16 @@
-import { assertStrictEquals, equal } from '@std/assert'
+import { assertStrictEquals, assertThrows, equal } from '@std/assert'
 import { describe, it } from '@std/testing/bdd'
 import { Option } from './option.ts'
 
 describe('Option', () => {
 	describe('constructors', () => {
+		it('Option should not be directly constructed ', () => {
+			assertThrows(() => {
+				// @ts-expect-error - TSC does not allow instantiation of abstract classes, but what about runtime?
+				new Option()
+			})
+		})
+
 		it('Some', () => {
 			const some = Option.Some(1)
 			assertStrictEquals(some._tag, 'Some')

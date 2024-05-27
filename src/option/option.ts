@@ -6,13 +6,22 @@ function format(x: unknown): string {
 }
 
 /**
- * FIXME: exported symbol is missing JSDoc documentation
+ * Represents optional values. Instances of `Option` are either an instance of {@linkcode Some} or the  {@linkcode None},  where  Some holds a value, and None is empty.
+ *
+ * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`.
+ * A less-idiomatic way to use Option values is via pattern matching method `match`:
  */
 export abstract class Option<out A> implements Inspectable, Equals {
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
 	public abstract readonly _tag: 'None' | 'Some'
+
+	protected constructor() {
+		if (new.target === Option) {
+			throw new Error('Option is not meant to be instantiated directly')
+		}
+	}
 
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
