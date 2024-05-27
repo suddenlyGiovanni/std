@@ -1,10 +1,10 @@
-import { assertStrictEquals, assertThrows, equal } from '@std/assert'
+import { assert, assertStrictEquals, assertThrows, equal } from '@std/assert'
 import { describe, it, test } from '@std/testing/bdd'
 import { Option } from './option.ts'
 
 describe('Option', () => {
 	describe('constructors', () => {
-		it('Option should not be directly constructed ', () => {
+		it('should throw an error when trying to construct Option directly  ', () => {
 			assertThrows(() => {
 				// @ts-expect-error - TSC does not allow instantiation of abstract classes, but what about runtime?
 				new Option()
@@ -17,9 +17,17 @@ describe('Option', () => {
 			assertStrictEquals(some.value, 1)
 		})
 
-		it('None', () => {
-			const none = Option.None()
-			assertStrictEquals(none._tag, 'None')
+		describe('None', () => {
+			it('constructor', () => {
+				const none = Option.None()
+				assertStrictEquals(none._tag, 'None')
+			})
+
+			it('None is a singleton ', () => {
+				const none = Option.None()
+				assert(Option.None() === none)
+				assert(Object.is(Option.None(), Option.None()))
+			})
 		})
 
 		it('fromNullable', () => {
@@ -29,7 +37,7 @@ describe('Option', () => {
 			assertStrictEquals(Option.fromNullable([]).equals(Option.Some([]), equal), true)
 
 			assertStrictEquals(Option.isNone(Option.fromNullable(null)), true)
-			assertStrictEquals(Option.fromNullable(undefined)._tag, 'None')
+			assertStrictEquals(Option.fromNullable(undefined).isNone(), true)
 		})
 	})
 
@@ -47,8 +55,8 @@ describe('Option', () => {
 			})
 
 			test('on Option instances: Some and None ', () => {
-				assertStrictEquals(Option.None().isNone(), true)
-				assertStrictEquals(Option.Some('foo').isNone(), false)
+				assertStrictEquals(Option.fromNullable(42).isNone(), false)
+				assertStrictEquals(Option.fromNullable(undefined).isNone(), true)
 			})
 		})
 
@@ -59,8 +67,8 @@ describe('Option', () => {
 			})
 
 			test('on Option instances: Some and None ', () => {
+				assertStrictEquals(Option.fromNullable(null).isSome(), false)
 				assertStrictEquals(Option.fromNullable(0).isSome(), true)
-				assertStrictEquals(Option.None().isSome(), false)
 			})
 		})
 	})

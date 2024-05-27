@@ -11,7 +11,7 @@ function format(x: unknown): string {
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`.
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
  */
-export abstract class Option<out A> implements Inspectable, Equals {
+export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	/**
 	 * FIXME: exported symbol is missing JSDoc documentation
 	 */
@@ -47,7 +47,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static None<T = never>(): None<T> | Some<T> {
+	public static None(): None | Some<never> {
 		return None.getInstance()
 	}
 
@@ -58,7 +58,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static Some<T>(value: T): None<T> | Some<T> {
+	public static Some<T>(value: T): None | Some<T> {
 		return new Some(value)
 	}
 
@@ -74,7 +74,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @param value - An nullable value
 	 */
-	public static fromNullable<T>(value: undefined | null | T): None<T> | Some<NonNullable<T>> {
+	public static fromNullable<T>(value: T): None | Some<NonNullable<T>> {
 		return value === undefined || value === null ? None.getInstance() : new Some(value)
 	}
 
@@ -93,12 +93,12 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	public static isNone<T>(self: Option<T>): self is None<T> {
-		return self instanceof None || self._tag === 'None'
+	public static isNone<T>(self: None | Some<T>): self is None {
+		return self instanceof None
 	}
 
 	/**
-	 * Tests if a value is a `Option`.
+	 * Tests if a value is a `Option`; it does not check if the value is a `Some` or a `None`.
 	 *
 	 * @param input - The value to check.
 	 *
@@ -113,7 +113,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	public static isOption(input: unknown): input is Option<unknown> {
+	public static isOption(input: unknown): input is None | Some<unknown> {
 		return input instanceof None || input instanceof Some
 	}
 
@@ -132,35 +132,30 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * ```
 	 * @category guards
 	 */
-	public static isSome<T>(self: Option<T>): self is Some<T> {
-		return self instanceof Some || self._tag === 'Some'
+	public static isSome<T>(self: None | Some<T>): self is Some<T> {
+		return self instanceof Some
 	}
 
 	/**
 	 *  FIXME: exported symbol is missing JSDoc documentation
 	 */
 	public equals<That>(
-		this: Some<A> | None<A>,
+		this: Some<A> | None,
 		that: That,
 		predicateStrategy: (self: A, that: That) => boolean = Object.is,
 	): boolean {
-		switch (this._tag) {
-			case 'Some':
-				return (
-					Option.isOption(that) &&
+		return this.isSome()
+			? Option.isOption(that) &&
 					Option.isSome(that) &&
 					predicateStrategy(this.value, that.value as That)
-				)
-			case 'None':
-				return Option.isOption(that) && Option.isNone(that)
-		}
+			: Option.isOption(that) && Option.isNone(that)
 	}
 
 	/**
 	 * Determine if an `Option` instance is a `None`.
 	 * @category guards
 	 */
-	public isNone(this: None<A> | Some<A>): this is None<A> {
+	public isNone(this: None | Some<A>): this is None {
 		return Option.isNone(this)
 	}
 
@@ -168,21 +163,16 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * Determine if an `Option` instance  is a `Some`.
 	 * @category guards
 	 */
-	public isSome(this: None<A> | Some<A>): this is Some<A> {
+	public isSome(this: None | Some<A>): this is Some<A> {
 		return Option.isSome(this)
 	}
 }
 
 /** Case class representing the absence of a value. */
-export class None<A> extends Option<A> {
-	static #instance: undefined | None<unknown> = undefined
+class None extends Option {
+	static #instance: undefined | None = undefined
 
 	public readonly _tag = 'None' as const
-
-	private constructor() {
-		super()
-		Object.freeze(this)
-	}
 
 	public toJSON() {
 		return {
@@ -191,28 +181,22 @@ export class None<A> extends Option<A> {
 		}
 	}
 
-	public static getInstance<A>(): None<A> {
+	private constructor() {
+		super()
+		Object.freeze(this)
+	}
+
+	public static getInstance(): None {
 		if (!None.#instance) {
 			None.#instance = new None()
 		}
-		return None.#instance as None<A>
+		return None.#instance
 	}
 }
 
 /** Case class representing the presence of a value. */
-export class Some<out A> extends Option<A> {
+class Some<out A> extends Option {
 	public readonly _tag = 'Some' as const
-	readonly #value: A
-
-	public get value(): A {
-		return this.#value
-	}
-
-	public constructor(value: A) {
-		super()
-		this.#value = value
-		Object.freeze(this)
-	}
 
 	public toJSON() {
 		return {
@@ -220,5 +204,17 @@ export class Some<out A> extends Option<A> {
 			_tag: this._tag,
 			value: this.value,
 		}
+	}
+
+	readonly #value: A
+
+	public constructor(value: A) {
+		super()
+		this.#value = value
+		Object.freeze(this)
+	}
+
+	public get value(): A {
+		return this.#value
 	}
 }
