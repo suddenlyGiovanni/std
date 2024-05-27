@@ -202,6 +202,44 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 		return self instanceof Some
 	}
 
+	/**
+	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
+	 *
+	 * @param that - the value to compare
+	 * @param predicateStrategy - an optional predicate strategy to use when comparing the values. Defaults to `Object.is`.
+	 * @returns `true` if the two values are equal, `false` otherwise.
+	 * @remarks
+	 * In its unary form, it uses referential equality (employing the Object.is algorithm). This behavior can be overridden by providing a custom predicate strategy as second argument.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals, equal } from '@std/assert'
+	 *
+	 * const some1 = Option.Some(1)
+	 * const none = Option.None()
+	 *
+	 * // equality on primitive types
+	 * assertStrictEquals(some1.equals(some1), true)
+	 * assertStrictEquals(some1.equals(none), false)
+	 * assertStrictEquals(none.equals(none), true)
+	 *
+	 * // equality derive types
+	 * assertStrictEquals(some1.equals(Option.Some(1)), true)
+	 * const someRecord = Option.Some({ foo: 'bar' })
+	 * assertStrictEquals(someRecord.equals(someRecord), true)
+	 * assertStrictEquals(someRecord.equals(Option.Some({ foo: 'bar' })), false)
+	 *
+	 * // equality with custom predicate strategy
+	 * assertStrictEquals(
+	 * 	someRecord.equals(
+	 * 		Option.Some({ foo: 'bar' }),
+	 * 		equal, // a custom deep equality strategy
+	 * 	),
+	 * 	true,
+	 * )
+	 * ```
+	 */
 	public equals<That>(
 		this: Option.Type<A>,
 		that: That,
