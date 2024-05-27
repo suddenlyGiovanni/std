@@ -6,6 +6,28 @@ function format(x: unknown): string {
 }
 
 /**
+ * The type-level namespace for Option
+ * @namespace Option
+ * @since 0.0.1
+ */
+export declare namespace Option {
+	/**
+	 * Option is the sum type of {@linkcode None} and {@linkcode Some}.
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 *
+	 * // ts-check
+	 * const some: Option.Type<number> = Option.Some(1)
+	 * const none: Option.Type<number> = Option.None()
+	 * ```
+	 *
+	 * @category type-level
+	 */
+	export type Type<A> = None | Some<A>
+}
+
+/**
  * Represents optional values. Instances of `Option` are either an instance of {@linkcode Some} or the  {@linkcode None},  where  Some holds a value, and None is empty.
  *
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
@@ -33,11 +55,18 @@ function format(x: unknown): string {
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
  */
 export abstract class Option<out A = unknown> implements Inspectable, Equals {
-	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
-	 */
 	public abstract readonly _tag: 'None' | 'Some'
 
+	/**
+	 * Option is an abstract class and should not be instantiated directly.
+	 * @throws Error - Option is not meant to be instantiated directly.
+	 *
+	 * @see Option.None - to create an empty Option
+	 * @see Option.Some - to create an Option with a value
+	 * @see Option.fromNullable - to create an Option from a nullable value
+	 *
+	 * @hideconstructor
+	 */
 	protected constructor() {
 		if (new.target === Option) {
 			throw new Error('Option is not meant to be instantiated directly')
@@ -45,7 +74,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	}
 
 	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
+	 * Overloads default {@linkcode Object#[Symbol#toStringTag]} getter allowing Option to return a custom string
 	 */
 	public get [Symbol.toStringTag](): string {
 		return `${this.constructor.name}.${this._tag}`
@@ -53,8 +82,9 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 
 	/**
 	 * Overloads default serialization behavior when using JSON stringify method
+	 * @override
 	 */
-	public toJSON(this: Some<A> | None): {
+	public toJSON(this: Option.Type<A>): {
 		_id: 'Option'
 		_tag: 'None' | 'Some'
 		value?: A
@@ -67,9 +97,10 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	}
 
 	/**
-	 * Overloads default {@linkcode Object.prototype.toString} method allowing Option to return a custom string representation of the boxed value
+	 * Overloads default {@linkcode Object#prototype#toString} method allowing Option to return a custom string representation of the boxed value
+	 * @override
 	 */
-	public toString(this: Some<A> | None): string {
+	public toString(this: Option.Type<A>): string {
 		return format(this.toJSON())
 	}
 
@@ -78,7 +109,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static None(): None | Some<never> {
+	public static None(): Option.Type<never> {
 		return None.getSingletonInstance()
 	}
 
@@ -86,26 +117,30 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * Creates a new `Option` that wraps the given value.
 	 *
 	 * @param value - The value to wrap.
-	 *
-	 * @category constructors
+	 * @returns An instance of {@linkcode Some(1)} containing the value.
 	 */
-	public static Some<T>(value: T): None | Some<T> {
+	public static Some<T>(value: T): Option.Type<T> {
 		return new Some(value)
 	}
 
 	/**
-	 * Constructs a new `Option` from a nullable type. If the value is `null` or
-	 * `undefined`, returns `None`, otherwise returns the value wrapped in a `Some`
+	 * Constructs a new `Option` from a nullable type.
+	 * @param value - An nullable value
+	 * @returns An `Option` that is {@linkcode class None} if the value is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the value.
+	 *
+	 * @example
+	 * ```ts
+	 *  import { assertStrictEquals  } from '@std/assert'
+	 *  import { Option } from  './option.ts'
+	 *
+	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None())
+	 *  assertStrictEquals(Option.fromNullable(null), Option.None())
+	 *  assertStrictEquals(Option.fromNullable(1), Option.Some(1))
+	 * ```
 	 *
 	 * @category Constructors
-	 * @example
-	 *   assert.deepStrictEqual(Option.fromNullable(undefined), Option.None())
-	 *   assert.deepStrictEqual(Option.fromNullable(null), Option.None())
-	 *   assert.deepStrictEqual(Option.fromNullable(1), Option.Some(1))
-	 *
-	 * @param value - An nullable value
 	 */
-	public static fromNullable<T>(value: T): None | Some<NonNullable<T>> {
+	public static fromNullable<T>(value: T): Option.Type<NonNullable<T>> {
 		return value === undefined || value === null ? None.getSingletonInstance() : new Some(value)
 	}
 
@@ -116,15 +151,15 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals } from '@std/assert'
+	 * import { Option } from  './option.ts'
 	 *
 	 * assertStrictEquals(Option.isNone(Option.Some(1)), false)
 	 * assertStrictEquals(Option.isNone(Option.None()), true)
 	 * ```
-	 * @category guards
+	 * @category type-guards
 	 */
-	public static isNone<T>(self: None | Some<T>): self is None {
+	public static isNone<T>(self: Option.Type<T>): self is None {
 		return self instanceof None
 	}
 
@@ -142,9 +177,9 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * assertStrictEquals(Option.isOption(Option.None()), true)
 	 * assertStrictEquals(Option.isOption({}), false)
 	 * ```
-	 * @category guards
+	 * @category type-guards
 	 */
-	public static isOption(input: unknown): input is None | Some<unknown> {
+	public static isOption(input: unknown): input is Option.Type<unknown> {
 		return input instanceof None || input instanceof Some
 	}
 
@@ -161,58 +196,62 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * assertStrictEquals(Option.isSome(Option.Some(1)), true)
 	 * assertStrictEquals(Option.isSome(Option.None()), false)
 	 * ```
-	 * @category guards
+	 * @category type-guards
 	 */
-	public static isSome<T>(self: None | Some<T>): self is Some<T> {
+	public static isSome<T>(self: Option.Type<T>): self is Some<T> {
 		return self instanceof Some
 	}
 
-	/**
-	 *  FIXME: exported symbol is missing JSDoc documentation
-	 */
 	public equals<That>(
-		this: Some<A> | None,
+		this: Option.Type<A>,
 		that: That,
 		predicateStrategy: (self: A, that: That) => boolean = Object.is,
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.value, that.value as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.value, that.value as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
 	/**
-	 * Determine if an `Option` instance is a `None`.
+	 * Type guard that checks if the `Option` instance is a {@linkcode None}.
+	 * @returns `true` if the `Option` instance is a {@linkcode None}, `false` otherwise.
 	 *
-	 * @category guards
+	 * @category type-guards
 	 */
-	public isNone(this: None | Some<A>): this is None {
+	public isNone(this: Option.Type<A>): this is None {
 		return Option.isNone(this)
 	}
 
 	/**
 	 * Determine if an `Option` instance  is a `Some`.
 	 *
-	 * @category guards
+	 * @category type-guards
 	 */
-	public isSome(this: None | Some<A>): this is Some<A> {
+	public isSome(this: Option.Type<A>): this is Some<A> {
 		return Option.isSome(this)
 	}
 }
 
-/** Case class representing the absence of a value. */
+/**
+ * Case class representing the absence of a value.
+ * @class None
+ * @extends Option
+ */
 class None extends Option {
 	static #instance: undefined | None = undefined
 
 	public readonly _tag = 'None' as const
 
 	/**
-	 * Do not call this constructor directly. Instead, use `None.getInstance()`.
-	 * Why? We don't need multiple instances of `None` in memory, and we can save memory by using a singleton pattern.
+	 * Creates a new immutable `None` instance.
 	 *
-	 * @see None.getSingletonInstance
-	 * @private
+	 * @returns An instance of `None`
+	 * @remaks
+	 * We don't need multiple instances of `None` in memory, therefore we can save memory by using a singleton pattern.
+	 * Do not call this constructor directly. Instead, use {@linkcode None#getSingletonInstance}.
+	 * @hideconstructor
 	 */
 	private constructor() {
 		super()
@@ -221,6 +260,9 @@ class None extends Option {
 
 	/**
 	 * Returns the singleton instance of `None`.
+	 *
+	 * @returns The singleton instance of `None`.
+	 * @internal - use instead {@linkcode Option#None}
 	 *
 	 * @category constructors
 	 */
@@ -232,12 +274,24 @@ class None extends Option {
 	}
 }
 
-/** Case class representing the presence of a value. */
+/**
+ * Case class representing the presence of a value.
+ * @class Some
+ * @extends Option
+ */
 class Some<out A> extends Option {
 	public readonly _tag = 'Some' as const
 
 	readonly #value: A
 
+	/**
+	 * Creates a new `Some` immutable instance that wraps the given value.
+	 *
+	 * @param value - The `value` to wrap.
+	 * @returns An instance of `Some`
+	 * @remarks Do not call this constructor directly. Instead, use the static  {@linkcode Option#Some}
+	 * @hideconstructor
+	 */
 	public constructor(value: A) {
 		super()
 		this.#value = value
