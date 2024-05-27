@@ -49,28 +49,6 @@ function format(x: unknown): string {
 }
 
 /**
- * The type-level namespace for Option
- * @namespace Option
- * @since 0.0.1
- */
-export declare namespace Option {
-	/**
-	 * Option is the sum type of {@linkcode None} and {@linkcode Some}.
-	 * @example
-	 * ```ts
-	 * import { Option } from  './option.ts'
-	 *
-	 * // ts-check
-	 * const some: Option.Type<number> = Option.Some(1)
-	 * const none: Option.Type<number> = Option.None()
-	 * ```
-	 *
-	 * @category type-level
-	 */
-	export type Type<A> = None | Some<A>
-}
-
-/**
  * Represents optional values. Instances of `Option` are either an instance of {@linkcode Some} or the  {@linkcode None},  where  Some holds a value, and None is empty.
  *
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
@@ -319,9 +297,32 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 }
 
 /**
+ * The type-level namespace for Option
+ * @namespace Option
+ * @since 0.0.1
+ */
+export declare namespace Option {
+	/**
+	 * Option is the sum type of {@linkcode None} and {@linkcode Some}.
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 *
+	 * // ts-check
+	 * const some: Option.Type<number> = Option.Some(1)
+	 * const none: Option.Type<number> = Option.None()
+	 * ```
+	 *
+	 * @category type-level
+	 */
+	export type Type<A> = None | Some<A>
+}
+
+/**
  * Case class representing the absence of a value.
  * @class None
  * @extends Option
+ * @public
  */
 class None extends Option {
 	static #instance: undefined | None = undefined
@@ -362,6 +363,7 @@ class None extends Option {
  * Case class representing the presence of a value.
  * @class Some
  * @extends Option
+ * @public
  */
 class Some<out A> extends Option {
 	public readonly _tag = 'Some' as const
