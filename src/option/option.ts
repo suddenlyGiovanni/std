@@ -55,6 +55,9 @@ export declare namespace Option {
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
  */
 export abstract class Option<out A = unknown> implements Inspectable, Equals {
+	/**
+	 * The discriminant property that identifies the type of the `Option` instance.
+	 */
 	public abstract readonly _tag: 'None' | 'Some'
 
 	/**
