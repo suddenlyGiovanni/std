@@ -1,3 +1,46 @@
+/**
+ * # Option Module
+ * The Option Module is inspired by the Scala 3 Option type. This module primarily solves one of the common problems in programming - avoiding null and undefined values.
+ *
+ * The Option type is a container that encapsulates an optional value, i.e., it stores some value or none. It's a safer alternative to using null or undefined. By using Option, you can avoid null reference errors. The main advantage of using an `Option` type is that you're explicitly dealing with something that may or may not be there.
+ *
+ * ## How it works
+ * This module exports a base abstract class `Option` and two concrete subclasses `Some` and `None`. An `Option` object encapsulates a value that may or may not be present. A `Some` object represents an `Option` that contains a value, and `None` represents an `Option` that has no value.
+ *
+ * ## How to use it
+ * When you have a value that you want to lift into a boxed `Option`, you create an object of type `Some`, as follows:
+ *
+ * ```ts
+ * import { Option } from './option.ts'
+ *
+ * const value = Option.Some("Hello, world!");
+ * ```
+ *
+ * If there isn't a value to lift, you create a `None` object, as follows:
+ *
+ * ```ts
+ * import { Option } from './option.ts'
+ *
+ * const value = Option.None();
+ * ```
+ *
+ * To check the contents of an `Option`, use the `isSome` and `isNone` methods and extract the value when it is `Some`:
+ *
+ * ```ts
+ * import { Option } from './option.ts'
+ *
+ * const value = Option.None();
+ *
+ * if (value.isSome()) {
+ *   console.log(value.value);
+ * } else {
+ *   console.log("Value is None");
+ * }
+ * ```
+ *
+ * @module
+ */
+
 import type { Equals } from '../internal/equals.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
 
@@ -32,7 +75,7 @@ export declare namespace Option {
  *
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
  * These are useful methods that exist for both Some and None:
- * - [ ] `isDefined` : True if not empty
+ * -[ ] `isDefined` : True if not empty
  * -[ ] `isEmpty` : True if empty
  * -[ ] `nonEmpty`: True if not empty
  * -[ ] `orElse`: Evaluate and return alternate optional value if empty
@@ -50,8 +93,8 @@ export declare namespace Option {
  * -[ ] `contains`: Checks if value equals optional value, or false if empty
  * -[ ] `zip`: Combine two optional values to make a paired optional value
  * -[ ] `unzip`: Split an optional pair to two optional values
- *  -[ ] `unzip3`: Split an optional triple to three optional values
- *  -[ ] `toList`: Unary list of optional value, otherwise the empty list
+ * -[ ] `unzip3`: Split an optional triple to three optional values
+ * -[ ] `toList`: Unary list of optional value, otherwise the empty list
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
  */
 export abstract class Option<out A = unknown> implements Inspectable, Equals {
@@ -250,8 +293,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.value, that.value as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.value, that.value as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
