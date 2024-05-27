@@ -155,6 +155,22 @@ export abstract class Option<out A> implements Inspectable, Equals {
 				return Option.isOption(that) && Option.isNone(that)
 		}
 	}
+
+	/**
+	 * Determine if an `Option` instance is a `None`.
+	 * @category guards
+	 */
+	public isNone(this: None<A> | Some<A>): this is None<A> {
+		return Option.isNone(this)
+	}
+
+	/**
+	 * Determine if an `Option` instance  is a `Some`.
+	 * @category guards
+	 */
+	public isSome(this: None<A> | Some<A>): this is Some<A> {
+		return Option.isSome(this)
+	}
 }
 
 /** Case class representing the absence of a value. */

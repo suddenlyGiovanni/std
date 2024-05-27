@@ -1,5 +1,5 @@
 import { assertStrictEquals, assertThrows, equal } from '@std/assert'
-import { describe, it } from '@std/testing/bdd'
+import { describe, it, test } from '@std/testing/bdd'
 import { Option } from './option.ts'
 
 describe('Option', () => {
@@ -40,14 +40,28 @@ describe('Option', () => {
 			assertStrictEquals(Option.isOption({}), false)
 		})
 
-		it('isNone', () => {
-			assertStrictEquals(Option.isNone(Option.None()), true)
-			assertStrictEquals(Option.isNone(Option.Some(1)), false)
+		describe('isNone', () => {
+			test('on Option static method ', () => {
+				assertStrictEquals(Option.isNone(Option.None()), true)
+				assertStrictEquals(Option.isNone(Option.Some(1)), false)
+			})
+
+			test('on Option instances: Some and None ', () => {
+				assertStrictEquals(Option.None().isNone(), true)
+				assertStrictEquals(Option.Some('foo').isNone(), false)
+			})
 		})
 
-		it('isSome', () => {
-			assertStrictEquals(Option.isSome(Option.None()), false)
-			assertStrictEquals(Option.isSome(Option.Some(1)), true)
+		describe('isSome', () => {
+			test('on Option static method ', () => {
+				assertStrictEquals(Option.isSome(Option.None()), false)
+				assertStrictEquals(Option.isSome(Option.Some(1)), true)
+			})
+
+			test('on Option instances: Some and None ', () => {
+				assertStrictEquals(Option.fromNullable(0).isSome(), true)
+				assertStrictEquals(Option.None().isSome(), false)
+			})
 		})
 	})
 
