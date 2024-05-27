@@ -52,14 +52,24 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	}
 
 	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
+	 * Overloads default serialization behavior when using JSON stringify method
 	 */
-	public abstract toJSON(): unknown
+	public toJSON(this: Some<A> | None): {
+		_id: 'Option'
+		_tag: 'None' | 'Some'
+		value?: A
+	} {
+		return {
+			_id: 'Option',
+			_tag: this._tag,
+			...(this.isSome() ? { value: this.value } : {}),
+		}
+	}
 
 	/**
-	 * FIXME: exported symbol is missing JSDoc documentation
+	 * Overloads default {@linkcode Object.prototype.toString} method allowing Option to return a custom string representation of the boxed value
 	 */
-	public toString(): string {
+	public toString(this: Some<A> | None): string {
 		return format(this.toJSON())
 	}
 
@@ -69,7 +79,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * @category constructors
 	 */
 	public static None(): None | Some<never> {
-		return None.getInstance()
+		return None.getSingletonInstance()
 	}
 
 	/**
@@ -96,7 +106,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * @param value - An nullable value
 	 */
 	public static fromNullable<T>(value: T): None | Some<NonNullable<T>> {
-		return value === undefined || value === null ? None.getInstance() : new Some(value)
+		return value === undefined || value === null ? None.getSingletonInstance() : new Some(value)
 	}
 
 	/**
@@ -174,6 +184,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 
 	/**
 	 * Determine if an `Option` instance is a `None`.
+	 *
 	 * @category guards
 	 */
 	public isNone(this: None | Some<A>): this is None {
@@ -182,6 +193,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 
 	/**
 	 * Determine if an `Option` instance  is a `Some`.
+	 *
 	 * @category guards
 	 */
 	public isSome(this: None | Some<A>): this is Some<A> {
@@ -195,19 +207,24 @@ class None extends Option {
 
 	public readonly _tag = 'None' as const
 
-	public toJSON() {
-		return {
-			_id: 'Option',
-			_tag: this._tag,
-		}
-	}
-
+	/**
+	 * Do not call this constructor directly. Instead, use `None.getInstance()`.
+	 * Why? We don't need multiple instances of `None` in memory, and we can save memory by using a singleton pattern.
+	 *
+	 * @see None.getSingletonInstance
+	 * @private
+	 */
 	private constructor() {
 		super()
 		Object.freeze(this)
 	}
 
-	public static getInstance(): None {
+	/**
+	 * Returns the singleton instance of `None`.
+	 *
+	 * @category constructors
+	 */
+	public static getSingletonInstance(): None {
 		if (!None.#instance) {
 			None.#instance = new None()
 		}
@@ -218,14 +235,6 @@ class None extends Option {
 /** Case class representing the presence of a value. */
 class Some<out A> extends Option {
 	public readonly _tag = 'Some' as const
-
-	public toJSON() {
-		return {
-			_id: 'Option',
-			_tag: this._tag,
-			value: this.value,
-		}
-	}
 
 	readonly #value: A
 
