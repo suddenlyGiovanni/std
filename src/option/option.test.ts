@@ -1,4 +1,4 @@
-import { assert, assertStrictEquals, assertThrows, equal } from '@std/assert'
+import { assert, assertEquals, assertStrictEquals, assertThrows, equal } from '@std/assert'
 import { describe, it, test } from '@std/testing/bdd'
 import { Option } from './option.ts'
 
@@ -142,6 +142,33 @@ describe('Option', () => {
 				),
 				true,
 			)
+		})
+	})
+
+	describe('Inspectable', () => {
+		const some = Option.Some(1)
+		const none = Option.None()
+		it('toStringTag', () => {
+			assertStrictEquals(some[Symbol.toStringTag], 'Option.Some')
+			assertStrictEquals(none[Symbol.toStringTag], 'Option.None')
+		})
+
+		it('toJSON', () => {
+			assertEquals(some.toJSON(), {
+				_id: 'Option',
+				_tag: 'Some',
+				value: 1,
+			})
+
+			assertEquals(none.toJSON(), {
+				_id: 'Option',
+				_tag: 'None',
+			})
+		})
+
+		it('toString', () => {
+			assertStrictEquals(some.toString(), JSON.stringify(some.toJSON(), null, 2))
+			assertStrictEquals(none.toString(), JSON.stringify(none.toJSON(), null, 2))
 		})
 	})
 })

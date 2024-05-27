@@ -123,7 +123,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * Overloads default {@linkcode Object#[Symbol#toStringTag]} getter allowing Option to return a custom string
 	 */
 	public get [Symbol.toStringTag](): string {
-		return `${this.constructor.name}.${this._tag}`
+		return `Option.${this._tag}`
 	}
 
 	/**
