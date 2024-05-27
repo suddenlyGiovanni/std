@@ -11,6 +11,8 @@ export interface Inspectable {
 	 *
 	 * Object.prototype.toString.call(new BoxedV1()); // '[object Object]'
 	 *
+	 * import { type  Inspectable } from './inspectable.ts'
+	 *
 	 * class BoxedV2 implements Inspectable {
 	 *  toString(): string {
 	 *    throw new Error('Method not implemented.')
@@ -53,6 +55,8 @@ export interface Inspectable {
 	 *
 	 * console.log(dogV1.toString()) // '[object Object]'
 	 * console.log(String(dogV1)) // '[object Object]'
+	 *
+	 * import { type  Inspectable } from './inspectable.ts'
 	 *
 	 * class DogV2 implements Inspectable {
 	 *  constructor(

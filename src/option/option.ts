@@ -8,7 +8,28 @@ function format(x: unknown): string {
 /**
  * Represents optional values. Instances of `Option` are either an instance of {@linkcode Some} or the  {@linkcode None},  where  Some holds a value, and None is empty.
  *
- * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`.
+ * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
+ * These are useful methods that exist for both Some and None:
+ * - [ ] `isDefined` : True if not empty
+ * -[ ] `isEmpty` : True if empty
+ * -[ ] `nonEmpty`: True if not empty
+ * -[ ] `orElse`: Evaluate and return alternate optional value if empty
+ * -[ ] `getOrElse`: Evaluate and return alternate value if empty
+ * -[ ] `get`: Return value, throw exception if empty
+ * -[ ] `fold`: Apply function on optional value, return default if empty
+ * -[ ] `map`: Apply a function on the optional value
+ * -[ ] `flatMap`: Same as map but function must return an optional value
+ * -[ ] `foreach`: Apply a procedure on option value
+ * -[ ] `collect`: Apply partial pattern match on optional value
+ * -[ ] `filter`: An optional value satisfies predicate
+ * -[ ] `filterNot`: An optional value doesn't satisfy predicate
+ * -[ ] `exists`: Apply predicate on optional value, or false if empty
+ * -[ ] `forall`: Apply predicate on optional value, or true if empty
+ * -[ ] `contains`: Checks if value equals optional value, or false if empty
+ * -[ ] `zip`: Combine two optional values to make a paired optional value
+ * -[ ] `unzip`: Split an optional pair to two optional values
+ *  -[ ] `unzip3`: Split an optional triple to three optional values
+ *  -[ ] `toList`: Unary list of optional value, otherwise the empty list
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
  */
 export abstract class Option<out A = unknown> implements Inspectable, Equals {
@@ -85,7 +106,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 * import { Option } from  '@suddenly-giovanni/std/option'
+	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals } from '@std/assert'
 	 *
 	 * assertStrictEquals(Option.isNone(Option.Some(1)), false)
@@ -104,7 +125,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 * import { Option } from  '@suddenly-giovanni/std/option'
+	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals } from '@std/assert'
 	 *
 	 * assertStrictEquals(Option.isOption(Option.Some(1)), true)
@@ -124,7 +145,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 * import { Option } from  '@suddenly-giovanni/std/option'
+	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals } from '@std/assert'
 	 *
 	 * assertStrictEquals(Option.isSome(Option.Some(1)), true)
@@ -146,8 +167,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.value, that.value as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.value, that.value as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 

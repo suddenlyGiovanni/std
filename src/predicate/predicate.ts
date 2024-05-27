@@ -16,7 +16,7 @@ export function isRecordOrArray(input: unknown): boolean {
  *
  * @example
  * ```ts
- * import { isFunction } from '@suddenly-giovanni/std/predicate'
+ * import { isFunction } from './predicate.ts'
  * import { assertEquals } from '@std/assert'
  *
  * assertEquals(isFunction(isFunction), true)
@@ -36,8 +36,8 @@ export function isFunction(input: unknown): input is Function {
  *
  * @example
  * ```ts
- * import { isObject } from '@suddenly-giovanni/std/predicate'
- * import { assertEquals } from '@std/ assert'
+ * import { isObject } from './predicate.ts'
+ * import { assertEquals } from '@std/assert'
  *
  * assertEquals(isObject({}), true)
  * assertEquals(isObject([]), true)
