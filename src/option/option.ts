@@ -1,4 +1,5 @@
 import type { Equals } from '../internal/equals.ts'
+import type * as F from '../internal/function.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
 
 function format(x: unknown): string {
@@ -249,6 +250,19 @@ export abstract class Option<out A> implements Inspectable, Equals {
 					Option.isSome(that) &&
 					predicateStrategy(this.value, that.value as That)
 			: Option.isOption(that) && Option.isNone(that)
+	}
+
+	/**
+	 * Returns the result of applying f to this Option's value if the Option is
+	 * nonempty. Otherwise, evaluates expression ifEmpty.
+	 *
+	 * @param ifEmpty - The expression to evaluate if empty.
+	 * @param f - The function to apply if nonempty.
+	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 * @category scala3-api
+	 */
+	public fold<B>(this: Option.Type<A>, ifEmpty: () => B, f: (a: A) => B): B {
+		return this.isEmpty() ? ifEmpty() : f(this.get())
 	}
 
 	/**
