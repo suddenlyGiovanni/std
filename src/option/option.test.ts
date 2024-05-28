@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertStrictEquals, assertThrows, equal } from 'jsr:@std/assert'
+import { expect } from '@std/expect'
 import { describe, it, test } from 'jsr:@std/testing/bdd'
 import { Option } from './option.ts'
 
@@ -72,8 +73,8 @@ describe('Option', () => {
 		})
 
 		test('isEmpty', () => {
-			assertStrictEquals(Option.None().isEmpty(), true)
-			assertStrictEquals(Option.Some('foo').isEmpty(), false)
+			expect(Option.None().isEmpty()).toBe(true)
+			expect(Option.Some('foo').isEmpty()).toBe(false)
 		})
 
 		describe('isSome', () => {
