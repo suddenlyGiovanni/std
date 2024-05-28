@@ -78,6 +78,17 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	}
 
 	/**
+	 * Type guard that returns `true` if the option is None, `false` otherwise.
+	 *
+	 * @returns `true` if the option is None, `false` otherwise.
+	 * @alias isNone
+	 * @category type-guards, scala3-api
+	 */
+	isEmpty(this: Option.Type<A>): this is None {
+		return this.isNone()
+	}
+
+	/**
 	 * Overloads default {@linkcode Object#prototype#toString} method allowing Option to return a custom string representation of the boxed value
 	 * @override
 	 */
@@ -243,8 +254,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.value, that.value as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.value, that.value as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 

@@ -71,6 +71,11 @@ describe('Option', () => {
 			})
 		})
 
+		test('isEmpty', () => {
+			assertStrictEquals(Option.None().isEmpty(), true)
+			assertStrictEquals(Option.Some('foo').isEmpty(), false)
+		})
+
 		describe('isSome', () => {
 			test('on Option static method ', () => {
 				assertStrictEquals(Option.isSome(Option.None()), false)
