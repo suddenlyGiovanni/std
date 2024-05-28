@@ -192,7 +192,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * @remarks
 	 * In its unary form, it uses referential equality (employing the Object.is algorithm). This behavior can be overridden by providing a custom predicate strategy as second argument.
 	 *
-	 * @example
+	 * @example Using the default referential equality strategy on primitive types:
 	 * ```ts
 	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
@@ -204,16 +204,31 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * assertStrictEquals(some1.equals(some1), true)
 	 * assertStrictEquals(some1.equals(none), false)
 	 * assertStrictEquals(none.equals(none), true)
+	 * ```
+	 *
+	 * @example Using the default referential equality strategy on non-primitive types:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals, equal } from '@std/assert'
+	 *
+	 * const some1 = Option.Some(1)
+	 * const none = Option.None()
 	 *
 	 * // equality derive types
 	 * assertStrictEquals(some1.equals(Option.Some(1)), true)
 	 * const someRecord = Option.Some({ foo: 'bar' })
 	 * assertStrictEquals(someRecord.equals(someRecord), true)
 	 * assertStrictEquals(someRecord.equals(Option.Some({ foo: 'bar' })), false)
+	 * ```
+	 *
+	 * @example Using a custom predicate strategy:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals, equal } from '@std/assert'
 	 *
 	 * // equality with custom predicate strategy
 	 * assertStrictEquals(
-	 * 	someRecord.equals(
+	 * 	Option.Some({ foo: 'bar' }).equals(
 	 * 		Option.Some({ foo: 'bar' }),
 	 * 		equal, // a custom deep equality strategy
 	 * 	),
