@@ -248,7 +248,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 		return this.isSome()
 			? Option.isOption(that) &&
 					Option.isSome(that) &&
-					predicateStrategy(this.value, that.value as That)
+					predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -382,10 +382,6 @@ class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
 
 	readonly #value: A
-
-	public get value(): A {
-		return this.#value
-	}
 
 	/**
 	 * Creates a new `Some` immutable instance that wraps the given value.

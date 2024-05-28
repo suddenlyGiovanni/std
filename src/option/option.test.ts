@@ -15,7 +15,7 @@ describe('Option', () => {
 		it('Some', () => {
 			const some = Option.Some(1)
 			assertStrictEquals(some._tag, 'Some')
-			assertStrictEquals(some.value, 1)
+			assertStrictEquals(some.get(), 1)
 		})
 
 		describe('None', () => {
