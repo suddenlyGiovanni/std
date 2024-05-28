@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JsonSchemaMappingsProjectConfiguration">
+    <state>
+      <map>
+        <entry key="Biome">
+          <value>
+            <SchemaInfo>
+              <option name="generatedName" value="New Schema" />
+              <option name="name" value="Biome" />
+              <option name="relativePathToSchema" value="https://biomejs.dev/schemas/1.7.3/schema.json" />
+              <option name="schemaVersion" value="JSON Schema version 7" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="biome.json" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="biome.jsonc" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="Deno Config (deno.json)">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="Deno Config (deno.json)" />
+              <option name="relativePathToSchema" value="https://raw.githubusercontent.com/denoland/deno/main/cli/schemas/config-file.v1.json" />
+              <option name="applicationDefined" value="true" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="deno.jsonc" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+      </map>
+    </state>
+  </component>
+</project>

@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Deno: test" type="DenoConfigurationType" inputPath="$PROJECT_DIR$" programParameters="test">
+    <option name="applicationArguments" value="--watch" />
+    <method v="2" />
+  </configuration>
+</component>
