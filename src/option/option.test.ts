@@ -1,74 +1,74 @@
-import { assert, assertEquals, assertStrictEquals, assertThrows, equal } from 'jsr:@std/assert'
+import { equal } from 'jsr:@std/assert'
 import { expect } from '@std/expect'
-import { describe, it, test } from 'jsr:@std/testing/bdd'
+import { describe, test } from 'jsr:@std/testing/bdd'
 import { Option } from './option.ts'
 
 describe('Option', () => {
 	describe('constructors', () => {
-		it('should throw an error when trying to construct Option directly  ', () => {
-			assertThrows(() => {
+		test('should throw an error when trying to construct Option directly  ', () => {
+			expect(() => {
 				// @ts-expect-error - TSC does not allow instantiation of abstract classes, but what about runtime?
 				new Option()
-			})
+			}).toThrow('Option is not meant to be instantiated directly')
 		})
 
-		it('Some', () => {
+		test('Some', () => {
 			const some = Option.Some(1)
-			assertStrictEquals(some._tag, 'Some')
-			assertStrictEquals(some.get(), 1)
+			expect(some._tag).toBe('Some')
+			expect(some.get()).toBe(1)
 		})
 
 		describe('None', () => {
-			it('constructor', () => {
+			test('constructor', () => {
 				const none = Option.None()
-				assertStrictEquals(none._tag, 'None')
+				expect(none._tag).toBe('None')
 			})
 
-			it('None is a singleton ', () => {
+			test('None is a singleton ', () => {
 				const none = Option.None()
-				assert(Option.None() === none)
-				assert(Object.is(Option.None(), Option.None()))
+				expect(Option.None()).toStrictEqual(none)
+				expect(Object.is(Option.None(), Option.None())).toBe(true)
 			})
 		})
 
-		it('fromNullable', () => {
-			assertStrictEquals(Option.fromNullable(2).equals(Option.Some(2)), true)
-			assertStrictEquals(Option.fromNullable(0).equals(Option.Some(0)), true)
-			assertStrictEquals(Option.fromNullable('').equals(Option.Some('')), true)
-			assertStrictEquals(Option.fromNullable([]).equals(Option.Some([]), equal), true)
+		test('fromNullable', () => {
+			expect(Option.fromNullable(2).equals(Option.Some(2))).toBe(true)
+			expect(Option.fromNullable(0).equals(Option.Some(0))).toBe(true)
+			expect(Option.fromNullable('').equals(Option.Some(''))).toBe(true)
+			expect(Option.fromNullable([]).equals(Option.Some([]), equal)).toBe(true)
 
-			assertStrictEquals(Option.isNone(Option.fromNullable(null)), true)
-			assertStrictEquals(Option.fromNullable(undefined).isNone(), true)
+			expect(Option.isNone(Option.fromNullable(null))).toBe(true)
+			expect(Option.fromNullable(undefined).isNone()).toBe(true)
 		})
 	})
 
 	describe('get', () => {
-		it('Some', () => {
-			assertStrictEquals(Option.Some(1).get(), 1)
-			assertEquals(Option.Some({ foo: 'bar' }).get(), { foo: 'bar' })
+		test('Some', () => {
+			expect(Option.Some(1).get()).toBe(1)
+			expect(Option.Some({ foo: 'bar' }).get()).toEqual({ foo: 'bar' })
 		})
 
-		it('None', () => {
-			assertThrows(() => Option.None().get())
+		test('None', () => {
+			expect(() => Option.None().get()).toThrow('None.get')
 		})
 	})
 
 	describe('guards', () => {
-		it('isOption', () => {
-			assertStrictEquals(Option.isOption(Option.Some(1)), true)
-			assertStrictEquals(Option.isOption(Option.None()), true)
-			assertStrictEquals(Option.isOption({}), false)
+		test('isOption', () => {
+			expect(Option.isOption(Option.Some(1))).toBe(true)
+			expect(Option.isOption(Option.None())).toBe(true)
+			expect(Option.isOption({})).toBe(false)
 		})
 
 		describe('isNone', () => {
 			test('on Option static method ', () => {
-				assertStrictEquals(Option.isNone(Option.None()), true)
-				assertStrictEquals(Option.isNone(Option.Some(1)), false)
+				expect(Option.isNone(Option.None())).toBe(true)
+				expect(Option.isNone(Option.Some(1))).toBe(false)
 			})
 
 			test('on Option instances: Some and None ', () => {
-				assertStrictEquals(Option.fromNullable(42).isNone(), false)
-				assertStrictEquals(Option.fromNullable(undefined).isNone(), true)
+				expect(Option.fromNullable(42).isNone()).toBe(false)
+				expect(Option.fromNullable(undefined).isNone()).toBe(true)
 			})
 		})
 
@@ -79,21 +79,20 @@ describe('Option', () => {
 
 		describe('isSome', () => {
 			test('on Option static method ', () => {
-				assertStrictEquals(Option.isSome(Option.None()), false)
-				assertStrictEquals(Option.isSome(Option.Some(1)), true)
+				expect(Option.isSome(Option.None())).toBe(false)
+				expect(Option.isSome(Option.Some(1))).toEqual(true)
 			})
 
 			test('on Option instances: Some and None ', () => {
-				assertStrictEquals(Option.fromNullable(null).isSome(), false)
-				assertStrictEquals(Option.fromNullable(0).isSome(), true)
+				expect(Option.fromNullable(null).isSome()).toBe(false)
+				expect(Option.fromNullable(0).isSome()).toBe(true)
 			})
 		})
 	})
 
 	describe('serialize', () => {
-		it('toStringTag', () => {
-			assertStrictEquals(
-				String(Option.Some(1)),
+		test('toStringTag', () => {
+			expect(String(Option.Some(1))).toBe(
 				JSON.stringify(
 					{
 						_id: 'Option',
@@ -104,8 +103,7 @@ describe('Option', () => {
 					2,
 				),
 			)
-			assertStrictEquals(
-				String(Option.None()),
+			expect(String(Option.None())).toBe(
 				JSON.stringify(
 					{
 						_id: 'Option',
@@ -119,28 +117,28 @@ describe('Option', () => {
 	})
 
 	describe('Equal', () => {
-		it('None ', () => {
-			assertStrictEquals(Option.None().equals(Option.None()), true)
-			assertStrictEquals(Option.None().equals(Option.Some('a')), false)
+		test('None ', () => {
+			expect(Option.None().equals(Option.None())).toBe(true)
+			expect(Option.None().equals(Option.Some('a'))).toBe(false)
 		})
 
-		it('Some', () => {
-			assertStrictEquals(Option.Some('a').equals(Option.None()), false)
-			assertStrictEquals(Option.Some(1).equals(Option.Some(2)), false)
-			assertStrictEquals(Option.Some(1).equals(Option.Some(1)), true)
+		test('Some', () => {
+			expect(Option.Some('a').equals(Option.None())).toBe(false)
+			expect(Option.Some(1).equals(Option.Some(2))).toBe(false)
+			expect(Option.Some(1).equals(Option.Some(1))).toBe(true)
 
-			assertStrictEquals(Option.Some([]).equals(Option.Some([])), false)
-			assertStrictEquals(Option.Some([]).equals(Option.Some([])), false)
+			expect(Option.Some([]).equals(Option.Some([]))).toBe(false)
+			expect(Option.Some([]).equals(Option.Some([]))).toBe(false)
 
 			const arr = [1, 2, 3]
-			assertStrictEquals(Option.Some(arr).equals(Option.Some(arr)), true)
-			assertStrictEquals(Option.Some(arr).equals(Option.Some([1, 2, 3])), false)
+			expect(Option.Some(arr).equals(Option.Some(arr))).toBe(true)
+			expect(Option.Some(arr).equals(Option.Some([1, 2, 3]))).toBe(false)
 		})
 
-		it('should use the custom comparison predicate strategy', () => {
-			assertStrictEquals(Option.Some([]).equals(Option.Some([]), equal), true)
-			assertStrictEquals(Option.Some([1, 2, 3]).equals(Option.Some([1, 2, 3]), equal), true)
-			assertStrictEquals(
+		test('should use the custom comparison predicate strategy', () => {
+			expect(Option.Some([]).equals(Option.Some([]), equal)).toBe(true)
+			expect(Option.Some([1, 2, 3]).equals(Option.Some([1, 2, 3]), equal)).toBe(true)
+			expect(
 				Option.Some({
 					foo: {
 						bar: {
@@ -157,35 +155,35 @@ describe('Option', () => {
 					}),
 					equal,
 				),
-				true,
-			)
+			).toBe(true)
 		})
 	})
 
 	describe('Inspectable', () => {
 		const some = Option.Some(1)
 		const none = Option.None()
-		it('toStringTag', () => {
-			assertStrictEquals(some[Symbol.toStringTag], 'Option.Some')
-			assertStrictEquals(none[Symbol.toStringTag], 'Option.None')
+
+		test('toStringTag', () => {
+			expect(some[Symbol.toStringTag]).toBe('Option.Some')
+			expect(none[Symbol.toStringTag]).toBe('Option.None')
 		})
 
-		it('toJSON', () => {
-			assertEquals(some.toJSON(), {
+		test('toJSON', () => {
+			expect(some.toJSON()).toEqual({
 				_id: 'Option',
 				_tag: 'Some',
 				value: 1,
 			})
 
-			assertEquals(none.toJSON(), {
+			expect(none.toJSON()).toEqual({
 				_id: 'Option',
 				_tag: 'None',
 			})
 		})
 
-		it('toString', () => {
-			assertStrictEquals(some.toString(), JSON.stringify(some.toJSON(), null, 2))
-			assertStrictEquals(none.toString(), JSON.stringify(none.toJSON(), null, 2))
+		test('toString', () => {
+			expect(some.toString()).toBe(JSON.stringify(some.toJSON(), null, 2))
+			expect(none.toString()).toBe(JSON.stringify(none.toJSON(), null, 2))
 		})
 	})
 })
