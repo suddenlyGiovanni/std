@@ -203,7 +203,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * @remarks
 	 * In its unary form, it uses referential equality (employing the Object.is algorithm). This behavior can be overridden by providing a custom predicate strategy as second argument.
 	 *
-	 * @example Using the default referential equality strategy on primitive types:
+	 * @example
+	 * Using the default referential equality strategy on primitive types:
 	 * ```ts
 	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
@@ -217,7 +218,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * assertStrictEquals(none.equals(none), true)
 	 * ```
 	 *
-	 * @example Using the default referential equality strategy on non-primitive types:
+	 * @example
+	 * Using the default referential equality strategy on non-primitive types:
 	 * ```ts
 	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals, equal } from '@std/assert'
@@ -232,7 +234,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * assertStrictEquals(someRecord.equals(Option.Some({ foo: 'bar' })), false)
 	 * ```
 	 *
-	 * @example Using a custom predicate strategy:
+	 * @example
+	 * Using a custom predicate strategy:
 	 * ```ts
 	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals, equal } from '@std/assert'
