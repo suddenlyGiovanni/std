@@ -73,7 +73,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 		return {
 			_id: 'Option',
 			_tag: this._tag,
-			...(this.isSome() ? { value: this.value } : {}),
+			...(this.isSome() ? { value: this.get() } : {}),
 		}
 	}
 
@@ -249,6 +249,13 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	}
 
 	/**
+	 * Returns the option's value.
+	 * @throws Error - if the option is empty
+	 * @remarks The option must be nonempty.
+	 */
+	public abstract get(): A
+
+	/**
 	 * Type guard that checks if the `Option` instance is a {@linkcode None}.
 	 * @returns `true` if the `Option` instance is a {@linkcode None}, `false` otherwise.
 	 *
@@ -298,8 +305,14 @@ export declare namespace Option {
  */
 class None extends Option {
 	static #instance: undefined | None = undefined
-
 	public readonly _tag = 'None' as const
+
+	/**
+	 * @inheritDoc
+	 */
+	public get(): never {
+		throw new Error('None.get')
+	}
 
 	/**
 	 * Creates a new immutable `None` instance.
@@ -342,6 +355,10 @@ class Some<out A> extends Option {
 
 	readonly #value: A
 
+	public get value(): A {
+		return this.#value
+	}
+
 	/**
 	 * Creates a new `Some` immutable instance that wraps the given value.
 	 *
@@ -356,7 +373,10 @@ class Some<out A> extends Option {
 		Object.freeze(this)
 	}
 
-	public get value(): A {
+	/**
+	 * @inheritDoc
+	 */
+	public get(): A {
 		return this.#value
 	}
 }

@@ -41,6 +41,17 @@ describe('Option', () => {
 		})
 	})
 
+	describe('get', () => {
+		it('Some', () => {
+			assertStrictEquals(Option.Some(1).get(), 1)
+			assertEquals(Option.Some({ foo: 'bar' }).get(), { foo: 'bar' })
+		})
+
+		it('None', () => {
+			assertThrows(() => Option.None().get())
+		})
+	})
+
 	describe('guards', () => {
 		it('isOption', () => {
 			assertStrictEquals(Option.isOption(Option.Some(1)), true)
