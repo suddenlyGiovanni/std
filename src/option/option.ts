@@ -32,7 +32,7 @@ function format(x: unknown): string {
  * -[ ] `toList`: Unary list of optional value, otherwise the empty list
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
  */
-export abstract class Option<out A = unknown> implements Inspectable, Equals {
+export abstract class Option<out A> implements Inspectable, Equals {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -75,17 +75,6 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 			_tag: this._tag,
 			...(this.isSome() ? { value: this.get() } : {}),
 		}
-	}
-
-	/**
-	 * Type guard that returns `true` if the option is None, `false` otherwise.
-	 *
-	 * @returns `true` if the option is None, `false` otherwise.
-	 * @alias isNone
-	 * @category type-guards, scala3-api
-	 */
-	isEmpty(this: Option.Type<A>): this is None {
-		return this.isNone()
 	}
 
 	/**
@@ -270,6 +259,17 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	public abstract get(): A
 
 	/**
+	 * Type guard that returns `true` if the option is None, `false` otherwise.
+	 *
+	 * @returns `true` if the option is None, `false` otherwise.
+	 * @alias isNone
+	 * @category type-guards, scala3-api
+	 */
+	isEmpty(this: Option.Type<A>): this is None {
+		return this.isNone()
+	}
+
+	/**
 	 * Type guard that checks if the `Option` instance is a {@linkcode None}.
 	 * @returns `true` if the `Option` instance is a {@linkcode None}, `false` otherwise.
 	 *
@@ -317,7 +317,7 @@ export declare namespace Option {
  * @extends Option
  * @public
  */
-class None extends Option {
+class None extends Option<unknown> {
 	static #instance: undefined | None = undefined
 	public readonly _tag = 'None' as const
 
@@ -364,7 +364,7 @@ class None extends Option {
  * @extends Option
  * @public
  */
-class Some<out A> extends Option {
+class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
 
 	readonly #value: A
