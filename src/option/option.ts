@@ -115,9 +115,10 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
 	 *  import { Option } from  './option.ts'
 	 *
-	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None())
-	 *  assertStrictEquals(Option.fromNullable(null), Option.None())
-	 *  assertStrictEquals(Option.fromNullable(1), Option.Some(1))
+	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None()) // None | Option.Some<never>
+	 *  assertStrictEquals(Option.fromNullable(undefined as (undefined | string)), Option.None()) // None | Option.Some<string>
+	 *  assertStrictEquals(Option.fromNullable(null), Option.None())  // None | Option.Some<never>
+	 *  assertStrictEquals(Option.fromNullable(1), Option.Some(1)) // None | Option.Some<number>
 	 * ```
 	 *
 	 * @category Constructors

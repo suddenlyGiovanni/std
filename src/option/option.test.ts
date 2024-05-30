@@ -1,3 +1,4 @@
+import { expectTypeOf } from 'npm:expect-type@0.19.0'
 import { equal } from 'jsr:@std/assert'
 import { expect } from 'jsr:@std/expect'
 import { describe, test } from 'jsr:@std/testing/bdd'
@@ -33,12 +34,44 @@ describe('Option', () => {
 
 		test('fromNullable', () => {
 			expect(Option.fromNullable(2).equals(Option.Some(2))).toBe(true)
-			expect(Option.fromNullable(0).equals(Option.Some(0))).toBe(true)
-			expect(Option.fromNullable('').equals(Option.Some(''))).toBe(true)
-			expect(Option.fromNullable([]).equals(Option.Some([]), equal)).toBe(true)
+			expectTypeOf(Option.fromNullable(2)).toEqualTypeOf<Option.Type<number>>()
 
-			expect(Option.isNone(Option.fromNullable(null))).toBe(true)
-			expect(Option.fromNullable(undefined).isNone()).toBe(true)
+			expect(Option.fromNullable(0).equals(Option.Some(0))).toBe(true)
+			expectTypeOf(Option.fromNullable(0)).toEqualTypeOf<Option.Type<number>>()
+
+			expect(Option.fromNullable('').equals(Option.Some(''))).toBe(true)
+			expectTypeOf(Option.fromNullable('')).toEqualTypeOf<Option.Type<string>>()
+
+			expect(Option.fromNullable([]).equals(Option.Some([]), equal)).toBe(true)
+			expectTypeOf(Option.fromNullable([])).toEqualTypeOf<Option.Type<never[]>>()
+			expectTypeOf(Option.fromNullable(['foo'])).toEqualTypeOf<Option.Type<string[]>>()
+
+			const nullOption = Option.fromNullable(null)
+			expect(nullOption.isNone()).toBe(true)
+			expectTypeOf(nullOption).toEqualTypeOf<Option.Type<never>>()
+
+			const undefinedOption = Option.fromNullable(undefined)
+			expect(undefinedOption.isNone()).toBe(true)
+			expectTypeOf(undefinedOption).toEqualTypeOf<Option.Type<never>>()
+
+			interface Bar {
+				readonly baz?: null | number
+			}
+
+			expectTypeOf(Option.fromNullable({} as undefined | Bar)).toEqualTypeOf<
+				Option.Type<{
+					readonly baz?: null | number
+				}>
+			>()
+			expectTypeOf(Option.fromNullable({} as Bar)).toEqualTypeOf<
+				Option.Type<{
+					readonly baz?: null | number
+				}>
+			>()
+			expectTypeOf(Option.fromNullable(undefined as undefined | string)).toEqualTypeOf<
+				Option.Type<string>
+			>()
+			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<Option.Type<number>>()
 		})
 	})
 
