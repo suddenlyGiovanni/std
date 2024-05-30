@@ -1,5 +1,5 @@
 import { equal } from 'jsr:@std/assert'
-import { expect } from '@std/expect'
+import { expect } from 'jsr:@std/expect'
 import { describe, test } from 'jsr:@std/testing/bdd'
 import { Option } from './option.ts'
 
