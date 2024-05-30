@@ -115,17 +115,29 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+	 * import { Option } from  './option.ts'
+	 * import type * as F from '../internal/function.ts'
 	 *
-	 * assertStrictEquals(Option.fold(Option.Some(1), () => 0, (a) => a + 1), 2)
-	 * assertStrictEquals(Option.fold(Option.None(), () => 0, (a) => a + 1), 0)
+	 * // Define a function to execute if the option holds a value
+	 * const increment = (a: number) => a + 1
+	 * // Define function to be evaluated if the Option is empty
+	 * const ifEmpty:F.Lazy<number> = () => 0
+	 *
+	 * // Define curry function
+	 * const incrementOrZero = Option.fold(ifEmpty, increment)
+	 *
+	 * assertStrictEquals(incrementOrZero(Option.Some(1)), 2)
+	 * assertStrictEquals(incrementOrZero(Option.None()), 0)
 	 * ```
 	 *
 	 * @category scala3-api
 	 */
-	public static fold<T, B>(self: Option.Type<T>, ifEmpty: F.Lazy<B>, f: (a: NoInfer<T>) => B): B {
-		return self.isEmpty() ? ifEmpty() : f(self.get())
+	public static fold<A, B>(ifEmpty: F.Lazy<B>, f: (a: A) => B): (self: Option.Type<A>) => B {
+		return (self) =>
+			self.isEmpty()
+				? ifEmpty() //
+				: f(self.get())
 	}
 
 	/**
@@ -135,7 +147,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert@0.225.3'
 	 *  import { Option } from  './option.ts'
 	 *
 	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None()) // None | Option.Some<never>
@@ -271,8 +283,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.get(), that.get() as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -295,7 +307,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @category scala3-api
 	 */
 	public fold<A, B>(this: Option.Type<A>, ifEmpty: F.Lazy<B>, f: (a: NoInfer<A>) => B): B {
-		return Option.fold(this, ifEmpty, f)
+		return Option.fold(ifEmpty, f)(this)
 	}
 
 	/**

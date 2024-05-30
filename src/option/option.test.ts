@@ -91,7 +91,7 @@ describe('Option', () => {
 	})
 
 	describe('fold', () => {
-		const fa = <A extends string>(s: A): number => s.length
+		const fa = (s: string): number => s.length
 		const ifEmpty: F.Lazy<number> = () => 42
 
 		it('returns call the ifEmpty for None cases ', () => {
@@ -111,14 +111,14 @@ describe('Option', () => {
 
 			// test the static method
 			expect(
-				Option.fold(stringOption, ifEmpty, (_) => {
+				Option.fold(ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
-				}),
+				})(stringOption),
 			).toBe(42)
 			expectTypeOf(
-				Option.fold(stringOption, ifEmpty, (_) => {
+				Option.fold(ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
-				}),
+				})(stringOption),
 			).toEqualTypeOf<number>()
 		})
 
@@ -129,8 +129,8 @@ describe('Option', () => {
 			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<number>()
 
 			// test the static method
-			expect(Option.fold(stringOption, ifEmpty, fa)).toBe(3)
-			expectTypeOf(Option.fold(stringOption, ifEmpty, fa)).toEqualTypeOf<number>()
+			expect(Option.fold(ifEmpty, fa)(stringOption)).toBe(3)
+			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<number>()
 		})
 	})
 
