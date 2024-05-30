@@ -13,7 +13,7 @@
  * ```ts
  * import { Option } from './option.ts'
  *
- * const value = Option.Some("Hello, world!");
+ * const value: Option.Type<string> = Option.Some("Hello, world!");
  * ```
  *
  * If there isn't a value to lift, you create a `None` object, as follows:
@@ -21,7 +21,7 @@
  * ```ts
  * import { Option } from './option.ts'
  *
- * const value = Option.None();
+ * const none: Option.Type<never> = Option.None();
  * ```
  *
  * To check the contents of an `Option`, use the `isSome` and `isNone` methods and extract the value when it is `Some`:
@@ -29,10 +29,10 @@
  * ```ts
  * import { Option } from './option.ts'
  *
- * const value = Option.None();
+ * const none: Option.Type<never> = Option.None();
  *
- * if (value.isSome()) {
- *   console.log(value.value);
+ * if (none.isSome()) {
+ *   console.log(none.get()); // this will throw an error !!!
  * } else {
  *   console.log("Value is None");
  * }

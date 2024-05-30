@@ -4,7 +4,7 @@ export declare namespace Types {
 	 *
 	 *  @example
 	 *```ts
-	 * import type { Types } from './types'
+	 * import type { Types } from './types.ts'
 	 *
 	 * type Res = Types.Tags<string | { _tag: 'a' } | { _tag: 'b'} > // "a" | "b"
 	 *```
@@ -18,7 +18,7 @@ export declare namespace Types {
 	 *
 	 * @example
 	 * ```ts
-	 * import type { Types } from './types'
+	 * import type { Types } from './types.ts'
 	 *
 	 * type Res1 = Types.Equals<{ a: number }, { a: number }> // true
 	 * type Res2 = Types.Equals<{ a: number }, { b: number }> // false
@@ -35,7 +35,7 @@ export declare namespace Types {
 	 *
 	 * @example
 	 *```ts
-	 * import type { Types } from './types'
+	 * import type { Types } from './types.ts'
 	 *
 	 * type Res = Types.Simplify<{ a: number } & { b: number }> // { a: number; b: number; }
 	 * ```

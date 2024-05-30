@@ -213,7 +213,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * Using the default referential equality strategy on non-primitive types:
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * import { assertStrictEquals, equal } from '@std/assert'
+	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
 	 *
 	 * const some1 = Option.Some(1)
 	 * const none = Option.None()
@@ -229,7 +229,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * Using a custom predicate strategy:
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * import { assertStrictEquals, equal } from '@std/assert'
+	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
 	 *
 	 * // equality with custom predicate strategy
 	 * assertStrictEquals(
