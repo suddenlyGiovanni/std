@@ -106,6 +106,19 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
+	 * Returns the result of applying f to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 *
+	 * @param self - The option to fold
+	 * @param ifEmpty - The expression to evaluate if empty.
+	 * @param f - The function to apply if nonempty.
+	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 * @category scala3-api
+	 */
+	public static fold<T, B>(self: Option.Type<T>, ifEmpty: F.Lazy<B>, f: (a: NoInfer<T>) => B): B {
+		return self.isEmpty() ? ifEmpty() : f(self.get())
+	}
+
+	/**
 	 * Constructs a new `Option` from a nullable type.
 	 * @param value - An nullable value
 	 * @returns An `Option` that is {@linkcode class None} if the value is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the value.
@@ -248,8 +261,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.get(), that.get() as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -382,6 +395,13 @@ class None extends Option<unknown> {
 class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
 
+	/**
+	 * @inheritDoc
+	 */
+	public get(): A {
+		return this.#value
+	}
+
 	readonly #value: A
 
 	/**
@@ -396,12 +416,5 @@ class Some<out A> extends Option<A> {
 		super()
 		this.#value = value
 		Object.freeze(this)
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public get(): A {
-		return this.#value
 	}
 }

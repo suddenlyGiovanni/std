@@ -73,7 +73,9 @@ describe('Option', () => {
 			expectTypeOf(Option.fromNullable(undefined as undefined | string)).toEqualTypeOf<
 				Option.Type<string>
 			>()
-			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<Option.Type<number>>()
+			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<
+				Option.Type<number>
+			>()
 		})
 	})
 
@@ -95,14 +97,26 @@ describe('Option', () => {
 		it('returns call the ifEmpty for None cases ', () => {
 			const stringOption = Option.fromNullable<null | string>(null)
 
+			// test the instance method
 			expect(
-				stringOption.fold(ifEmpty, _ => {
+				stringOption.fold(ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				}),
 			).toBe(42)
-
 			expectTypeOf(
-				stringOption.fold(ifEmpty, _ => {
+				stringOption.fold(ifEmpty, (_) => {
+					throw new Error('Called `absurd` function which should be un-callable')
+				}),
+			).toEqualTypeOf<number>()
+
+			// test the static method
+			expect(
+				Option.fold(stringOption, ifEmpty, (_) => {
+					throw new Error('Called `absurd` function which should be un-callable')
+				}),
+			).toBe(42)
+			expectTypeOf(
+				Option.fold(stringOption, ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				}),
 			).toEqualTypeOf<number>()
@@ -110,8 +124,13 @@ describe('Option', () => {
 
 		it('should call `f` for the `Some` case', () => {
 			const stringOption = Option.fromNullable<null | string>('abc')
+			// test the instance method
 			expect(stringOption.fold(ifEmpty, fa)).toBe(3)
 			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<number>()
+
+			// test the static method
+			expect(Option.fold(stringOption, ifEmpty, fa)).toBe(3)
+			expectTypeOf(Option.fold(stringOption, ifEmpty, fa)).toEqualTypeOf<number>()
 		})
 	})
 
