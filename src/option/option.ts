@@ -112,6 +112,16 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @param ifEmpty - The expression to evaluate if empty.
 	 * @param f - The function to apply if nonempty.
 	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+	 *
+	 * assertStrictEquals(Option.fold(Option.Some(1), () => 0, (a) => a + 1), 2)
+	 * assertStrictEquals(Option.fold(Option.None(), () => 0, (a) => a + 1), 0)
+	 * ```
+	 *
 	 * @category scala3-api
 	 */
 	public static fold<T, B>(self: Option.Type<T>, ifEmpty: F.Lazy<B>, f: (a: NoInfer<T>) => B): B {
@@ -261,8 +271,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.get(), that.get() as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -273,10 +283,19 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @param ifEmpty - The expression to evaluate if empty.
 	 * @param f - The function to apply if nonempty.
 	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+	 *
+	 * assertStrictEquals(Option.Some(1).fold(() => 0, (a) => a + 1), 2)
+	 * assertStrictEquals(Option.Some(1).fold(() => 0, (a) => a + 1), 0)
+	 * ```
 	 * @category scala3-api
 	 */
 	public fold<A, B>(this: Option.Type<A>, ifEmpty: F.Lazy<B>, f: (a: NoInfer<A>) => B): B {
-		return this.isEmpty() ? ifEmpty() : f(this.get())
+		return Option.fold(this, ifEmpty, f)
 	}
 
 	/**
