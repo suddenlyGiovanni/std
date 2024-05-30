@@ -262,7 +262,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
 	 * @category scala3-api
 	 */
-	public fold<B>(this: Option.Type<A>, ifEmpty: () => B, f: (a: A) => B): B {
+	public fold<A, B>(this: Option.Type<A>, ifEmpty: F.Lazy<B>, f: (a: NoInfer<A>) => B): B {
 		return this.isEmpty() ? ifEmpty() : f(this.get())
 	}
 

@@ -1,7 +1,9 @@
 import { expectTypeOf } from 'npm:expect-type@0.19.0'
 import { equal } from 'jsr:@std/assert'
 import { expect } from 'jsr:@std/expect'
-import { describe, test } from 'jsr:@std/testing/bdd'
+import { describe, it, test } from 'jsr:@std/testing/bdd'
+
+import type * as F from '../internal/function.ts'
 import { Option } from './option.ts'
 
 describe('Option', () => {
@@ -83,6 +85,33 @@ describe('Option', () => {
 
 		test('None', () => {
 			expect(() => Option.None().get()).toThrow('None.get')
+		})
+	})
+
+	describe('fold', () => {
+		const fa = <A extends string>(s: A): number => s.length
+		const ifEmpty: F.Lazy<number> = () => 42
+
+		it('returns call the ifEmpty for None cases ', () => {
+			const stringOption = Option.fromNullable<null | string>(null)
+
+			expect(
+				stringOption.fold(ifEmpty, _ => {
+					throw new Error('Called `absurd` function which should be un-callable')
+				}),
+			).toBe(42)
+
+			expectTypeOf(
+				stringOption.fold(ifEmpty, _ => {
+					throw new Error('Called `absurd` function which should be un-callable')
+				}),
+			).toEqualTypeOf<number>()
+		})
+
+		it('should call `f` for the `Some` case', () => {
+			const stringOption = Option.fromNullable<null | string>('abc')
+			expect(stringOption.fold(ifEmpty, fa)).toBe(3)
+			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<number>()
 		})
 	})
 
