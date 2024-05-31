@@ -81,7 +81,9 @@ describe('Option', () => {
 			expectTypeOf(Option.fromNullable(undefined as undefined | string)).toEqualTypeOf<
 				Option.Type<string>
 			>()
-			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<Option.Type<number>>()
+			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<
+				Option.Type<number>
+			>()
 		})
 	})
 
@@ -90,9 +92,10 @@ describe('Option', () => {
 			const someOfNumber = Option.Some(1)
 			expectTypeOf<Option.Value<typeof someOfNumber>>().toEqualTypeOf<number>()
 
-			const noneOfNumber = Option.None()
-			// FIXME: This should be `number` but it's `never` instead
-			expectTypeOf<Option.Value<typeof noneOfNumber>>().toEqualTypeOf<never>()
+			const noneOfUnknown = Option.None()
+			const noneOfNumber = Option.None<number>()
+			expectTypeOf<Option.Value<typeof noneOfUnknown>>().toEqualTypeOf<unknown>()
+			expectTypeOf<Option.Value<typeof noneOfNumber>>().toEqualTypeOf<number>()
 
 			type Foo = { foo: string }
 			const someOfRecord = Option.Some({ foo: 'bar' } satisfies Foo)

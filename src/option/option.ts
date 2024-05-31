@@ -91,8 +91,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static None(): Option.Type<never> {
-		return None.getSingletonInstance()
+	public static None<A>(): Option.Type<A> {
+		return None.getSingletonInstance<A>()
 	}
 
 	/**
@@ -172,8 +172,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 
 	/**
 	 * Constructs a new `Option` from a nullable type.
-	 * @param value - An nullable value
-	 * @returns An `Option` that is {@linkcode class None} if the value is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the value.
+	 * @param nullableValue - An nullable nullableValue
+	 * @returns An `Option` that is {@linkcode class None} if the nullableValue is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the nullableValue.
 	 *
 	 * @example
 	 * ```ts
@@ -186,10 +186,12 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *  assertStrictEquals(Option.fromNullable(1), Option.Some(1)) // None | Option.Some<number>
 	 * ```
 	 *
-	 * @category Constructors
+	 * @category constructors
 	 */
-	public static fromNullable<T>(value: T): Option.Type<NonNullable<T>> {
-		return value === undefined || value === null ? None.getSingletonInstance() : new Some(value)
+	public static fromNullable<T>(nullableValue: T): Option.Type<NonNullable<T>> {
+		return nullableValue === undefined || nullableValue === null
+			? None.getSingletonInstance<NonNullable<T>>()
+			: Option.Some(nullableValue as NonNullable<T>)
 	}
 
 	/**
@@ -207,7 +209,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * ```
 	 * @category type-guards
 	 */
-	public static isNone<T>(self: Option.Type<T>): self is None {
+	public static isNone<T>(self: Option.Type<T>): self is None<T> {
 		return self instanceof None
 	}
 
@@ -313,8 +315,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.get(), that.get() as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -354,7 +356,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @alias isNone
 	 * @category type-guards, scala3-api
 	 */
-	isEmpty(this: Option.Type<A>): this is None {
+	isEmpty(this: Option.Type<A>): this is None<A> {
 		return this.isNone()
 	}
 
@@ -364,7 +366,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category type-guards
 	 */
-	public isNone(this: Option.Type<A>): this is None {
+	public isNone(this: Option.Type<A>): this is None<A> {
 		return Option.isNone(this)
 	}
 
@@ -397,7 +399,7 @@ export declare namespace Option {
 	 *
 	 * @category type-level
 	 */
-	export type Type<A> = None | Some<A>
+	export type Type<A> = None<A> | Some<A>
 
 	/**
 	 * Type utility to extract the type of the value from an Option.
@@ -425,8 +427,8 @@ export declare namespace Option {
  * @extends Option
  * @public
  */
-class None extends Option<unknown> {
-	static #instance: undefined | None = undefined
+class None<out A> extends Option<A> {
+	static #instance: undefined | None<unknown> = undefined
 	public readonly _tag = 'None' as const
 
 	/**
@@ -458,11 +460,11 @@ class None extends Option<unknown> {
 	 *
 	 * @category constructors
 	 */
-	public static getSingletonInstance(): None {
+	public static getSingletonInstance<B>(): None<B> {
 		if (!None.#instance) {
-			None.#instance = new None()
+			None.#instance = new None<B>()
 		}
-		return None.#instance
+		return None.#instance as None<B>
 	}
 }
 
