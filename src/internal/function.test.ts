@@ -1,5 +1,6 @@
-import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
-import { describe, it } from 'jsr:@std/testing@^0.224.0/bdd'
+// deno-lint-ignore-file no-explicit-any
+import { assertStrictEquals } from 'jsr:@std/assert'
+import { describe, it } from 'jsr:@std/testing/bdd'
 
 import { pipe } from './function.ts'
 
@@ -29,6 +30,7 @@ describe('Function', () => {
 		assertStrictEquals(pipe(2, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g), 2046)
 		assertStrictEquals(pipe(2, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f), 2047)
 		assertStrictEquals(
+			// biome-ignore lint/suspicious/noExplicitAny: this is a test, we allow ourselves to use any
 			(pipe as any)(...[2, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g]),
 			4094,
 		)
