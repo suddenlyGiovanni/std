@@ -141,6 +141,36 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
+	 * Matches the given `Option` and returns either the provided `onNone` value or the result of the provided `onSome`
+	 * function when passed the `Option`'s value.
+	 *
+	 * @param self - The `Option` to match
+	 * @param onNone - The value to be returned if the `Option` is `None`
+	 * @param onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
+	 *
+	 * @example
+	 * import { pipe, Option } from "effect"
+	 *
+	 * assert.deepStrictEqual(
+	 *   pipe(Option.some(1), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 *   'a some containing 1'
+	 * )
+	 *
+	 * assert.deepStrictEqual(
+	 *   pipe(Option.none(), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 *   'a none'
+	 * )
+	 *
+	 * @category pattern matching
+	 */
+	public static match<A, B>(cases: {
+		readonly onNone: F.Lazy<B>
+		readonly onSome: (a: A) => B
+	}): (self: Option.Type<A>) => B {
+		return Option.fold(cases.onNone, cases.onSome)
+	}
+
+	/**
 	 * Constructs a new `Option` from a nullable type.
 	 * @param value - An nullable value
 	 * @returns An `Option` that is {@linkcode class None} if the value is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the value.
@@ -283,8 +313,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.get(), that.get() as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 

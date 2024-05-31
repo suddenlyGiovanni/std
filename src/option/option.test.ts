@@ -1,10 +1,18 @@
 import { expectTypeOf } from 'npm:expect-type@0.19.0'
-import { equal } from 'jsr:@std/assert'
+import { assertEquals, equal } from 'jsr:@std/assert'
 import { expect } from 'jsr:@std/expect'
 import { describe, it, test } from 'jsr:@std/testing/bdd'
 
 import type * as F from '../internal/function.ts'
 import { Option } from './option.ts'
+
+// deno-lint-ignore no-namespace
+namespace Util {
+	// biome-ignore lint/suspicious/noExportsInTest: <explanation>
+	export const deepStrictEqual = <A>(actual: A, expected: A) => {
+		assertEquals(actual, expected)
+	}
+}
 
 describe('Option', () => {
 	describe('constructors', () => {
@@ -131,6 +139,16 @@ describe('Option', () => {
 			// test the static method
 			expect(Option.fold(ifEmpty, fa)(stringOption)).toBe(3)
 			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<number>()
+		})
+	})
+
+	describe('match', () => {
+		const onNone = () => 'none'
+		const onSome = (s: string) => `some${s.length}`
+		test('static', () => {
+			const match = Option.match({ onNone, onSome })
+			Util.deepStrictEqual(match(Option.None()), 'none')
+			Util.deepStrictEqual(match(Option.Some('abc')), 'some3')
 		})
 	})
 
