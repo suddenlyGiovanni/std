@@ -398,6 +398,25 @@ export declare namespace Option {
 	 * @category type-level
 	 */
 	export type Type<A> = None | Some<A>
+
+	/**
+	 * Type utility to extract the type of the value from an Option.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 *
+	 * const aNumber: number = 42
+	 * const someOfNumber: Option.Type<number> = Option.Some(aNumber)
+	 * const test1: Option.Value<typeof someOfNumber> = aNumber // ✅ no ts error!
+	 * //       ^? number
+	 *
+	 * // @ts-expect-error Type 'string' is not assignable to type 'number'.
+	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
+	 * ```
+	 */
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
+		: never
 }
 
 /**
