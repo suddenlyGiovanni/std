@@ -177,7 +177,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 *  import { assertStrictEquals  } from 'jsr:@std/assert@0.225.3'
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert@^0.225.3'
 	 *  import { Option } from  './option.ts'
 	 *
 	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None()) // None | Option.Some<never>
