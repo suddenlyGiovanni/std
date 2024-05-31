@@ -29,9 +29,19 @@
  * ```
  */
 export function pipe<A>(a: A): A
+
+/**
+ * @inheritdoc
+ */
 export function pipe<A, B>(a: A, ab: (a: A) => B): B
+
+/** @inheritdoc */
 export function pipe<A, B, C>(a: A, ab: (a: A) => B, bc: (b: B) => C): C
+
+/** @inheritdoc */
 export function pipe<A, B, C, D>(a: A, ab: (a: A) => B, bc: (b: B) => C, cd: (c: C) => D): D
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E>(
 	a: A,
 	ab: (a: A) => B,
@@ -39,6 +49,8 @@ export function pipe<A, B, C, D, E>(
 	cd: (c: C) => D,
 	de: (d: D) => E,
 ): E
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F>(
 	a: A,
 	ab: (a: A) => B,
@@ -47,6 +59,8 @@ export function pipe<A, B, C, D, E, F>(
 	de: (d: D) => E,
 	ef: (e: E) => F,
 ): F
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G>(
 	a: A,
 	ab: (a: A) => B,
@@ -56,6 +70,8 @@ export function pipe<A, B, C, D, E, F, G>(
 	ef: (e: E) => F,
 	fg: (f: F) => G,
 ): G
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H>(
 	a: A,
 	ab: (a: A) => B,
@@ -66,6 +82,8 @@ export function pipe<A, B, C, D, E, F, G, H>(
 	fg: (f: F) => G,
 	gh: (g: G) => H,
 ): H
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I>(
 	a: A,
 	ab: (a: A) => B,
@@ -77,6 +95,8 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
 	gh: (g: G) => H,
 	hi: (h: H) => I,
 ): I
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J>(
 	a: A,
 	ab: (a: A) => B,
@@ -89,6 +109,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J>(
 	hi: (h: H) => I,
 	ij: (i: I) => J,
 ): J
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
 	a: A,
 	ab: (a: A) => B,
@@ -102,6 +124,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
 	ij: (i: I) => J,
 	jk: (j: J) => K,
 ): K
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L>(
 	a: A,
 	ab: (a: A) => B,
@@ -116,6 +140,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L>(
 	jk: (j: J) => K,
 	kl: (k: K) => L,
 ): L
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M>(
 	a: A,
 	ab: (a: A) => B,
@@ -131,6 +157,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M>(
 	kl: (k: K) => L,
 	lm: (l: L) => M,
 ): M
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
 	a: A,
 	ab: (a: A) => B,
@@ -147,6 +175,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
 	lm: (l: L) => M,
 	mn: (m: M) => N,
 ): N
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
 	a: A,
 	ab: (a: A) => B,
@@ -164,6 +194,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
 	mn: (m: M) => N,
 	no: (n: N) => O,
 ): O
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
 	a: A,
 	ab: (a: A) => B,
@@ -182,6 +214,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
 	no: (n: N) => O,
 	op: (o: O) => P,
 ): P
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
 	a: A,
 	ab: (a: A) => B,
@@ -201,6 +235,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
 	op: (o: O) => P,
 	pq: (p: P) => Q,
 ): Q
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
 	a: A,
 	ab: (a: A) => B,
@@ -221,6 +257,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
 	pq: (p: P) => Q,
 	qr: (q: Q) => R,
 ): R
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
 	a: A,
 	ab: (a: A) => B,
@@ -242,6 +280,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
 	qr: (q: Q) => R,
 	rs: (r: R) => S,
 ): S
+
+/** @inheritdoc */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>(
 	a: A,
 	ab: (a: A) => B,
@@ -264,6 +304,8 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
 	rs: (r: R) => S,
 	st: (s: S) => T,
 ): T
+
+/** @inheritdoc */
 export function pipe(
 	a: unknown,
 	ab?: Function,
