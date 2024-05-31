@@ -115,46 +115,54 @@ describe('Option', () => {
 	})
 
 	describe('fold', () => {
-		const fa = (s: string): number => s.length
+		const fa = (s: string): { length: number } => ({ length: s.length })
 		const ifEmpty: F.Lazy<number> = () => 42
 
 		it('returns call the ifEmpty for None cases ', () => {
 			const stringOption = Option.fromNullable<null | string>(null)
 
 			// test the instance method
-			expect(
+			Util.deepStrictEqual(
 				stringOption.fold(ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				}),
-			).toBe(42)
+				42,
+			)
+
 			expectTypeOf(
-				stringOption.fold(ifEmpty, (_) => {
+				stringOption.fold(ifEmpty, (_): boolean => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				}),
-			).toEqualTypeOf<number>()
+			).toEqualTypeOf<number | boolean>()
 
 			// test the static method
-			expect(
+			Util.deepStrictEqual(
 				Option.fold(ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				})(stringOption),
-			).toBe(42)
+				42,
+			)
+
 			expectTypeOf(
 				Option.fold(ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				})(stringOption),
-			).toEqualTypeOf<number>()
+			).toEqualTypeOf(42)
 		})
 
 		it('should call `f` for the `Some` case', () => {
 			const stringOption = Option.fromNullable<null | string>('abc')
 			// test the instance method
-			expect(stringOption.fold(ifEmpty, fa)).toBe(3)
-			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<number>()
+			Util.deepStrictEqual(stringOption.fold(ifEmpty, fa), { length: 3 })
+			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<
+				number | { length: number }
+			>()
 
 			// test the static method
-			expect(Option.fold(ifEmpty, fa)(stringOption)).toBe(3)
-			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<number>()
+			Util.deepStrictEqual(Option.fold(ifEmpty, fa)(stringOption), { length: 3 })
+			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<
+				number | { length: number }
+			>()
 		})
 	})
 

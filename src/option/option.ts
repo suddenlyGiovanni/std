@@ -113,30 +113,60 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @param f - The function to apply if nonempty.
 	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
 	 *
+	 * @remarks
+	 * This is a curried function, so it can be partially applied.
+	 * It is also known as `reduce` in other languages.
+	 *
 	 * @example
+	 *  ( ( ) -> B,  (A) -> B ) -> Option.Type<A> -> B
 	 * ```ts
 	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
-	 * import { Option } from  './option.ts'
 	 * import type * as F from '../internal/function.ts'
 	 *
+	 * import { Option } from  './option.ts'
+	 *
 	 * // Define a function to execute if the option holds a value
-	 * const increment = (a: number) => a + 1
+	 * const increment: (x: number) => number = a => a + 1
 	 * // Define function to be evaluated if the Option is empty
 	 * const ifEmpty:F.Lazy<number> = () => 0
 	 *
 	 * // Define curry function
 	 * const incrementOrZero = Option.fold(ifEmpty, increment)
 	 *
-	 * assertStrictEquals(incrementOrZero(Option.Some(1)), 2)
-	 * assertStrictEquals(incrementOrZero(Option.None()), 0)
+	 * const two = incrementOrZero(Option.Some(1))
+	 * //        ^? number
+	 * assertStrictEquals(two, 2)
+	 *
+	 * const zero: number = incrementOrZero(Option.None())
+	 * //        ^? number
+	 * assertStrictEquals(zero, 0)
+	 * ```
+	 *
+	 * @example
+	 * ( ( ) -> B,  (A) -> C ) -> Option.Type<A> -> B | C
+	 * ```ts
+	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+	 * import type * as F from '../internal/function.ts'
+	 *
+	 * import { Option } from  './option.ts'
+	 *
+	 * const fold = Option.fold(() => null, (a: number) => a + 1)
+	 *
+	 * const two: number | null = fold(Option.Some(1))
+	 * // 			  ^? number | null
+	 * assertStrictEquals(two, 2)
+	 *
+	 * const numberOrNull: number | null = fold(Option.None())
+	 * // 			  ^? number | null
+	 * assertStrictEquals(numberOrNull, null)
 	 * ```
 	 *
 	 * @category scala3-api
 	 */
-	public static fold<A, B>(ifEmpty: F.Lazy<B>, f: (a: A) => B): (self: Option.Type<A>) => B {
-		return (self) =>
-			self.isEmpty()
-				? ifEmpty() //
+	public static fold<B, A, C = B>(ifEmpty: F.Lazy<B>, f: (a: A) => C) {
+		return (self: Option.Type<A>): B | C =>
+			self.isEmpty() //
+				? ifEmpty()
 				: f(self.get())
 	}
 
@@ -338,7 +368,11 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * ```
 	 * @category scala3-api
 	 */
-	public fold<A, B>(this: Option.Type<A>, ifEmpty: F.Lazy<B>, f: (a: NoInfer<A>) => B): B {
+	public fold<A, B, C = B>(
+		this: Option.Type<A>,
+		ifEmpty: F.Lazy<B>,
+		f: (a: NoInfer<A>) => C,
+	): B | C {
 		return Option.fold(ifEmpty, f)(this)
 	}
 
