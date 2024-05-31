@@ -27,8 +27,8 @@
 		"lint": "deno run -A npm:@biomejs/biome lint ./src",
 		"test": "deno test --allow-all --unstable ./src",
 		"test:ci": "deno test --allow-all --parallel --coverage --unstable ./src",
-		"doc:lint": "deno doc --lint ./src",
-		"doc:test": "deno test --doc ./src",
+		"doc:lint": "deno doc --lint ./src/**/*.ts",
+		"doc:test": "deno test --doc ./src/**/*.ts",
 		"cov:gen": "deno coverage coverage --lcov --output=cov.lcov",
 		"cov:view": "deno coverage --html coverage",
 		"ok": "deno task lint && deno fmt --check && deno task test"
