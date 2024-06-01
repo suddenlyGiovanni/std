@@ -9,5 +9,8 @@
 	"deno.codeLens.references": true,
 	"deno.codeLens.referencesAllFunctions": true,
 	"deno.codeLens.test": true,
-	"editor.defaultFormatter": "biomejs.biome"
+	"editor.defaultFormatter": "biomejs.biome",
+	"deno.disablePaths": [
+		"./dagger"
+	]
 }
