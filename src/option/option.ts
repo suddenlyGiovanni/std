@@ -154,7 +154,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 *  import { assertStrictEquals  } from '@std/assert'
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
 	 *  import { Option } from  './option.ts'
 	 *
 	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None())
@@ -175,7 +175,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 * import { assertStrictEquals } from '@std/assert'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
 	 * import { Option } from  './option.ts'
 	 *
 	 * assertStrictEquals(Option.isNone(Option.Some(1)), false)
@@ -195,7 +195,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * @example
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * import { assertStrictEquals } from '@std/assert'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
 	 *
 	 * assertStrictEquals(Option.isOption(Option.Some(1)), true)
 	 * assertStrictEquals(Option.isOption(Option.None()), true)
@@ -215,7 +215,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * @example
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * import { assertStrictEquals } from '@std/assert'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
 	 *
 	 * assertStrictEquals(Option.isSome(Option.Some(1)), true)
 	 * assertStrictEquals(Option.isSome(Option.None()), false)
@@ -238,7 +238,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * @example
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * import { assertStrictEquals, equal } from '@std/assert'
+	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
 	 *
 	 * const some1 = Option.Some(1)
 	 * const none = Option.None()
@@ -271,8 +271,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.value, that.value as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.value, that.value as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 

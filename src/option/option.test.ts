@@ -1,5 +1,5 @@
-import { assert, assertEquals, assertStrictEquals, assertThrows, equal } from '@std/assert'
-import { describe, it, test } from '@std/testing/bdd'
+import { assert, assertEquals, assertStrictEquals, assertThrows, equal } from 'jsr:@std/assert'
+import { describe, it, test } from 'jsr:@std/testing/bdd'
 import { Option } from './option.ts'
 
 describe('Option', () => {
