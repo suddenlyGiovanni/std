@@ -357,7 +357,7 @@ export function pipe<A>(...args: readonly [A, ...Function[]]): unknown {
  * const f = flow(len, double)
  *
  * assertStrictEquals(f('aaa'), 6)
- *```
+ * ```
  */
 export function flow<A extends ReadonlyArray<unknown>, B>(ab: (...a: A) => B): (...a: A) => B
 export function flow<A extends ReadonlyArray<unknown>, B, C>(
