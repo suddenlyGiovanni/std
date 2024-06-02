@@ -271,8 +271,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.value, that.value as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.value, that.value as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 

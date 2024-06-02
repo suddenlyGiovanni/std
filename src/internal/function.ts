@@ -11,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+ * import { assertStrictEquals } from 'jsr:@std/assert'
  * import { pipe } from './function.ts'
  *
  * const length = (s: string): number => s.length
@@ -27,21 +27,33 @@
  * 			9
  * 		)
  * ```
+ *
+ * @see flow
  */
 export function pipe<A>(a: A): A
 
 /**
+ * pipe function overload for arity 2
  * @inheritdoc
  */
 export function pipe<A, B>(a: A, ab: (a: A) => B): B
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 3
+ * @inheritdoc
+ */
 export function pipe<A, B, C>(a: A, ab: (a: A) => B, bc: (b: B) => C): C
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 4
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D>(a: A, ab: (a: A) => B, bc: (b: B) => C, cd: (c: C) => D): D
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 5
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E>(
 	a: A,
 	ab: (a: A) => B,
@@ -50,7 +62,10 @@ export function pipe<A, B, C, D, E>(
 	de: (d: D) => E,
 ): E
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 6
+ *  @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F>(
 	a: A,
 	ab: (a: A) => B,
@@ -60,7 +75,10 @@ export function pipe<A, B, C, D, E, F>(
 	ef: (e: E) => F,
 ): F
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 7
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G>(
 	a: A,
 	ab: (a: A) => B,
@@ -71,7 +89,10 @@ export function pipe<A, B, C, D, E, F, G>(
 	fg: (f: F) => G,
 ): G
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 8
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H>(
 	a: A,
 	ab: (a: A) => B,
@@ -83,7 +104,10 @@ export function pipe<A, B, C, D, E, F, G, H>(
 	gh: (g: G) => H,
 ): H
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 9
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I>(
 	a: A,
 	ab: (a: A) => B,
@@ -96,7 +120,10 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
 	hi: (h: H) => I,
 ): I
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 10
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J>(
 	a: A,
 	ab: (a: A) => B,
@@ -110,7 +137,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J>(
 	ij: (i: I) => J,
 ): J
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 11
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
 	a: A,
 	ab: (a: A) => B,
@@ -125,7 +155,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
 	jk: (j: J) => K,
 ): K
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 12
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L>(
 	a: A,
 	ab: (a: A) => B,
@@ -141,7 +174,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L>(
 	kl: (k: K) => L,
 ): L
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 13
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M>(
 	a: A,
 	ab: (a: A) => B,
@@ -158,7 +194,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M>(
 	lm: (l: L) => M,
 ): M
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 14
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
 	a: A,
 	ab: (a: A) => B,
@@ -176,7 +215,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
 	mn: (m: M) => N,
 ): N
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 15
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
 	a: A,
 	ab: (a: A) => B,
@@ -195,7 +237,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
 	no: (n: N) => O,
 ): O
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 16
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
 	a: A,
 	ab: (a: A) => B,
@@ -215,7 +260,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
 	op: (o: O) => P,
 ): P
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 17
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
 	a: A,
 	ab: (a: A) => B,
@@ -236,7 +284,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
 	pq: (p: P) => Q,
 ): Q
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 18
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
 	a: A,
 	ab: (a: A) => B,
@@ -258,7 +309,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
 	qr: (q: Q) => R,
 ): R
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 19
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
 	a: A,
 	ab: (a: A) => B,
@@ -281,7 +335,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
 	rs: (r: R) => S,
 ): S
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 20
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>(
 	a: A,
 	ab: (a: A) => B,
@@ -306,9 +363,166 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
 ): T
 
 /** @inheritdoc */
-export function pipe(
-	a: unknown,
-	ab?: Function,
+export function pipe<A>(...args: readonly [A, ...Function[]]): unknown {
+	const [a, ...fns] = args
+	switch (fns.length) {
+		case 0:
+			return a
+		case 1:
+			return fns[0](a)
+		case 2:
+			return fns[1](fns[0](a))
+		case 3:
+			return fns[2](fns[1](fns[0](a)))
+		case 4:
+			return fns[3](fns[2](fns[1](fns[0](a))))
+		case 5:
+			return fns[4](fns[3](fns[2](fns[1](fns[0](a)))))
+		case 6:
+			return fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a))))))
+		case 7:
+			return fns[6](fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a)))))))
+		case 8:
+			return fns[7](fns[6](fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a))))))))
+		case 9:
+			return fns[8](fns[7](fns[6](fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a)))))))))
+		default: {
+			let ret = a
+
+			for (const fn of fns) {
+				ret = fn(ret)
+			}
+			return ret
+		}
+	}
+}
+
+/**
+ * Performs left-to-right function composition.
+ * The first argument may have any arity, the remaining arguments must be unary.
+ *
+ * @see pipe.
+ *
+ * @example
+ * ```ts
+ * import { assertStrictEquals } from 'jsr:@std/assert'
+ * import { flow } from "./function.ts"
+ *
+ * const len = (s: string): number => s.length
+ * const double = (n: number): number => n * 2
+ *
+ * const f = flow(len, double)
+ *
+ * assertStrictEquals(f('aaa'), 6)
+ * ```
+ */
+export function flow<A extends ReadonlyArray<unknown>, B>(ab: (...a: A) => B): (...a: A) => B
+
+/**
+ * flow function overload for arity 2
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+): (...a: A) => C
+
+/**
+ * flow function overload for arity 3
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C, D>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+	cd: (c: C) => D,
+): (...a: A) => D
+
+/**
+ * flow function overload for arity 4
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C, D, E>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+	cd: (c: C) => D,
+	de: (d: D) => E,
+): (...a: A) => E
+
+/**
+ * flow function overload for arity 5
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+	cd: (c: C) => D,
+	de: (d: D) => E,
+	ef: (e: E) => F,
+): (...a: A) => F
+
+/**
+ * flow function overload for arity 6
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+	cd: (c: C) => D,
+	de: (d: D) => E,
+	ef: (e: E) => F,
+	fg: (f: F) => G,
+): (...a: A) => G
+
+/**
+ * flow function overload for arity 7
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+	cd: (c: C) => D,
+	de: (d: D) => E,
+	ef: (e: E) => F,
+	fg: (f: F) => G,
+	gh: (g: G) => H,
+): (...a: A) => H
+
+/**
+ * flow function overload for arity 8
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H, I>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+	cd: (c: C) => D,
+	de: (d: D) => E,
+	ef: (e: E) => F,
+	fg: (f: F) => G,
+	gh: (g: G) => H,
+	hi: (h: H) => I,
+): (...a: A) => I
+
+/**
+ * flow function overload for arity 9
+ * @inheritdoc
+ */
+export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H, I, J>(
+	ab: (...a: A) => B,
+	bc: (b: B) => C,
+	cd: (c: C) => D,
+	de: (d: D) => E,
+	ef: (e: E) => F,
+	fg: (f: F) => G,
+	gh: (g: G) => H,
+	hi: (h: H) => I,
+	ij: (i: I) => J,
+): (...a: A) => J
+
+/**
+ * @inheritdoc
+ */
+export function flow(
+	ab: Function,
 	bc?: Function,
 	cd?: Function,
 	de?: Function,
@@ -316,33 +530,43 @@ export function pipe(
 	fg?: Function,
 	gh?: Function,
 	hi?: Function,
+	ij?: Function,
 ): unknown {
 	switch (arguments.length) {
 		case 1:
-			return a
+			return ab
 		case 2:
-			return ab!(a)
-		case 3:
-			return bc!(ab!(a))
-		case 4:
-			return cd!(bc!(ab!(a)))
-		case 5:
-			return de!(cd!(bc!(ab!(a))))
-		case 6:
-			return ef!(de!(cd!(bc!(ab!(a)))))
-		case 7:
-			return fg!(ef!(de!(cd!(bc!(ab!(a))))))
-		case 8:
-			return gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))
-		case 9:
-			return hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))))
-		default: {
-			let ret = arguments[0]
-
-			for (let i = 1; i < arguments.length; i++) {
-				ret = arguments[i](ret)
+			return function (this: unknown) {
+				return bc!(ab.apply(this, arguments))
 			}
-			return ret
-		}
+		case 3:
+			return function (this: unknown) {
+				return cd!(bc!(ab.apply(this, arguments)))
+			}
+		case 4:
+			return function (this: unknown) {
+				return de!(cd!(bc!(ab.apply(this, arguments))))
+			}
+		case 5:
+			return function (this: unknown) {
+				return ef!(de!(cd!(bc!(ab.apply(this, arguments)))))
+			}
+		case 6:
+			return function (this: unknown) {
+				return fg!(ef!(de!(cd!(bc!(ab.apply(this, arguments))))))
+			}
+		case 7:
+			return function (this: unknown) {
+				return gh!(fg!(ef!(de!(cd!(bc!(ab.apply(this, arguments)))))))
+			}
+		case 8:
+			return function (this: unknown) {
+				return hi!(gh!(fg!(ef!(de!(cd!(bc!(ab.apply(this, arguments))))))))
+			}
+		case 9:
+			return function (this: unknown) {
+				return ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab.apply(this, arguments)))))))))
+			}
 	}
+	return
 }

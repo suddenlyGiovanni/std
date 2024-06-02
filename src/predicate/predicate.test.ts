@@ -1,5 +1,7 @@
+// deno-lint-ignore-file no-explicit-any
+import { expectTypeOf } from 'npm:expect-type@0.19.0'
 import { assertEquals, assertStrictEquals } from 'jsr:@std/assert'
-import { describe, it } from 'jsr:@std/testing/bdd'
+import { describe, it, test } from 'jsr:@std/testing/bdd'
 
 import { isFunction, isObject, isRecordOrArray } from './predicate.ts'
 
@@ -57,5 +59,10 @@ describe('isObject', () => {
 		assertStrictEquals(isObject(true), false)
 		assertStrictEquals(isObject(1n), false)
 		assertStrictEquals(isObject(Symbol.for('a')), false)
+	})
+
+	test('type', () => {
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		expectTypeOf(new Array<any>().filter(isObject)).toEqualTypeOf<object[]>()
 	})
 })
