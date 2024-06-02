@@ -27,21 +27,33 @@
  * 			9
  * 		)
  * ```
+ *
+ * @see flow
  */
 export function pipe<A>(a: A): A
 
 /**
+ * pipe function overload for arity 2
  * @inheritdoc
  */
 export function pipe<A, B>(a: A, ab: (a: A) => B): B
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 3
+ * @inheritdoc
+ */
 export function pipe<A, B, C>(a: A, ab: (a: A) => B, bc: (b: B) => C): C
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 4
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D>(a: A, ab: (a: A) => B, bc: (b: B) => C, cd: (c: C) => D): D
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 5
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E>(
 	a: A,
 	ab: (a: A) => B,
@@ -50,7 +62,10 @@ export function pipe<A, B, C, D, E>(
 	de: (d: D) => E,
 ): E
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 6
+ *  @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F>(
 	a: A,
 	ab: (a: A) => B,
@@ -60,7 +75,10 @@ export function pipe<A, B, C, D, E, F>(
 	ef: (e: E) => F,
 ): F
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 7
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G>(
 	a: A,
 	ab: (a: A) => B,
@@ -71,7 +89,10 @@ export function pipe<A, B, C, D, E, F, G>(
 	fg: (f: F) => G,
 ): G
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 8
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H>(
 	a: A,
 	ab: (a: A) => B,
@@ -83,7 +104,10 @@ export function pipe<A, B, C, D, E, F, G, H>(
 	gh: (g: G) => H,
 ): H
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 9
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I>(
 	a: A,
 	ab: (a: A) => B,
@@ -96,7 +120,10 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
 	hi: (h: H) => I,
 ): I
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 10
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J>(
 	a: A,
 	ab: (a: A) => B,
@@ -110,7 +137,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J>(
 	ij: (i: I) => J,
 ): J
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 11
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
 	a: A,
 	ab: (a: A) => B,
@@ -125,7 +155,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K>(
 	jk: (j: J) => K,
 ): K
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 12
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L>(
 	a: A,
 	ab: (a: A) => B,
@@ -141,7 +174,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L>(
 	kl: (k: K) => L,
 ): L
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 13
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M>(
 	a: A,
 	ab: (a: A) => B,
@@ -158,7 +194,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M>(
 	lm: (l: L) => M,
 ): M
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 14
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
 	a: A,
 	ab: (a: A) => B,
@@ -176,7 +215,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
 	mn: (m: M) => N,
 ): N
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 15
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
 	a: A,
 	ab: (a: A) => B,
@@ -195,7 +237,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
 	no: (n: N) => O,
 ): O
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 16
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
 	a: A,
 	ab: (a: A) => B,
@@ -215,7 +260,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
 	op: (o: O) => P,
 ): P
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 17
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
 	a: A,
 	ab: (a: A) => B,
@@ -236,7 +284,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
 	pq: (p: P) => Q,
 ): Q
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 18
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
 	a: A,
 	ab: (a: A) => B,
@@ -258,7 +309,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
 	qr: (q: Q) => R,
 ): R
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 19
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
 	a: A,
 	ab: (a: A) => B,
@@ -281,7 +335,10 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
 	rs: (r: R) => S,
 ): S
 
-/** @inheritdoc */
+/**
+ * pipe function overload for arity 20
+ * @inheritdoc
+ */
 export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>(
 	a: A,
 	ab: (a: A) => B,
