@@ -306,41 +306,34 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
 ): T
 
 /** @inheritdoc */
-export function pipe(
-	a: unknown,
-	ab?: Function,
-	bc?: Function,
-	cd?: Function,
-	de?: Function,
-	ef?: Function,
-	fg?: Function,
-	gh?: Function,
-	hi?: Function,
-): unknown {
-	switch (arguments.length) {
-		case 1:
+export function pipe<A>(...args: readonly [A, ...Function[]]): unknown {
+	const [a, ...fns] = args
+	switch (fns.length) {
+		case 0:
 			return a
+		case 1:
+			return fns[0](a)
 		case 2:
-			return ab!(a)
+			return fns[1](fns[0](a))
 		case 3:
-			return bc!(ab!(a))
+			return fns[2](fns[1](fns[0](a)))
 		case 4:
-			return cd!(bc!(ab!(a)))
+			return fns[3](fns[2](fns[1](fns[0](a))))
 		case 5:
-			return de!(cd!(bc!(ab!(a))))
+			return fns[4](fns[3](fns[2](fns[1](fns[0](a)))))
 		case 6:
-			return ef!(de!(cd!(bc!(ab!(a)))))
+			return fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a))))))
 		case 7:
-			return fg!(ef!(de!(cd!(bc!(ab!(a))))))
+			return fns[6](fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a)))))))
 		case 8:
-			return gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))
+			return fns[7](fns[6](fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a))))))))
 		case 9:
-			return hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))))
+			return fns[8](fns[7](fns[6](fns[5](fns[4](fns[3](fns[2](fns[1](fns[0](a)))))))))
 		default: {
-			let ret = arguments[0]
+			let ret = a
 
-			for (let i = 1; i < arguments.length; i++) {
-				ret = arguments[i](ret)
+			for (const fn of fns) {
+				ret = fn(ret)
 			}
 			return ret
 		}
