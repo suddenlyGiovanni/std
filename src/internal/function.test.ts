@@ -2,13 +2,13 @@
 import { assertStrictEquals } from 'jsr:@std/assert'
 import { describe, it } from 'jsr:@std/testing/bdd'
 
-import { pipe } from './function.ts'
+import { flow, pipe } from './function.ts'
 
 describe('Function', () => {
 	const g = (n: number): number => n * 2
 	const f = (n: number): number => n + 1
 
-	it('pipe()', () => {
+	it('pipe', () => {
 		assertStrictEquals(pipe(2), 2)
 		assertStrictEquals(pipe(2, f), 3)
 		assertStrictEquals(pipe(2, f, g), 6)
@@ -34,5 +34,19 @@ describe('Function', () => {
 			(pipe as any)(...[2, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g, f, g]),
 			4094,
 		)
+	})
+
+	it('flow', () => {
+		assertStrictEquals(flow(f)(2), 3)
+		assertStrictEquals(flow(f, g)(2), 6)
+		assertStrictEquals(flow(f, g, f)(2), 7)
+		assertStrictEquals(flow(f, g, f, g)(2), 14)
+		assertStrictEquals(flow(f, g, f, g, f)(2), 15)
+		assertStrictEquals(flow(f, g, f, g, f, g)(2), 30)
+		assertStrictEquals(flow(f, g, f, g, f, g, f)(2), 31)
+		assertStrictEquals(flow(f, g, f, g, f, g, f, g)(2), 62)
+		assertStrictEquals(flow(f, g, f, g, f, g, f, g, f)(2), 63)
+		// biome-ignore lint/suspicious/noExplicitAny:  this is a test, we allow ourselves to use any
+		assertStrictEquals((flow as any)(...[f, g, f, g, f, g, f, g, f, g]), undefined)
 	})
 })
