@@ -120,7 +120,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @example
 	 *  ( ( ) -> B,  (A) -> B ) -> Option.Type<A> -> B
 	 * ```ts
-	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
 	 * import type * as F from '../internal/function.ts'
 	 *
 	 * import { Option } from  './option.ts'
@@ -145,7 +145,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @example
 	 * ( ( ) -> B,  (A) -> C ) -> Option.Type<A> -> B | C
 	 * ```ts
-	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
 	 * import type * as F from '../internal/function.ts'
 	 *
 	 * import { Option } from  './option.ts'
@@ -207,7 +207,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @example
 	 * ```ts
-	 *  import { assertStrictEquals  } from 'jsr:@std/assert@^0.225.3'
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
 	 *  import { Option } from  './option.ts'
 	 *
 	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None()) // None | Option.Some<never>
@@ -345,8 +345,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.get(), that.get() as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -361,7 +361,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * @example
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
 	 *
 	 * assertStrictEquals(Option.Some(1).fold(() => 0, (a) => a + 1), 2)
 	 * assertStrictEquals(Option.Some(1).fold(() => 0, (a) => a + 1), 0)
@@ -451,7 +451,8 @@ export declare namespace Option {
 	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
 	 * ```
 	 */
-	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>]
+		? _A
 		: never
 }
 

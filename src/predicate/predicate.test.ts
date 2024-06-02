@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { expectTypeOf } from 'npm:expect-type@0.19.0'
 import { assertEquals, assertStrictEquals } from 'jsr:@std/assert'
-import { describe, it, test } from 'jsr:@std/testing'
+import { describe, it, test } from 'jsr:@std/testing/bdd'
 
 import { isFunction, isObject, isRecordOrArray } from './predicate.ts'
 
