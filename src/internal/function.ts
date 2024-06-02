@@ -360,21 +360,41 @@ export function pipe<A>(...args: readonly [A, ...Function[]]): unknown {
  * ```
  */
 export function flow<A extends ReadonlyArray<unknown>, B>(ab: (...a: A) => B): (...a: A) => B
+
+/**
+ * flow function overload for arity 2
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
 ): (...a: A) => C
+
+/**
+ * flow function overload for arity 3
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C, D>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
 	cd: (c: C) => D,
 ): (...a: A) => D
+
+/**
+ * flow function overload for arity 4
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C, D, E>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
 	cd: (c: C) => D,
 	de: (d: D) => E,
 ): (...a: A) => E
+
+/**
+ * flow function overload for arity 5
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
@@ -382,6 +402,11 @@ export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F>(
 	de: (d: D) => E,
 	ef: (e: E) => F,
 ): (...a: A) => F
+
+/**
+ * flow function overload for arity 6
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
@@ -390,6 +415,11 @@ export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G>(
 	ef: (e: E) => F,
 	fg: (f: F) => G,
 ): (...a: A) => G
+
+/**
+ * flow function overload for arity 7
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
@@ -399,6 +429,11 @@ export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H>(
 	fg: (f: F) => G,
 	gh: (g: G) => H,
 ): (...a: A) => H
+
+/**
+ * flow function overload for arity 8
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H, I>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
@@ -409,6 +444,11 @@ export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H, I>(
 	gh: (g: G) => H,
 	hi: (h: H) => I,
 ): (...a: A) => I
+
+/**
+ * flow function overload for arity 9
+ * @inheritdoc
+ */
 export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H, I, J>(
 	ab: (...a: A) => B,
 	bc: (b: B) => C,
@@ -420,6 +460,10 @@ export function flow<A extends ReadonlyArray<unknown>, B, C, D, E, F, G, H, I, J
 	hi: (h: H) => I,
 	ij: (i: I) => J,
 ): (...a: A) => J
+
+/**
+ * @inheritdoc
+ */
 export function flow(
 	ab: Function,
 	bc?: Function,
