@@ -11,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { assertStrictEquals } from 'jsr:@std/assert@^0.225.3'
+ * import { assertStrictEquals } from 'jsr:@std/assert'
  * import { pipe } from './function.ts'
  *
  * const length = (s: string): number => s.length
