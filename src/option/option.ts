@@ -51,12 +51,14 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 */
 	protected constructor() {
 		if (new.target === Option) {
-			throw new Error('Option is not meant to be instantiated directly')
+			throw new Error(
+				"Option is not meant to be instantiated directly; instantiate instead Option's derived classes (Some, None)",
+			)
 		}
 	}
 
 	/**
-	 * Overloads default {@linkcode Object#[Symbol#toStringTag]} getter allowing Option to return a custom string
+	 * Overloads default {@linkcode Object.[Symbol.toStringTag]} getter allowing Option to return a custom string
 	 */
 	public get [Symbol.toStringTag](): string {
 		return `Option.${this._tag}`
@@ -79,7 +81,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
-	 * Overloads default {@linkcode Object#prototype#toString} method allowing Option to return a custom string representation of the boxed value
+	 * Overloads default {@linkcode Object.prototype.toString} method allowing Option to return a custom string representation of the boxed value
 	 * @override
 	 */
 	public toString(this: Option.Type<A>): string {
@@ -106,12 +108,11 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
-	 * Returns the result of applying f to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
 	 *
-	 * @param self - The option to fold
 	 * @param ifEmpty - The expression to evaluate if empty.
 	 * @param f - The function to apply if nonempty.
-	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 * @returns a function that takes an Option and returns the result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
 	 *
 	 * @remarks
 	 * This is a curried function, so it can be partially applied.
@@ -160,7 +161,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * // 			  ^? number | null
 	 * assertStrictEquals(numberOrNull, null)
 	 * ```
-	 * @see match
+	 * @see {Option.match}
 	 * @category scala3-api
 	 */
 	public static fold<B, A, C = B>(
@@ -283,7 +284,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *   'a none'
 	 * )
 	 * ```
-	 * @see fold
+	 * @see {Option.fold}
 	 * @category pattern matching
 	 */
 	public static match<B, A, C = B>(cases: {
@@ -378,6 +379,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * assertStrictEquals(Option.Some(1).fold(() => 0, (a) => a + 1), 0)
 	 * ```
 	 * @category scala3-api
+	 * @see {Option.fold}
 	 */
 	public fold<A, B, C = B>(
 		this: Option.Type<A>,
@@ -535,7 +537,7 @@ export class None<out A> extends Option<A> {
 	 * @returns An instance of `None`
 	 * @remaks
 	 * We don't need multiple instances of `None` in memory, therefore we can save memory by using a singleton pattern.
-	 * Do not call this constructor directly. Instead, use {@linkcode None#getSingletonInstance}.
+	 * Do not call this constructor directly. Instead, use {@linkcode None.getSingletonInstance}.
 	 * @hideconstructor
 	 */
 	private constructor() {
@@ -547,7 +549,7 @@ export class None<out A> extends Option<A> {
 	 * Returns the singleton instance of `None`.
 	 *
 	 * @returns The singleton instance of `None`.
-	 * @internal - use instead {@linkcode Option#None}
+	 * @internal - use instead {@linkcode Option.None}
 	 *
 	 * @category constructors
 	 */
@@ -582,7 +584,7 @@ export class Some<out A> extends Option<A> {
 	 *
 	 * @param value - The `value` to wrap.
 	 * @returns An instance of `Some`
-	 * @remarks Do not call this constructor directly. Instead, use the static  {@linkcode Option#Some}
+	 * @remarks Do not call this constructor directly. Instead, use the static  {@linkcode Option.Some}
 	 * @hideconstructor
 	 */
 	public constructor(value: A) {
