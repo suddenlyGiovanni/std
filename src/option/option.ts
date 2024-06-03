@@ -268,22 +268,28 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * import { pipe } from '../internal/function.ts'
 	 *
 	 * assertStrictEquals(
-	 *   pipe(Option.Some(1), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 *   pipe(
+	 *    Option.Some(1),
+	 *    Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })
+	 *   ),
 	 *   'a some containing 1'
 	 * )
 	 *
 	 * assertStrictEquals(
-	 *   pipe(Option.None(), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 *   pipe(
+	 *    Option.None(),
+	 *    Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })
+	 *   ),
 	 *   'a none'
 	 * )
 	 * ```
 	 * @see fold
 	 * @category pattern matching
 	 */
-	public static match<A, B>(cases: {
+	public static match<B, A, C = B>(cases: {
 		readonly onNone: F.Lazy<B>
-		readonly onSome: (a: A) => B
-	}): (self: Option.Type<A>) => B {
+		readonly onSome: (a: A) => C
+	}): (self: Option.Type<A>) => B | C {
 		return Option.fold(cases.onNone, cases.onSome)
 	}
 

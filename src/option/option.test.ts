@@ -179,16 +179,17 @@ describe('Option', () => {
 
 	describe('match', () => {
 		const onNone = () => 'none' as const
-		const onSome = (s: string) => `some${s.length}` as const
+		const onSome = (s: string): number => s.length
 		test('static', () => {
 			Util.deepStrictEqual(
 				pipe(null as null | string, Option.fromNullable, Option.match({ onNone, onSome })),
 				'none',
 			)
-			Util.deepStrictEqual(
-				pipe('abc', Option.Some, Option.match({ onNone, onSome })),
-				'some3',
-			)
+			Util.deepStrictEqual(pipe('abc', Option.Some, Option.match({ onNone, onSome })), 3)
+
+			expectTypeOf(Option.match({ onNone, onSome })(Option.fromNullable(null))).toEqualTypeOf<
+				number | 'none'
+			>()
 		})
 	})
 
