@@ -1,6 +1,33 @@
 // deno-lint-ignore-file ban-types
 
 /**
+ * A lazy computation that can be used to defer the evaluation of an expression.
+ *
+ * @example
+ * To defer the evaluation of an expression:
+ * ```ts
+ * import { type Lazy } from './function.ts'
+ * declare function fib(n: number): number
+ *
+ * const lazy: Lazy<number> = () => fib(100) // fib is not called yet, hence the computation is deferred
+ * ```
+ *
+ * @example
+ * As a parameter type in a function:
+ * ```ts
+ * import { type Lazy } from './function.ts'
+ * function defer<A>(f: Lazy<A>): A {
+ * 	return f()
+ * }
+ * const value = defer(() => 1) // 1
+ *  ```
+ */
+export interface Lazy<A> {
+	// biome-ignore lint/style/useShorthandFunctionType: we want the opaque type here
+	(): A
+}
+
+/**
  * Pipes the value of an expression into a pipeline of functions.
  *
  * This is useful in combination with data-last functions as a simulation of methods:

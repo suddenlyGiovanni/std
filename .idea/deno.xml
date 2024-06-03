@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DenoSettings">
-    <option name="denoInit" value="{&#10;  &quot;enable&quot;: true,&#10;  &quot;lint&quot;: true,&#10;  &quot;unstable&quot;: true,&#10;  &quot;config&quot;: &quot;deno.jsonc&quot;&#10;}" />
+    <option name="denoInit" value="{&#10;  &quot;enable&quot;: true,&#10;  &quot;lint&quot;: true,&#10;  &quot;unstable&quot;: true,&#10;  &quot;config&quot;: &quot;deno.jsonc&quot;,&#10;&#9;&quot;deno.codeLens.implementations&quot;: true,&#10;&#9;&quot;deno.codeLens.references&quot;: true,&#10;&#9;&quot;deno.codeLens.referencesAllFunctions&quot;: true,&#10;&#9;&quot;deno.codeLens.test&quot;: true,&#10;&#9;&quot;deno.future&quot;: true&#10;}" />
     <option name="useDenoValue" value="ENABLE" />
   </component>
 </project>

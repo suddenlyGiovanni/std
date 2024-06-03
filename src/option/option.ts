@@ -1,47 +1,5 @@
-/**
- * # Option Module
- * The Option Module is inspired by the Scala 3 Option type. This module primarily solves one of the common problems in programming - avoiding null and undefined values.
- *
- * The Option type is a container that encapsulates an optional value, i.e., it stores some value or none. It's a safer alternative to using null or undefined. By using Option, you can avoid null reference errors. The main advantage of using an `Option` type is that you're explicitly dealing with something that may or may not be there.
- *
- * ## How it works
- * This module exports a base abstract class `Option` and two concrete subclasses `Some` and `None`. An `Option` object encapsulates a value that may or may not be present. A `Some` object represents an `Option` that contains a value, and `None` represents an `Option` that has no value.
- *
- * ## How to use it
- * When you have a value that you want to lift into a boxed `Option`, you create an object of type `Some`, as follows:
- *
- * ```ts
- * import { Option } from './option.ts'
- *
- * const value = Option.Some("Hello, world!");
- * ```
- *
- * If there isn't a value to lift, you create a `None` object, as follows:
- *
- * ```ts
- * import { Option } from './option.ts'
- *
- * const value = Option.None();
- * ```
- *
- * To check the contents of an `Option`, use the `isSome` and `isNone` methods and extract the value when it is `Some`:
- *
- * ```ts
- * import { Option } from './option.ts'
- *
- * const value = Option.None();
- *
- * if (value.isSome()) {
- *   console.log(value.value);
- * } else {
- *   console.log("Value is None");
- * }
- * ```
- *
- * @module
- */
-
 import type { Equals } from '../internal/equals.ts'
+import type * as F from '../internal/function.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
 
 function format(x: unknown): string {
@@ -54,12 +12,12 @@ function format(x: unknown): string {
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
  * These are useful methods that exist for both Some and None:
  * -[ ] `isDefined` : True if not empty
- * -[ ] `isEmpty` : True if empty
+ * - {@linkcode Option#isEmpty} : True if empty
  * -[ ] `nonEmpty`: True if not empty
  * -[ ] `orElse`: Evaluate and return alternate optional value if empty
  * -[ ] `getOrElse`: Evaluate and return alternate value if empty
- * -[ ] `get`: Return value, throw exception if empty
- * -[ ] `fold`: Apply function on optional value, return default if empty
+ * - {@linkcode Option#get} : Return value, throw exception if empty
+ * - {@linkcode Option#fold}: Apply function on optional value, return default if empty
  * -[ ] `map`: Apply a function on the optional value
  * -[ ] `flatMap`: Same as map but function must return an optional value
  * -[ ] `foreach`: Apply a procedure on option value
@@ -74,8 +32,33 @@ function format(x: unknown): string {
  * -[ ] `unzip3`: Split an optional triple to three optional values
  * -[ ] `toList`: Unary list of optional value, otherwise the empty list
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
+ *
+ * ```ts
+ * import { assertStrictEquals } from 'jsr:@std/assert'
+ * import { pipe } from '../internal/function.ts'
+ * import { Option } from './option.ts'
+ *
+ * assertStrictEquals(
+ * 	pipe(
+ * 		Option.fromNullable<number | undefined>(undefined),
+ * 		Option.match({
+ * 			onNone: () => 'a none',
+ * 			onSome: a => `a some containing ${a}`,
+ * 		}),
+ * 	),
+ * 	'a none',
+ * )
+ *
+ * assertStrictEquals(
+ * 	Option.fromNullable(1).match({
+ * 		onNone: () => 'a none',
+ * 		onSome: a => `a some containing ${a}`,
+ * 	}),
+ * 	'a some containing 1',
+ * )
+ * ```
  */
-export abstract class Option<out A = unknown> implements Inspectable, Equals {
+export abstract class Option<out A> implements Inspectable, Equals {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -93,12 +76,14 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 */
 	protected constructor() {
 		if (new.target === Option) {
-			throw new Error('Option is not meant to be instantiated directly')
+			throw new Error(
+				"Option is not meant to be instantiated directly; instantiate instead Option's derived classes (Some, None)",
+			)
 		}
 	}
 
 	/**
-	 * Overloads default {@linkcode Object#[Symbol#toStringTag]} getter allowing Option to return a custom string
+	 * Overloads default {@linkcode Object.[Symbol.toStringTag]} getter allowing Option to return a custom string
 	 */
 	public get [Symbol.toStringTag](): string {
 		return `Option.${this._tag}`
@@ -116,12 +101,12 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 		return {
 			_id: 'Option',
 			_tag: this._tag,
-			...(this.isSome() ? { value: this.value } : {}),
+			...(this.isSome() ? { value: this.get() } : {}),
 		}
 	}
 
 	/**
-	 * Overloads default {@linkcode Object#prototype#toString} method allowing Option to return a custom string representation of the boxed value
+	 * Overloads default {@linkcode Object.prototype.toString} method allowing Option to return a custom string representation of the boxed value
 	 * @override
 	 */
 	public toString(this: Option.Type<A>): string {
@@ -133,8 +118,8 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static None(): Option.Type<never> {
-		return None.getSingletonInstance()
+	public static None<A>(): Option.Type<A> {
+		return None.getSingletonInstance<A>()
 	}
 
 	/**
@@ -148,24 +133,115 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	}
 
 	/**
+	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 * This is equivalent to:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 *
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => B
+	 * declare const ifEmpty: <B>() => B
+	 *
+	 * option.match({
+	 *    onSome: (x) => f(x),
+	 *    onNone: () => ifEmpty(),
+	 *  })
+	 * ```
+	 *
+	 * This is also equivalent to:
+	 * ```ts no-eval no-assert
+	 * import { Option } from  './option.ts'
+	 *
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => B
+	 * declare const ifEmpty: <B>() => B
+	 *
+	 * option.map(f).getOrElse(ifEmpty())
+	 * ```
+	 *
+	 * @param ifEmpty - The expression to evaluate if empty.
+	 * @param f - The function to apply if nonempty.
+	 * @returns a function that takes an Option and returns the result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 *
+	 * @remarks
+	 * This is a curried function, so it can be partially applied.
+	 * It is also known as `reduce` in other languages.
+	 *
+	 * @example
+	 *  ( ( ) -> B,  (A) -> B ) -> Option.Type<A> -> B
+	 * ```ts
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
+	 * import type * as F from '../internal/function.ts'
+	 *
+	 * import { Option } from  './option.ts'
+	 *
+	 * // Define a function to execute if the option holds a value
+	 * const increment: (x: number) => number = a => a + 1
+	 * // Define function to be evaluated if the Option is empty
+	 * const ifEmpty:F.Lazy<number> = () => 0
+	 *
+	 * // Define curry function
+	 * const incrementOrZero = Option.fold(ifEmpty, increment)
+	 *
+	 * const two = incrementOrZero(Option.Some(1))
+	 * //        ^? number
+	 * assertStrictEquals(two, 2)
+	 *
+	 * const zero: number = incrementOrZero(Option.None())
+	 * //        ^? number
+	 * assertStrictEquals(zero, 0)
+	 * ```
+	 *
+	 * @example
+	 * ( ( ) -> B,  (A) -> C ) -> Option.Type<A> -> B | C
+	 * ```ts
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
+	 * import type * as F from '../internal/function.ts'
+	 *
+	 * import { Option } from  './option.ts'
+	 *
+	 * const fold = Option.fold(() => null, (a: number) => a + 1)
+	 *
+	 * const two: number | null = fold(Option.Some(1))
+	 * // 			  ^? number | null
+	 * assertStrictEquals(two, 2)
+	 *
+	 * const numberOrNull: number | null = fold(Option.None())
+	 * // 			  ^? number | null
+	 * assertStrictEquals(numberOrNull, null)
+	 * ```
+	 * @see {Option.match}
+	 * @category scala3-api
+	 */
+	public static fold<B, A, C = B>(
+		ifEmpty: F.Lazy<B>,
+		f: (a: A) => C,
+	): (self: Option.Type<A>) => B | C {
+		return (self) => (self.isEmpty() ? ifEmpty() : f(self.get()))
+	}
+
+	/**
 	 * Constructs a new `Option` from a nullable type.
-	 * @param value - An nullable value
-	 * @returns An `Option` that is {@linkcode class None} if the value is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the value.
+	 * @param nullableValue - An nullable nullableValue
+	 * @returns An `Option` that is {@linkcode class None} if the nullableValue is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the nullableValue.
 	 *
 	 * @example
 	 * ```ts
 	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
 	 *  import { Option } from  './option.ts'
 	 *
-	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None())
-	 *  assertStrictEquals(Option.fromNullable(null), Option.None())
-	 *  assertStrictEquals(Option.fromNullable(1), Option.Some(1))
+	 *  assertStrictEquals(Option.fromNullable(undefined), Option.None()) // None | Option.Some<never>
+	 *  assertStrictEquals(Option.fromNullable(undefined as (undefined | string)), Option.None()) // None | Option.Some<string>
+	 *  assertStrictEquals(Option.fromNullable(null), Option.None())  // None | Option.Some<never>
+	 *  assertStrictEquals(Option.fromNullable(1), Option.Some(1)) // None | Option.Some<number>
 	 * ```
 	 *
-	 * @category Constructors
+	 * @category constructors
 	 */
-	public static fromNullable<T>(value: T): Option.Type<NonNullable<T>> {
-		return value === undefined || value === null ? None.getSingletonInstance() : new Some(value)
+	public static fromNullable<T>(nullableValue: T): Option.Type<NonNullable<T>> {
+		return nullableValue === undefined || nullableValue === null
+			? None.getSingletonInstance<NonNullable<T>>()
+			: Option.Some(nullableValue as NonNullable<T>)
 	}
 
 	/**
@@ -183,7 +259,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * ```
 	 * @category type-guards
 	 */
-	public static isNone<T>(self: Option.Type<T>): self is None {
+	public static isNone<T>(self: Option.Type<T>): self is None<T> {
 		return self instanceof None
 	}
 
@@ -227,6 +303,47 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	}
 
 	/**
+	 * Curried pattern matching for `Option` instances.
+	 * Given a pattern matching object, it will return a function that will match the `Option` instance against the pattern.
+	 *
+	 * @param cases - The pattern matching object
+	 * @param cases.onNone - The lazy value to be returned if the `Option` is `None`;
+	 * @param cases.onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
+	 * @returns A function that will match the `Option` instance against the pattern.
+	 *
+	 * @example
+	 * ```ts
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 * import { pipe } from '../internal/function.ts'
+	 *
+	 * assertStrictEquals(
+	 *   pipe(
+	 *    Option.Some(1),
+	 *    Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })
+	 *   ),
+	 *   'a some containing 1'
+	 * )
+	 *
+	 * assertStrictEquals(
+	 *   pipe(
+	 *    Option.None(),
+	 *    Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })
+	 *   ),
+	 *   'a none'
+	 * )
+	 * ```
+	 * @see {Option.fold}
+	 * @category pattern matching
+	 */
+	public static match<B, A, C = B>(cases: {
+		readonly onNone: F.Lazy<B>
+		readonly onSome: (a: A) => C
+	}): (self: Option.Type<A>) => B | C {
+		return Option.fold(cases.onNone, cases.onSome)
+	}
+
+	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
 	 *
 	 * @param that - the value to compare
@@ -236,6 +353,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * In its unary form, it uses referential equality (employing the Object.is algorithm). This behavior can be overridden by providing a custom predicate strategy as second argument.
 	 *
 	 * @example
+	 * Using the default referential equality strategy on primitive types:
 	 * ```ts
 	 * import { Option } from  './option.ts'
 	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
@@ -247,16 +365,33 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 * assertStrictEquals(some1.equals(some1), true)
 	 * assertStrictEquals(some1.equals(none), false)
 	 * assertStrictEquals(none.equals(none), true)
+	 * ```
+	 *
+	 * @example
+	 * Using the default referential equality strategy on non-primitive types:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
+	 *
+	 * const some1 = Option.Some(1)
+	 * const none = Option.None()
 	 *
 	 * // equality derive types
 	 * assertStrictEquals(some1.equals(Option.Some(1)), true)
 	 * const someRecord = Option.Some({ foo: 'bar' })
 	 * assertStrictEquals(someRecord.equals(someRecord), true)
 	 * assertStrictEquals(someRecord.equals(Option.Some({ foo: 'bar' })), false)
+	 * ```
+	 *
+	 * @example
+	 * Using a custom predicate strategy:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals, equal } from 'jsr:@std/assert'
 	 *
 	 * // equality with custom predicate strategy
 	 * assertStrictEquals(
-	 * 	someRecord.equals(
+	 * 	Option.Some({ foo: 'bar' }).equals(
 	 * 		Option.Some({ foo: 'bar' }),
 	 * 		equal, // a custom deep equality strategy
 	 * 	),
@@ -272,8 +407,75 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 		return this.isSome()
 			? Option.isOption(that) &&
 				Option.isSome(that) &&
-				predicateStrategy(this.value, that.value as That)
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
+	}
+
+	/**
+	 * Returns the result of applying f to this Option's value if the Option is
+	 * nonempty. Otherwise, evaluates expression ifEmpty.
+	 *
+	 * @param ifEmpty - The expression to evaluate if empty.
+	 * @param f - The function to apply if nonempty.
+	 * @returns The result of applying `f` to this Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
+	 *
+	 * assertStrictEquals(Option.Some(1).fold(() => 0, (a) => a + 1), 2)
+	 * assertStrictEquals(Option.Some(1).fold(() => 0, (a) => a + 1), 0)
+	 * ```
+	 * @category scala3-api
+	 * @see {Option.fold}
+	 */
+	public fold<A, B, C = B>(
+		this: Option.Type<A>,
+		ifEmpty: F.Lazy<B>,
+		f: (a: NoInfer<A>) => C,
+	): B | C {
+		return Option.fold(ifEmpty, f)(this)
+	}
+
+	/**
+	 * Returns the option's value.
+	 * @throws Error - if the option is empty
+	 * @remarks The option must be nonempty.
+	 */
+	public abstract get(): A
+
+	/**
+	 * Returns the option's value if the option is nonempty, otherwise return the result of evaluating default.
+	 *
+	 * This is equivalent to the following pattern match:
+	 * ```ts no-assert
+	 * import { Option } from  './option.ts'
+	 *
+	 * declare const option: Option.Type<unknown>
+	 * declare const defaultValue: <B>() => B
+	 *
+	 * option.match({
+	 * 	onNone: () => defaultValue(),
+	 * 	onSome: (a) => a
+	 * })
+	 * ```
+	 *
+	 * @param defaultValue - T the default expression. It will be evaluated if the option is empty.
+	 */
+	public getOrElse<B extends A>(this: Option.Type<A>, defaultValue: F.Lazy<B>): A | B {
+		return this.isEmpty() ? defaultValue() : this.get()
+	}
+
+	/**
+	 * Type guard that returns `true` if the option is None, `false` otherwise.
+	 *
+	 * @returns `true` if the option is None, `false` otherwise.
+	 * @alias isNone
+	 * @category type-guards, scala3-api
+	 */
+	isEmpty(this: Option.Type<A>): this is None<A> {
+		return this.isNone()
 	}
 
 	/**
@@ -282,7 +484,7 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 *
 	 * @category type-guards
 	 */
-	public isNone(this: Option.Type<A>): this is None {
+	public isNone(this: Option.Type<A>): this is None<A> {
 		return Option.isNone(this)
 	}
 
@@ -293,6 +495,52 @@ export abstract class Option<out A = unknown> implements Inspectable, Equals {
 	 */
 	public isSome(this: Option.Type<A>): this is Some<A> {
 		return Option.isSome(this)
+	}
+
+	/**
+	 * Pattern matches the value of the Option.
+	 *
+	 * @this {Some | None} - The `Option` instance to match.
+	 * @param cases - The pattern matching object containing callbacks for different case branches:
+	 * @param cases.onNone - The lazy value to be returned if the `Option` is `None`;
+	 * @param cases.onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
+	 * @returns The value returned by the corresponding callback from the cases object of type `B` or `C`.
+	 *
+	 * @example
+	 * ```ts
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertStrictEquals(
+	 *    Option.fromNullable<null | number>(1)
+	 *      .match({
+	 *        onNone: () => 'a none',
+	 *        onSome: (a) => `a some containing ${a}`
+	 *        }),
+	 *   'a some containing 1'
+	 * )
+	 *
+	 * assertStrictEquals(
+	 *    Option.fromNullable<null | number>(null)
+	 *      .match({
+	 *        onNone: () => 'a none',
+	 *        onSome: (a) => `a some containing ${a}`
+	 *        }),
+	 *   'a none'
+	 * )
+	 * ```
+	 * @see {Option.fold}
+	 * @see {Option.match}
+	 * @category pattern-matching
+	 */
+	public match<A, B, C = B>(
+		this: Option.Type<A>,
+		cases: {
+			readonly onNone: F.Lazy<B>
+			readonly onSome: (a: A) => C
+		},
+	): B | C {
+		return Option.match(cases)(this)
 	}
 }
 
@@ -315,19 +563,44 @@ export declare namespace Option {
 	 *
 	 * @category type-level
 	 */
-	export type Type<A> = None | Some<A>
+	export type Type<A> = None<A> | Some<A>
+
+	/**
+	 * Type utility to extract the type of the value from an Option.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 *
+	 * const aNumber: number = 42
+	 * const someOfNumber: Option.Type<number> = Option.Some(aNumber)
+	 * const test1: Option.Value<typeof someOfNumber> = aNumber // ✅ no ts error!
+	 * //       ^? number
+	 *
+	 * // @ts-expect-error Type 'string' is not assignable to type 'number'.
+	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
+	 * ```
+	 */
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
+		: never
 }
 
 /**
  * Case class representing the absence of a value.
  * @class None
  * @extends Option
- * @public
+ * @internal
  */
-class None extends Option {
-	static #instance: undefined | None = undefined
-
+export class None<out A> extends Option<A> {
+	static #instance: undefined | None<unknown> = undefined
 	public readonly _tag = 'None' as const
+
+	/**
+	 * @inheritDoc
+	 */
+	public get(): never {
+		throw new Error('None.get')
+	}
 
 	/**
 	 * Creates a new immutable `None` instance.
@@ -335,7 +608,7 @@ class None extends Option {
 	 * @returns An instance of `None`
 	 * @remaks
 	 * We don't need multiple instances of `None` in memory, therefore we can save memory by using a singleton pattern.
-	 * Do not call this constructor directly. Instead, use {@linkcode None#getSingletonInstance}.
+	 * Do not call this constructor directly. Instead, use {@linkcode None.getSingletonInstance}.
 	 * @hideconstructor
 	 */
 	private constructor() {
@@ -347,15 +620,15 @@ class None extends Option {
 	 * Returns the singleton instance of `None`.
 	 *
 	 * @returns The singleton instance of `None`.
-	 * @internal - use instead {@linkcode Option#None}
+	 * @internal - use instead {@linkcode Option.None}
 	 *
 	 * @category constructors
 	 */
-	public static getSingletonInstance(): None {
+	public static getSingletonInstance<B>(): None<B> {
 		if (!None.#instance) {
-			None.#instance = new None()
+			None.#instance = new None<B>()
 		}
-		return None.#instance
+		return None.#instance as None<B>
 	}
 }
 
@@ -363,10 +636,17 @@ class None extends Option {
  * Case class representing the presence of a value.
  * @class Some
  * @extends Option
- * @public
+ * @internal
  */
-class Some<out A> extends Option {
+export class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
+
+	/**
+	 * @inheritDoc
+	 */
+	public get(): A {
+		return this.#value
+	}
 
 	readonly #value: A
 
@@ -375,16 +655,12 @@ class Some<out A> extends Option {
 	 *
 	 * @param value - The `value` to wrap.
 	 * @returns An instance of `Some`
-	 * @remarks Do not call this constructor directly. Instead, use the static  {@linkcode Option#Some}
+	 * @remarks Do not call this constructor directly. Instead, use the static  {@linkcode Option.Some}
 	 * @hideconstructor
 	 */
 	public constructor(value: A) {
 		super()
 		this.#value = value
 		Object.freeze(this)
-	}
-
-	public get value(): A {
-		return this.#value
 	}
 }
