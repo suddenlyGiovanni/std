@@ -409,6 +409,23 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	public abstract get(): A
 
 	/**
+	 * Returns the option's value if the option is nonempty, otherwise return the result of evaluating default.
+	 *
+	 * This is equivalent to the following pattern match:
+	 * ```ts
+	 * option.match({
+	 * 	onNone: () => defaultValue(),
+	 * 	onSome: (a) => a
+	 * })
+	 * ```
+	 *
+	 * @param defaultValue - T the default expression. It will be evaluated if the option is empty.
+	 */
+	public getOrElse<B extends A>(this: Option.Type<A>, defaultValue: F.Lazy<B>): A | B {
+		return this.isEmpty() ? defaultValue() : this.get()
+	}
+
+	/**
 	 * Type guard that returns `true` if the option is None, `false` otherwise.
 	 *
 	 * @returns `true` if the option is None, `false` otherwise.

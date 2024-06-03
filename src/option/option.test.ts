@@ -115,6 +115,36 @@ describe('Option', () => {
 		})
 	})
 
+	describe('getOrElse', () => {
+		test('Some', () => {
+			expect(Option.Some(1).getOrElse(() => 2)).toBe(1)
+			expect(Option.Some({ foo: 'bar' }).getOrElse(() => ({ foo: 'baz' }))).toEqual({
+				foo: 'bar',
+			})
+
+			expectTypeOf(Option.Some({ foo: 'bar' }).getOrElse(() => ({ foo: 'baz' })))
+				.toEqualTypeOf<{
+					foo: string
+				}>()
+
+			expectTypeOf(
+				Option.Some({ foo: 'bar' }).getOrElse(() => ({ foo: 'baz' })),
+			).not.toEqualTypeOf<{ foo: number }>() // it should extend the type Option instance type
+		})
+
+		test('None', () => {
+			expect(Option.None().getOrElse(() => 2)).toBe(2)
+			expect(
+				Option.fromNullable<undefined | { foo: string }>(undefined).getOrElse(() => ({
+					foo: 'baz',
+				})),
+			).toEqual({
+				foo: 'baz',
+			})
+			expect(Option.None().getOrElse(() => null)).toEqual(null)
+		})
+	})
+
 	describe('fold', () => {
 		const fa = (s: string): { length: number } => ({ length: s.length })
 		const ifEmpty: F.Lazy<number> = () => 42
