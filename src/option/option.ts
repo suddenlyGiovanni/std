@@ -160,14 +160,14 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * // 			  ^? number | null
 	 * assertStrictEquals(numberOrNull, null)
 	 * ```
-	 *
+	 * @see match
 	 * @category scala3-api
 	 */
-	public static fold<B, A, C = B>(ifEmpty: F.Lazy<B>, f: (a: A) => C) {
-		return (self: Option.Type<A>): B | C =>
-			self.isEmpty() //
-				? ifEmpty()
-				: f(self.get())
+	public static fold<B, A, C = B>(
+		ifEmpty: F.Lazy<B>,
+		f: (a: A) => C,
+	): (self: Option.Type<A>) => B | C {
+		return (self) => (self.isEmpty() ? ifEmpty() : f(self.get()))
 	}
 
 	/**
