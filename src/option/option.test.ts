@@ -3,6 +3,7 @@ import { assertEquals, equal } from 'jsr:@std/assert'
 import { expect } from 'jsr:@std/expect'
 import { describe, it, test } from 'jsr:@std/testing/bdd'
 
+import { pipe } from '../internal/function.ts'
 import type * as F from '../internal/function.ts'
 import { Option } from './option.ts'
 
@@ -81,9 +82,7 @@ describe('Option', () => {
 			expectTypeOf(Option.fromNullable(undefined as undefined | string)).toEqualTypeOf<
 				Option.Type<string>
 			>()
-			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<
-				Option.Type<number>
-			>()
+			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<Option.Type<number>>()
 		})
 	})
 
@@ -123,7 +122,7 @@ describe('Option', () => {
 
 			// test the instance method
 			Util.deepStrictEqual(
-				stringOption.fold(ifEmpty, (_) => {
+				stringOption.fold(ifEmpty, _ => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				}),
 				42,
@@ -137,16 +136,23 @@ describe('Option', () => {
 
 			// test the static method
 			Util.deepStrictEqual(
-				Option.fold(ifEmpty, (_) => {
-					throw new Error('Called `absurd` function which should be un-callable')
-				})(stringOption),
+				pipe(
+					null as null | string,
+					Option.fromNullable,
+					Option.fold(ifEmpty, _ => {
+						throw new Error('Called `absurd` function which should be un-callable')
+					}),
+				),
 				42,
 			)
 
 			expectTypeOf(
-				Option.fold(ifEmpty, (_) => {
-					throw new Error('Called `absurd` function which should be un-callable')
-				})(stringOption),
+				pipe(
+					stringOption,
+					Option.fold(ifEmpty, _ => {
+						throw new Error('Called `absurd` function which should be un-callable')
+					}),
+				),
 			).toEqualTypeOf(42)
 		})
 
@@ -154,12 +160,13 @@ describe('Option', () => {
 			const stringOption = Option.fromNullable<null | string>('abc')
 			// test the instance method
 			Util.deepStrictEqual(stringOption.fold(ifEmpty, fa), { length: 3 })
-			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<
-				number | { length: number }
-			>()
+			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<number | { length: number }>()
 
 			// test the static method
-			Util.deepStrictEqual(Option.fold(ifEmpty, fa)(stringOption), { length: 3 })
+			Util.deepStrictEqual(
+				pipe('abc' as null | string, Option.fromNullable, Option.fold(ifEmpty, fa)),
+				{ length: 3 },
+			)
 			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<
 				number | { length: number }
 			>()
@@ -167,26 +174,28 @@ describe('Option', () => {
 	})
 
 	describe('match', () => {
-		const onNone = () => 'none'
-		const onSome = (s: string) => `some${s.length}`
+		const onNone = () => 'none' as const
+		const onSome = (s: string) => `some${s.length}` as const
 		test('static', () => {
-			const match = Option.match({ onNone, onSome })
-			Util.deepStrictEqual(match(Option.None()), 'none')
-			Util.deepStrictEqual(match(Option.Some('abc')), 'some3')
+			Util.deepStrictEqual(
+				pipe(null as null | string, Option.fromNullable, Option.match({ onNone, onSome })),
+				'none',
+			)
+			Util.deepStrictEqual(pipe('abc', Option.Some, Option.match({ onNone, onSome })), 'some3')
 		})
 	})
 
 	describe('guards', () => {
 		test('isOption', () => {
-			expect(Option.isOption(Option.Some(1))).toBe(true)
-			expect(Option.isOption(Option.None())).toBe(true)
-			expect(Option.isOption({})).toBe(false)
+			expect(pipe(Option.Some(1), Option.isOption)).toBe(true)
+			expect(pipe(Option.None(), Option.isOption)).toBe(true)
+			expect(pipe({}, Option.isOption)).toBe(false)
 		})
 
 		describe('isNone', () => {
 			test('on Option static method ', () => {
-				expect(Option.isNone(Option.None())).toBe(true)
-				expect(Option.isNone(Option.Some(1))).toBe(false)
+				expect(pipe(Option.None(), Option.isNone)).toBe(true)
+				expect(pipe(Option.Some(1), Option.isNone)).toBe(false)
 			})
 
 			test('on Option instances: Some and None ', () => {
@@ -202,8 +211,8 @@ describe('Option', () => {
 
 		describe('isSome', () => {
 			test('on Option static method ', () => {
-				expect(Option.isSome(Option.None())).toBe(false)
-				expect(Option.isSome(Option.Some(1))).toEqual(true)
+				expect(pipe(Option.None(), Option.isSome)).toBe(false)
+				expect(pipe(Option.Some(1), Option.isSome)).toEqual(true)
 			})
 
 			test('on Option instances: Some and None ', () => {
