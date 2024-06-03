@@ -470,9 +470,9 @@ export declare namespace Option {
  * Case class representing the absence of a value.
  * @class None
  * @extends Option
- * @public
+ * @internal
  */
-class None<out A> extends Option<A> {
+export class None<out A> extends Option<A> {
 	static #instance: undefined | None<unknown> = undefined
 	public readonly _tag = 'None' as const
 
@@ -517,9 +517,9 @@ class None<out A> extends Option<A> {
  * Case class representing the presence of a value.
  * @class Some
  * @extends Option
- * @public
+ * @internal
  */
-class Some<out A> extends Option<A> {
+export class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
 
 	/**
