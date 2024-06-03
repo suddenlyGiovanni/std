@@ -171,40 +171,6 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
-	 * Curried pattern matching for `Option` instances.
-	 * Given a pattern matching object, it will return a function that will match the `Option` instance against the pattern.
-	 *
-	 * @param cases - The pattern matching object
-	 * @param cases.onNone - The lazy value to be returned if the `Option` is `None`;
-	 * @param cases.onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
-	 * @returns A function that will match the `Option` instance against the pattern.
-	 *
-	 * @example
-	 * ```ts
-	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
-	 * import { Option } from './option.ts'
-	 * import { pipe } from '../internal/function.ts'
-	 *
-	 * assertStrictEquals(
-	 *   pipe(Option.Some(1), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
-	 *   'a some containing 1'
-	 * )
-	 *
-	 * assertStrictEquals(
-	 *   pipe(Option.None(), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
-	 *   'a none'
-	 * )
-	 * ```
-	 * @category pattern matching
-	 */
-	public static match<A, B>(cases: {
-		readonly onNone: F.Lazy<B>
-		readonly onSome: (a: A) => B
-	}): (self: Option.Type<A>) => B {
-		return Option.fold(cases.onNone, cases.onSome)
-	}
-
-	/**
 	 * Constructs a new `Option` from a nullable type.
 	 * @param nullableValue - An nullable nullableValue
 	 * @returns An `Option` that is {@linkcode class None} if the nullableValue is `null` or `undefined`, otherwise a {@linkcode Some(1)} containing the nullableValue.
@@ -284,6 +250,41 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 */
 	public static isSome<T>(self: Option.Type<T>): self is Some<T> {
 		return self instanceof Some
+	}
+
+	/**
+	 * Curried pattern matching for `Option` instances.
+	 * Given a pattern matching object, it will return a function that will match the `Option` instance against the pattern.
+	 *
+	 * @param cases - The pattern matching object
+	 * @param cases.onNone - The lazy value to be returned if the `Option` is `None`;
+	 * @param cases.onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
+	 * @returns A function that will match the `Option` instance against the pattern.
+	 *
+	 * @example
+	 * ```ts
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 * import { pipe } from '../internal/function.ts'
+	 *
+	 * assertStrictEquals(
+	 *   pipe(Option.Some(1), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 *   'a some containing 1'
+	 * )
+	 *
+	 * assertStrictEquals(
+	 *   pipe(Option.None(), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 *   'a none'
+	 * )
+	 * ```
+	 * @see fold
+	 * @category pattern matching
+	 */
+	public static match<A, B>(cases: {
+		readonly onNone: F.Lazy<B>
+		readonly onSome: (a: A) => B
+	}): (self: Option.Type<A>) => B {
+		return Option.fold(cases.onNone, cases.onSome)
 	}
 
 	/**

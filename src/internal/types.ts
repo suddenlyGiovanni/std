@@ -3,11 +3,11 @@ export declare namespace Types {
 	 * Returns the tags in a type.
 	 *
 	 *  @example
-	 *```ts
+	 * ```ts
 	 * import type { Types } from './types.ts'
 	 *
 	 * type Res = Types.Tags<string | { _tag: 'a' } | { _tag: 'b'} > // "a" | "b"
-	 *```
+	 * ```
 	 *
 	 * @category types
 	 */
@@ -22,7 +22,7 @@ export declare namespace Types {
 	 *
 	 * type Res1 = Types.Equals<{ a: number }, { a: number }> // true
 	 * type Res2 = Types.Equals<{ a: number }, { b: number }> // false
-	 *```
+	 * ```
 	 *
 	 * @category models
 	 */
@@ -34,7 +34,7 @@ export declare namespace Types {
 	 * Simplifies the type signature of a type.
 	 *
 	 * @example
-	 *```ts
+	 * ```ts
 	 * import type { Types } from './types.ts'
 	 *
 	 * type Res = Types.Simplify<{ a: number } & { b: number }> // { a: number; b: number; }
@@ -43,7 +43,6 @@ export declare namespace Types {
 	 */
 	export type Simplify<A> = {
 		[K in keyof A]: A[K]
-	} extends infer B
-		? B
+	} extends infer B ? B
 		: never
 }

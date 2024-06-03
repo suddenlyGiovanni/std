@@ -82,7 +82,9 @@ describe('Option', () => {
 			expectTypeOf(Option.fromNullable(undefined as undefined | string)).toEqualTypeOf<
 				Option.Type<string>
 			>()
-			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<Option.Type<number>>()
+			expectTypeOf(Option.fromNullable(null as null | number)).toEqualTypeOf<
+				Option.Type<number>
+			>()
 		})
 	})
 
@@ -122,7 +124,7 @@ describe('Option', () => {
 
 			// test the instance method
 			Util.deepStrictEqual(
-				stringOption.fold(ifEmpty, _ => {
+				stringOption.fold(ifEmpty, (_) => {
 					throw new Error('Called `absurd` function which should be un-callable')
 				}),
 				42,
@@ -139,7 +141,7 @@ describe('Option', () => {
 				pipe(
 					null as null | string,
 					Option.fromNullable,
-					Option.fold(ifEmpty, _ => {
+					Option.fold(ifEmpty, (_) => {
 						throw new Error('Called `absurd` function which should be un-callable')
 					}),
 				),
@@ -149,7 +151,7 @@ describe('Option', () => {
 			expectTypeOf(
 				pipe(
 					stringOption,
-					Option.fold(ifEmpty, _ => {
+					Option.fold(ifEmpty, (_) => {
 						throw new Error('Called `absurd` function which should be un-callable')
 					}),
 				),
@@ -160,7 +162,9 @@ describe('Option', () => {
 			const stringOption = Option.fromNullable<null | string>('abc')
 			// test the instance method
 			Util.deepStrictEqual(stringOption.fold(ifEmpty, fa), { length: 3 })
-			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<number | { length: number }>()
+			expectTypeOf(stringOption.fold(ifEmpty, fa)).toEqualTypeOf<
+				number | { length: number }
+			>()
 
 			// test the static method
 			Util.deepStrictEqual(
@@ -181,7 +185,10 @@ describe('Option', () => {
 				pipe(null as null | string, Option.fromNullable, Option.match({ onNone, onSome })),
 				'none',
 			)
-			Util.deepStrictEqual(pipe('abc', Option.Some, Option.match({ onNone, onSome })), 'some3')
+			Util.deepStrictEqual(
+				pipe('abc', Option.Some, Option.match({ onNone, onSome })),
+				'some3',
+			)
 		})
 	})
 
