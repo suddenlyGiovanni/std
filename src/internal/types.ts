@@ -1,3 +1,21 @@
+/**
+ * This namespace provides utility types for type manipulation.
+ *
+ * @example
+ * ```ts
+ * import type { Types } from './types.ts'
+ *
+ * type Test1 = Types.Tags<string | { _tag: 'a' } | { _tag: 'b'} >
+ * //      ^? "a" | "b"
+ *
+ * type Test2 = Types.Equals<{ a: number }, { a: number }>
+ * //       ^? true
+ *
+ * type Test3 = Types.Simplify<{ a: number } & { b: number }>
+ * //   ^? { a: number; b: number; }
+ *
+ * ```
+ */
 export declare namespace Types {
 	/**
 	 * Returns the tags in a type.
