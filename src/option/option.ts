@@ -12,12 +12,12 @@ function format(x: unknown): string {
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
  * These are useful methods that exist for both Some and None:
  * -[ ] `isDefined` : True if not empty
- * -[ ] `isEmpty` : True if empty
+ * - {@linkcode Option#isEmpty} : True if empty
  * -[ ] `nonEmpty`: True if not empty
  * -[ ] `orElse`: Evaluate and return alternate optional value if empty
  * -[ ] `getOrElse`: Evaluate and return alternate value if empty
- * -[ ] `get`: Return value, throw exception if empty
- * -[ ] `fold`: Apply function on optional value, return default if empty
+ * - {@linkcode Option#get} : Return value, throw exception if empty
+ * - {@linkcode Option#fold}: Apply function on optional value, return default if empty
  * -[ ] `map`: Apply a function on the optional value
  * -[ ] `flatMap`: Same as map but function must return an optional value
  * -[ ] `foreach`: Apply a procedure on option value
@@ -32,6 +32,31 @@ function format(x: unknown): string {
  * -[ ] `unzip3`: Split an optional triple to three optional values
  * -[ ] `toList`: Unary list of optional value, otherwise the empty list
  * A less-idiomatic way to use Option values is via pattern matching method `match`:
+ *
+ * ```ts
+ * import { assertStrictEquals } from 'jsr:@std/assert'
+ * import { pipe } from '../internal/function.ts'
+ * import { Option } from './option.ts'
+ *
+ * assertStrictEquals(
+ * 	pipe(
+ * 		Option.fromNullable<number | undefined>(undefined),
+ * 		Option.match({
+ * 			onNone: () => 'a none',
+ * 			onSome: a => `a some containing ${a}`,
+ * 		}),
+ * 	),
+ * 	'a none',
+ * )
+ *
+ * assertStrictEquals(
+ * 	Option.fromNullable(1).match({
+ * 		onNone: () => 'a none',
+ * 		onSome: a => `a some containing ${a}`,
+ * 	}),
+ * 	'a some containing 1',
+ * )
+ * ```
  */
 export abstract class Option<out A> implements Inspectable, Equals {
 	/**
