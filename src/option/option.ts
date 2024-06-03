@@ -1,9 +1,14 @@
 import type { Equals } from '../internal/equals.ts'
 import type * as F from '../internal/function.ts'
+import type { TypeLambda } from '../internal/hkt.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
+}
+
+interface OptionTypeLambda extends TypeLambda {
+	readonly type: Option.Type<this['Target']>
 }
 
 /**

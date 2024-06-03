@@ -63,4 +63,19 @@ export declare namespace Types {
 		[K in keyof A]: A[K]
 	} extends infer B ? B
 		: never
+
+	/**
+	 * Invariant helper.
+	 */
+	export type Invariant<A> = (_: A) => A
+
+	/**
+	 * Covariant helper.
+	 */
+	export type Covariant<A> = (_: never) => A
+
+	/**
+	 * Contravariant helper.
+	 */
+	export type Contravariant<A> = (_: A) => void
 }
