@@ -109,6 +109,18 @@ export abstract class Option<out A> implements Inspectable, Equals {
 
 	/**
 	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
+	 * This is equivalent to:
+	 * ```ts
+	 * option.match({
+	 *    onSome: (x) => f(x),
+	 *    onNone: _ => ifEmpty(),
+	 *  })
+	 * ```
+	 *
+	 * This is also equivalent to:
+	 * ```ts
+	 * option.map(f).getOrElse(ifEmpty())
+	 * ```
 	 *
 	 * @param ifEmpty - The expression to evaluate if empty.
 	 * @param f - The function to apply if nonempty.
