@@ -423,6 +423,52 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	public isSome(this: Option.Type<A>): this is Some<A> {
 		return Option.isSome(this)
 	}
+
+	/**
+	 * Pattern matches the value of the Option.
+	 *
+	 * @this {Some | None} - The `Option` instance to match.
+	 * @param cases - The pattern matching object containing callbacks for different case branches:
+	 * @param cases.onNone - The lazy value to be returned if the `Option` is `None`;
+	 * @param cases.onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
+	 * @returns The value returned by the corresponding callback from the cases object of type `B` or `C`.
+	 *
+	 * @example
+	 * ```ts
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertStrictEquals(
+	 *    Option.fromNullable<null | number>(1)
+	 *      .match({
+	 *        onNone: () => 'a none',
+	 *        onSome: (a) => `a some containing ${a}`
+	 *        }),
+	 *   'a some containing 1'
+	 * )
+	 *
+	 * assertStrictEquals(
+	 *    Option.fromNullable<null | number>(null)
+	 *      .match({
+	 *        onNone: () => 'a none',
+	 *        onSome: (a) => `a some containing ${a}`
+	 *        }),
+	 *   'a none'
+	 * )
+	 * ```
+	 * @see {Option.fold}
+	 * @see {Option.match}
+	 * @category pattern-matching
+	 */
+	public match<A, B, C = B>(
+		this: Option.Type<A>,
+		cases: {
+			readonly onNone: F.Lazy<B>
+			readonly onSome: (a: A) => C
+		},
+	): B | C {
+		return Option.match(cases)(this)
+	}
 }
 
 /**

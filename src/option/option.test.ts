@@ -191,6 +191,13 @@ describe('Option', () => {
 				number | 'none'
 			>()
 		})
+		test('instance', () => {
+			Util.deepStrictEqual(Option.None<string>().match({ onNone, onSome }), 'none')
+			Util.deepStrictEqual(Option.Some('abc').match({ onNone, onSome }), 3)
+			expectTypeOf(Option.fromNullable(null).match({ onNone, onSome })).toEqualTypeOf<
+				number | 'none'
+			>()
+		})
 	})
 
 	describe('guards', () => {
