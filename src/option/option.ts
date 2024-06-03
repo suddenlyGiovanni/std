@@ -171,26 +171,30 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
-	 * Matches the given `Option` and returns either the provided `onNone` value or the result of the provided `onSome`
-	 * function when passed the `Option`'s value.
+	 * Curried pattern matching for `Option` instances.
+	 * Given a pattern matching object, it will return a function that will match the `Option` instance against the pattern.
 	 *
-	 * @param self - The `Option` to match
-	 * @param onNone - The value to be returned if the `Option` is `None`
-	 * @param onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
+	 * @param cases - The pattern matching object
+	 * @param cases.onNone - The lazy value to be returned if the `Option` is `None`;
+	 * @param cases.onSome - The function to be called if the `Option` is `Some`, it will be passed the `Option`'s value and its result will be returned
+	 * @returns A function that will match the `Option` instance against the pattern.
 	 *
 	 * @example
-	 * import { pipe, Option } from "effect"
+	 * ```ts
+	 *  import { assertStrictEquals  } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 * import { pipe } from '../internal/function.ts'
 	 *
-	 * assert.deepStrictEqual(
-	 *   pipe(Option.some(1), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 * assertStrictEquals(
+	 *   pipe(Option.Some(1), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
 	 *   'a some containing 1'
 	 * )
 	 *
-	 * assert.deepStrictEqual(
-	 *   pipe(Option.none(), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
+	 * assertStrictEquals(
+	 *   pipe(Option.None(), Option.match({ onNone: () => 'a none', onSome: (a) => `a some containing ${a}` })),
 	 *   'a none'
 	 * )
-	 *
+	 * ```
 	 * @category pattern matching
 	 */
 	public static match<A, B>(cases: {
@@ -345,8 +349,8 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.get(), that.get() as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -451,8 +455,7 @@ export declare namespace Option {
 	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
 	 * ```
 	 */
-	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>]
-		? _A
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
 		: never
 }
 
