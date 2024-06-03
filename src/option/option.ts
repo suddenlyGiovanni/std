@@ -136,14 +136,26 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
 	 * This is equivalent to:
 	 * ```ts
+	 * import { Option } from  './option.ts'
+	 *
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => B
+	 * declare const ifEmpty: <B>() => B
+	 *
 	 * option.match({
 	 *    onSome: (x) => f(x),
-	 *    onNone: _ => ifEmpty(),
+	 *    onNone: () => ifEmpty(),
 	 *  })
 	 * ```
 	 *
 	 * This is also equivalent to:
-	 * ```ts
+	 * ```ts no-eval no-assert
+	 * import { Option } from  './option.ts'
+	 *
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => B
+	 * declare const ifEmpty: <B>() => B
+	 *
 	 * option.map(f).getOrElse(ifEmpty())
 	 * ```
 	 *
@@ -437,7 +449,12 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 * Returns the option's value if the option is nonempty, otherwise return the result of evaluating default.
 	 *
 	 * This is equivalent to the following pattern match:
-	 * ```ts
+	 * ```ts no-assert
+	 * import { Option } from  './option.ts'
+	 *
+	 * declare const option: Option.Type<unknown>
+	 * declare const defaultValue: <B>() => B
+	 *
 	 * option.match({
 	 * 	onNone: () => defaultValue(),
 	 * 	onSome: (a) => a
