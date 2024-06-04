@@ -18,14 +18,14 @@ interface OptionTypeLambda extends TypeLambda {
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
  * These are useful methods that exist for both Some and None:
  * -[ ] `isDefined` : True if not empty
- * - {@linkcode Option#isEmpty} : True if empty
+ * - {@linkcode Option#isEmpty|isEmpty} : True if empty
  * -[ ] `nonEmpty`: True if not empty
  * -[ ] `orElse`: Evaluate and return alternate optional value if empty
- * -[ ] `getOrElse`: Evaluate and return alternate value if empty
- * - {@linkcode Option#get} : Return value, throw exception if empty
- * - {@linkcode Option#fold}: Apply function on optional value, return default if empty
+ * - {@linkcode Option#getOrElse|getOrElse}: Evaluate and return alternate value if empty
+ * - {@linkcode Option#get|get} : Return value, throw exception if empty
+ * - {@linkcode Option#fold|fold}: Apply function on optional value, return default if empty
  * -[ ] `map`: Apply a function on the optional value
- * -[ ] `flatMap`: Same as map but function must return an optional value
+ * - {@linkcode  Option#flatMap|flatMap }: Same as map but function must return an optional value
  * -[ ] `foreach`: Apply a procedure on option value
  * -[ ] `collect`: Apply partial pattern match on optional value
  * -[ ] `filter`: An optional value satisfies predicate
