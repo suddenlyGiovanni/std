@@ -213,7 +213,7 @@ describe('Option', () => {
 
 	describe('flatMap', () => {
 		const f = (n: number) => Option.Some(n * 2)
-		const g = () => Option.None()
+		const g = () => Option.None<string>()
 
 		test('static', () => {
 			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
