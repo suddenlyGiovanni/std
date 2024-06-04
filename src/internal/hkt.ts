@@ -60,20 +60,20 @@ export interface TypeLambda {
 export type Kind<F extends TypeLambda, In, Out2, Out1, Target> = F extends {
 	readonly type: unknown
 }
-	? // If F has a type property, it means it is a concrete type lambda (e.g., F = ArrayTypeLambda).
-		// The intersection allows us to obtain the result of applying F to Target.
-		(F & {
-			readonly In: In
-			readonly Out2: Out2
-			readonly Out1: Out1
-			readonly Target: Target
-		})['type']
-	: // If F is generic, we must explicitly specify all of its type parameters
-		// to ensure that none are omitted from type checking.
-		{
-			readonly F: F
-			readonly In: Types.Contravariant<In>
-			readonly Out2: Types.Covariant<Out2>
-			readonly Out1: Types.Covariant<Out1>
-			readonly Target: Types.Invariant<Target>
-		}
+	// If F has a type property, it means it is a concrete type lambda (e.g., F = ArrayTypeLambda).
+	// The intersection allows us to obtain the result of applying F to Target.
+	? (F & {
+		readonly In: In
+		readonly Out2: Out2
+		readonly Out1: Out1
+		readonly Target: Target
+	})['type']
+	// If F is generic, we must explicitly specify all of its type parameters
+	// to ensure that none are omitted from type checking.
+	: {
+		readonly F: F
+		readonly In: Types.Contravariant<In>
+		readonly Out2: Types.Covariant<Out2>
+		readonly Out1: Types.Covariant<Out1>
+		readonly Target: Types.Invariant<Target>
+	}

@@ -2,6 +2,7 @@ import type { Equals } from '../internal/equals.ts'
 import type * as F from '../internal/function.ts'
 import type { TypeLambda } from '../internal/hkt.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
+import type { FlatMap } from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -63,7 +64,7 @@ interface OptionTypeLambda extends TypeLambda {
  * )
  * ```
  */
-export abstract class Option<out A> implements Inspectable, Equals {
+export abstract class Option<out A> implements Inspectable, Equals, FlatMap<OptionTypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -85,6 +86,37 @@ export abstract class Option<out A> implements Inspectable, Equals {
 				"Option is not meant to be instantiated directly; instantiate instead Option's derived classes (Some, None)",
 			)
 		}
+	}
+
+	/**
+	 * @see  Option#flatMap
+	 */
+	static flatMap<A, B>(f: (a: A) => Option.Type<B>): (self: Option.Type<A>) => Option.Type<B> {
+		return (self) => (Option.isNone(self) ? Option.None() : f(self.get()))
+	}
+
+	/**
+	 * Returns the result of applying `f` to `this` Option's value if this Option is nonempty. Returns `None` if this Option is empty.
+	 * Slightly different from `map` in that `f` is expected to return `Option.Type` (which could be None).
+	 *
+	 * @param f – the function to apply
+	 * @returns the result of applying `f` to `this` Option's value if this Option is nonempty. Returns `None` if this Option is empty.
+	 *
+	 *  @remarks
+	 * This is equivalent to:
+	 * ```ts
+	 * option.match({
+	 *  onSome: (x) => f(x),
+	 *  onNone: () => None()
+	 * })
+	 * ```
+	 *
+	 * @see {Option.flatMap}
+	 * @see map
+	 * @see foreach
+	 */
+	public flatMap<A, B>(this: Option.Type<A>, f: (a: A) => Option.Type<B>): Option.Type<B> {
+		return Option.flatMap(f)(this)
 	}
 
 	/**
