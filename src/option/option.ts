@@ -114,6 +114,7 @@ export abstract class Option<out A> implements Inspectable, Equals, FlatMap<Opti
 	 * @see {Option.flatMap}
 	 * @see map
 	 * @see foreach
+	 * @implements {FlatMap}
 	 */
 	public flatMap<A, B>(this: Option.Type<A>, f: (a: A) => Option.Type<B>): Option.Type<B> {
 		return Option.flatMap(f)(this)

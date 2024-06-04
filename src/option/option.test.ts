@@ -1,10 +1,9 @@
 import { expectTypeOf } from 'npm:expect-type@0.19.0'
-import { assertEquals, equal } from 'jsr:@std/assert'
+import { assertEquals, assertStrictEquals, equal } from 'jsr:@std/assert'
 import { expect } from 'jsr:@std/expect'
 import { describe, it, test } from 'jsr:@std/testing/bdd'
 
-import { pipe } from '../internal/function.ts'
-import type * as F from '../internal/function.ts'
+import { type Lazy, pipe } from '../internal/function.ts'
 import { Option } from './option.ts'
 
 // deno-lint-ignore no-namespace
@@ -12,6 +11,11 @@ namespace Util {
 	// biome-ignore lint/suspicious/noExportsInTest: <explanation>
 	export const deepStrictEqual = <A>(actual: A, expected: A) => {
 		assertEquals(actual, expected)
+	}
+
+	// biome-ignore lint/suspicious/noExportsInTest: <explanation>
+	export const optionEqual = <A>(actual: Option.Type<A>, expected: Option.Type<A>) => {
+		assertStrictEquals(actual.equals(expected), true)
 	}
 }
 
@@ -147,7 +151,7 @@ describe('Option', () => {
 
 	describe('fold', () => {
 		const fa = (s: string): { length: number } => ({ length: s.length })
-		const ifEmpty: F.Lazy<number> = () => 42
+		const ifEmpty: Lazy<number> = () => 42
 
 		it('returns call the ifEmpty for None cases ', () => {
 			const stringOption = Option.fromNullable<null | string>(null)
@@ -204,6 +208,36 @@ describe('Option', () => {
 			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<
 				number | { length: number }
 			>()
+		})
+	})
+
+	describe('flatMap', () => {
+		const f = (n: number) => Option.Some(n * 2)
+		const g = () => Option.None()
+
+		test('static', () => {
+			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
+			Util.deepStrictEqual(pipe(Option.None<number>(), Option.flatMap(f)), Option.None())
+			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
+			Util.deepStrictEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
+		})
+
+		test('instance', () => {
+			Util.deepStrictEqual(Option.Some(1).flatMap(f), Option.Some(2))
+			Util.deepStrictEqual(Option.None<number>().flatMap(f), Option.None())
+			Util.deepStrictEqual(Option.Some(1).flatMap(g), Option.None())
+			Util.deepStrictEqual(Option.None().flatMap(g), Option.None())
+		})
+
+		test('associativity law', () => {
+			const Fa: Option.Type<number> = Option.Some(1)
+			const f: (a: number) => Option.Type<string> = (a) => Option.Some(a.toString())
+			const g: (b: string) => Option.Type<boolean> = (b) => Option.Some(Boolean(b))
+			// If ⊕ is associative, then a ⊕ (b ⊕ c) = (a ⊕ b) ⊕ c.
+			Util.optionEqual(
+				Fa.flatMap(f).flatMap(g),
+				Fa.flatMap((a) => f(a).flatMap(g)),
+			)
 		})
 	})
 
