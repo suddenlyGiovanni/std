@@ -65,8 +65,7 @@ interface OptionTypeLambda extends TypeLambda {
  * ```
  */
 export abstract class Option<out A>
-	implements Inspectable, Equals, FlatMapFluent<OptionTypeLambda>
-{
+	implements Inspectable, Equals, FlatMapFluent<OptionTypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -144,24 +143,10 @@ export abstract class Option<out A>
 	 * Applies a function to the value of an Option and flattens the result, if the input is Some.
 	 * @returns A function that takes an Option and returns the result of applying `f` to this Option's value if the Option is nonempty. Otherwise, returns None.
 	 * @see  Option#flatMap
-	 *
-	 * @example
-	 * ```ts
-	 * import { assertStrictEquals } from 'jsr:@std/assert'
-	 * import { Option } from  './option.ts'
-	 * import { pipe } from '../internal/function.ts'
-	 *
-	 * const two = pipe(
-	 *  Option.Some(Option.Some(1)),
-	 *  Option.flatMap(a => a),
-	 *  Option.flatMap(a => Option.Some(a + 1)),
-	 *  Option.flatMap(a => a)
-	 * )
-	 * assertStrictEquals(two, 2)
-	 * ```
 	 */
-	public static flatMap: FlatMapPipable<OptionTypeLambda>['flatMap'] = f => self =>
-		self.isNone() ? Option.None() : f(self.get())
+	public static flatMap: FlatMapPipable<OptionTypeLambda>['flatMap'] =
+		<A, B>(f: (a: A) => Option.Type<B>) => (self: Option.Type<A>): Option.Type<B> =>
+			self.isNone() ? Option.None() : f(self.get())
 
 	/**
 	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
@@ -248,7 +233,7 @@ export abstract class Option<out A>
 		ifEmpty: F.Lazy<B>,
 		f: (a: A) => C,
 	): (self: Option.Type<A>) => B | C {
-		return self => (self.isEmpty() ? ifEmpty() : f(self.get()))
+		return (self) => (self.isEmpty() ? ifEmpty() : f(self.get()))
 	}
 
 	/**
@@ -437,8 +422,8 @@ export abstract class Option<out A>
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.get(), that.get() as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -641,8 +626,7 @@ export declare namespace Option {
 	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
 	 * ```
 	 */
-	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>]
-		? _A
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
 		: never
 }
 
