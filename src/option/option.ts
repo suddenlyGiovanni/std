@@ -3,8 +3,7 @@ import type * as F from '../internal/function.ts'
 import type { TypeLambda } from '../internal/hkt.ts'
 
 import type { Inspectable } from '../internal/inspectable.ts'
-import { Covariant, type FlatMap } from '../typeclass/mod.ts'
-import type { OfPipeable } from '../typeclass/of.ts'
+import { Covariant, type FlatMap, type Of } from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -383,7 +382,7 @@ export abstract class Option<out A>
 	 *
 	 * @see Option.Some
 	 */
-	public static of: OfPipeable<OptionTypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
+	public static of: Of.Pipeable<OptionTypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
 
 	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
