@@ -97,7 +97,7 @@ describe('Option', () => {
 
 			const noneOfUnknown = Option.None()
 			const noneOfNumber = Option.None<number>()
-			expectTypeOf<Option.Value<typeof noneOfUnknown>>().toEqualTypeOf<unknown>()
+			expectTypeOf<Option.Value<typeof noneOfUnknown>>().toEqualTypeOf<never>()
 			expectTypeOf<Option.Value<typeof noneOfNumber>>().toEqualTypeOf<number>()
 
 			type Foo = { foo: string }
@@ -135,7 +135,7 @@ describe('Option', () => {
 		})
 
 		test('None', () => {
-			expect(Option.None().getOrElse(() => 2)).toBe(2)
+			expect(Option.None<number>().getOrElse(() => 2)).toBe(2)
 			expect(
 				Option.fromNullable<undefined | { foo: string }>(undefined).getOrElse(() => ({
 					foo: 'baz',
@@ -143,7 +143,7 @@ describe('Option', () => {
 			).toEqual({
 				foo: 'baz',
 			})
-			expect(Option.None().getOrElse(() => null)).toEqual(null)
+			expect(Option.None<null | unknown>().getOrElse(() => null)).toEqual(null)
 		})
 	})
 

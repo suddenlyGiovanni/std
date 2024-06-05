@@ -133,7 +133,7 @@ export abstract class Option<out A>
 	 *
 	 * @category constructors
 	 */
-	public static None<A>(): Option.Type<A> {
+	public static None<A = never>(): Option.Type<A> {
 		return None.getSingletonInstance<A>()
 	}
 
