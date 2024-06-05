@@ -211,26 +211,28 @@ describe('Option', () => {
 
 	describe('Covariant', () => {
 		describe('map', () => {
-			test('static', () => {
-				const f: (n: number) => number = (n) => n * 2
-				const g: (n: number) => string = (n) => n.toString()
-				Util.deepStrictEqual(pipe(Option.Some(1), Option.map(f)), Option.Some(2))
-				expectTypeOf(Option.map(f)(Option.Some(1))).toEqualTypeOf<Option.Type<number>>()
+			const f: (n: number) => number = (n) => n * 2
+			const g: (n: number) => string = (n) => n.toString()
+			const someNumber = Option.of(1)
+			const noneNumber = Option.None<number>()
 
-				Util.deepStrictEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
+			test('static', () => {
+				Util.optionEqual(pipe(someNumber, Option.map(f)), Option.of(2))
+				expectTypeOf(Option.map(f)(someNumber)).toEqualTypeOf<Option.Type<number>>()
+
+				Util.optionEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
 				expectTypeOf(Option.map(g)(Option.Some(1))).toEqualTypeOf<Option.Type<string>>()
 
-				Util.deepStrictEqual(
-					pipe(Option.None<number>(), Option.map(f)),
-					Option.None<number>(),
-				)
-				Util.deepStrictEqual(
-					pipe(Option.None<number>(), Option.map(g)),
-					Option.None<string>(),
-				)
+				Util.optionEqual(pipe(noneNumber, Option.map(f)), noneNumber)
+				Util.optionEqual(pipe(noneNumber, Option.map(g)), Option.None<string>())
 			})
 
-			test.skip('instance', () => {})
+			test('instance', () => {
+				Util.optionEqual(someNumber.map(f), Option.of(2))
+				Util.optionEqual(Option.Some(42).map(g), Option.Some('42'))
+				Util.optionEqual(noneNumber.map(f), noneNumber)
+				Util.optionEqual(noneNumber.map(g), Option.None<string>())
+			})
 		})
 
 		describe('imap', () => {
@@ -244,7 +246,10 @@ describe('Option', () => {
 				Util.optionEqual(pipe(noneNumber, Option.imap(f, g)), Option.None<string>())
 			})
 
-			test.skip('instance', () => {})
+			test('instance', () => {
+				Util.optionEqual(someNumber.imap(f, g), Option.of('1'))
+				Util.optionEqual(noneNumber.imap(f, g), Option.None<string>())
+			})
 		})
 
 		describe('Functor laws', () => {

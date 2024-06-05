@@ -28,7 +28,7 @@ export interface OptionTypeLambda extends TypeLambda {
  * - {@linkcode Option#getOrElse|getOrElse}: Evaluate and return alternate value if empty
  * - {@linkcode Option#get|get} : Return value, throw exception if empty
  * - {@linkcode Option#fold|fold}: Apply function on optional value, return default if empty
- * -[ ] `map`: Apply a function on the optional value
+ * - {@linkcode Option#map|map}: Apply a function on the optional value
  * - {@linkcode  Option#flatMap|flatMap }: Same as map but function must return an optional value
  * -[ ] `foreach`: Apply a procedure on option value
  * -[ ] `collect`: Apply partial pattern match on optional value
@@ -69,7 +69,11 @@ export interface OptionTypeLambda extends TypeLambda {
  * ```
  */
 export abstract class Option<out A>
-	implements Inspectable, Equals, FlatMap.Fluent<OptionTypeLambda> {
+	implements
+		Inspectable,
+		Equals,
+		FlatMap.Fluent<OptionTypeLambda>,
+		Covariant.Fluent<OptionTypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -324,10 +328,16 @@ export abstract class Option<out A>
 		return self instanceof Some
 	}
 
+	/**
+	 * @see Option#map
+	 */
 	public static map: Covariant.Pipeable<OptionTypeLambda>['map'] =
 		<A, B>(f: (a: A) => B) => (self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : Option.Some(f(self.get()))
 
+	/**
+	 * @see Option#imap
+	 */
 	public static imap: Covariant.Pipeable<OptionTypeLambda>['imap'] = Covariant.imap<
 		OptionTypeLambda
 	>(Option.map)
@@ -538,6 +548,13 @@ export abstract class Option<out A>
 	}
 
 	/**
+	 * @see Option.imap
+	 */
+	public imap<A, B>(this: Option.Type<A>, f: (a: A) => B, g: (b: B) => A): Option.Type<B> {
+		return Option.map(f)(this)
+	}
+
+	/**
 	 * Type guard that returns `true` if the option is None, `false` otherwise.
 	 *
 	 * @returns `true` if the option is None, `false` otherwise.
@@ -565,6 +582,35 @@ export abstract class Option<out A>
 	 */
 	public isSome(this: Option.Type<A>): this is Some<A> {
 		return Option.isSome(this)
+	}
+
+	/**
+	 * Returns a `Some` containing the result of applying `f` to this Option's value if this Option is nonempty.
+	 * Otherwise, return `None`
+	 *
+	 * @param f - The function to apply
+	 * @returns a `Some<B>` if the Option is nonempty, otherwise `None`
+	 *
+	 * @remarks
+	 * This is equivalent to:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => B
+	 *
+	 * option.match({
+	 * 	onSome: (a) => Option.Some(f(a)), // Some<B>
+	 * 	onNone: () => Option.None()
+	 * })
+	 * ```
+	 *
+	 * @remarks
+	 * This is similar to {@linkcode Option#flatMap|flatMap } except here, `f` does not need to wrap its result in an `Option`.
+	 *
+	 * @see Option.map
+	 */
+	public map<A, B>(this: Option.Type<A>, f: (a: A) => B): Option.Type<B> {
+		return Option.map(f)(this)
 	}
 
 	/**
