@@ -28,6 +28,16 @@ describe('Option', () => {
 			}).toThrow('Option is not meant to be instantiated directly')
 		})
 
+		test('of', () => {
+			const some = Option.of(1)
+			expectTypeOf(some).toEqualTypeOf<Option.Type<number>>()
+			expect(some._tag).toBe('Some')
+			expect(some.get()).toBe(1)
+
+			expectTypeOf(Option.of(null)).toEqualTypeOf<Option.Type<null>>() // should we allow this?
+			expectTypeOf(Option.of(undefined)).toEqualTypeOf<Option.Type<undefined>>() // should we allow this? maybe of should not lift nullable values?
+		})
+
 		test('Some', () => {
 			const some = Option.Some(1)
 			expect(some._tag).toBe('Some')

@@ -9,6 +9,7 @@ import type {
 	// Covariant,
 	// Invariant
 } from '../typeclass/mod.ts'
+import type { OfPipeable } from '../typeclass/of.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -139,9 +140,11 @@ export abstract class Option<out A> implements Inspectable, Equals, FlatMap<Opti
 	 *
 	 * @param value - The value to wrap.
 	 * @returns An instance of {@linkcode Some(1)} containing the value.
+	 *
+	 * @alias Option.of
 	 */
 	public static Some<T>(value: T): Option.Type<T> {
-		return new Some(value)
+		return Option.of(value)
 	}
 
 	/**
@@ -367,6 +370,17 @@ export abstract class Option<out A> implements Inspectable, Equals, FlatMap<Opti
 	}): (self: Option.Type<A>) => B | C {
 		return Option.fold(cases.onNone, cases.onSome)
 	}
+
+	/**
+	 * lifts a value `A` to in the context of an `Option`
+	 *
+	 * @template A - The type of the value to lift
+	 * @param a - The value to lift
+	 * @returns An instance of {@linkcode Option.Type} containing the value of type `A`.
+	 *
+	 * @see Option.Some
+	 */
+	public static of: OfPipeable<OptionTypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
 
 	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
