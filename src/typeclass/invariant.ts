@@ -13,20 +13,19 @@ import type { Kind, TypeClass, TypeLambda } from '../internal/hkt.ts'
  *     fa.imap(f1)(f2).imap(g1)(g2) <-> fa.imap(g1.compose(f1))(f2.compose(g2))
  * ```
  */
-export interface InvariantFluent<F extends TypeLambda> extends TypeClass<F> {
-	imap<R, O, E, A, B>(
-		this: Kind<F, R, O, E, A>,
-		to: (a: A) => B,
-		from: (b: B) => A,
-	): Kind<F, R, O, E, B>
-}
+export declare namespace Invariant {
+	export interface Fluent<F extends TypeLambda> extends TypeClass<F> {
+		imap<R, O, E, A, B>(
+			this: Kind<F, R, O, E, A>,
+			to: (a: A) => B,
+			from: (b: B) => A,
+		): Kind<F, R, O, E, B>
+	}
 
-export interface InvariantPipeable<F extends TypeLambda> extends TypeClass<F> {
-	new <A, In, Out2, Out1>(): Kind<F, In, Out2, Out1, A>
-
-	// static curried Imap
-	readonly imap: <A, B>(
-		to: (a: A) => B,
-		from: (b: B) => A,
-	) => <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>
+	export interface Pipeable<F extends TypeLambda> extends TypeClass<F> {
+		imap<A, B>(
+			to: (a: A) => B,
+			from: (b: B) => A,
+		): <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>
+	}
 }
