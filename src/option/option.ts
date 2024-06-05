@@ -1,13 +1,9 @@
 import type { Equals } from '../internal/equals.ts'
 import type * as F from '../internal/function.ts'
 import type { TypeLambda } from '../internal/hkt.ts'
+
 import type { Inspectable } from '../internal/inspectable.ts'
-import { type CovariantPipeable, imap } from '../typeclass/covariant.ts'
-import type {
-	FlatMap,
-	// Covariant,
-	// Invariant
-} from '../typeclass/mod.ts'
+import { Covariant, type FlatMap } from '../typeclass/mod.ts'
 import type { OfPipeable } from '../typeclass/of.ts'
 
 function format(x: unknown): string {
@@ -329,13 +325,13 @@ export abstract class Option<out A>
 		return self instanceof Some
 	}
 
-	public static map: CovariantPipeable<OptionTypeLambda>['map'] =
+	public static map: Covariant.Pipeable<OptionTypeLambda>['map'] =
 		<A, B>(f: (a: A) => B) => (self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : Option.Some(f(self.get()))
 
-	public static imap: CovariantPipeable<OptionTypeLambda>['imap'] = imap<OptionTypeLambda>(
-		Option.map,
-	)
+	public static imap: Covariant.Pipeable<OptionTypeLambda>['imap'] = Covariant.imap<
+		OptionTypeLambda
+	>(Option.map)
 
 	/**
 	 * Curried pattern matching for `Option` instances.
@@ -622,7 +618,6 @@ export abstract class Option<out A>
 /**
  * The type-level namespace for Option
  * @namespace Option
- * @since 0.0.1
  */
 export declare namespace Option {
 	/**

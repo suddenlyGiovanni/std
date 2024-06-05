@@ -3,11 +3,11 @@ import { pipe } from '../internal/function.ts'
 import { Option, type OptionTypeLambda } from '../option/option.ts'
 
 import { Util } from '../test/utils.ts'
-import * as _ from './covariant.ts'
+import { Covariant } from './covariant.ts'
 
 describe('Covariant', () => {
 	it('imap', () => {
-		const f = _.imap<OptionTypeLambda>(Option.map)(
+		const f = Covariant.imap<OptionTypeLambda>(Option.map)(
 			(s: string) => [s],
 			([s]) => s,
 		)
