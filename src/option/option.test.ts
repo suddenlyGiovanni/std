@@ -1,23 +1,11 @@
 import { expectTypeOf } from 'npm:expect-type@0.19.0'
-import { assertEquals, assertStrictEquals, equal } from 'jsr:@std/assert'
+import { equal } from 'jsr:@std/assert'
 import { expect } from 'jsr:@std/expect'
 import { describe, it, test } from 'jsr:@std/testing/bdd'
 
 import { type Lazy, pipe } from '../internal/function.ts'
+import { Util } from '../test/utils.ts'
 import { Option } from './option.ts'
-
-// deno-lint-ignore no-namespace
-namespace Util {
-	// biome-ignore lint/suspicious/noExportsInTest: <explanation>
-	export const deepStrictEqual = <A>(actual: A, expected: A) => {
-		assertEquals(actual, expected)
-	}
-
-	// biome-ignore lint/suspicious/noExportsInTest: <explanation>
-	export const optionEqual = <A>(actual: Option.Type<A>, expected: Option.Type<A>) => {
-		assertStrictEquals(actual.equals(expected), true)
-	}
-}
 
 describe('Option', () => {
 	describe('constructors', () => {
