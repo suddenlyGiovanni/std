@@ -3,7 +3,6 @@ import type * as F from '../internal/function.ts'
 import type { TypeLambda } from '../internal/hkt.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
 import { type CovariantPipeable, imap } from '../typeclass/covariant.ts'
-import type { FlatMapPipeable } from '../typeclass/flat-map.ts'
 import type {
 	FlatMap,
 	// Covariant,
@@ -74,7 +73,8 @@ export interface OptionTypeLambda extends TypeLambda {
  * )
  * ```
  */
-export abstract class Option<out A> implements Inspectable, Equals, FlatMap<OptionTypeLambda> {
+export abstract class Option<out A>
+	implements Inspectable, Equals, FlatMap.Fluent<OptionTypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -155,7 +155,7 @@ export abstract class Option<out A> implements Inspectable, Equals, FlatMap<Opti
 	 * @returns A function that takes an Option and returns the result of applying `f` to this Option's value if the Option is nonempty. Otherwise, returns None.
 	 * @see  Option#flatMap
 	 */
-	public static flatMap: FlatMapPipeable<OptionTypeLambda>['flatMap'] =
+	public static flatMap: FlatMap.Pipeable<OptionTypeLambda>['flatMap'] =
 		<A, B>(f: (a: A) => Option.Type<B>) => (self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : f(self.get())
 
