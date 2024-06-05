@@ -22,12 +22,10 @@ export interface FlatMapFluent<F extends TypeLambda> extends TypeClass<F> {
 	): Kind<F, R1 & R2, O1 | O2, E1 | E2, B>
 }
 
-export interface FlatMapPipable<F extends TypeLambda> extends TypeClass<F> {
+export interface FlatMapPipeable<F extends TypeLambda> extends TypeClass<F> {
 	new <A, In, Out2, Out1>(): Kind<F, In, Out2, Out1, A>
 
 	readonly flatMap: <A, R2, O2, E2, B>(
 		f: (a: A) => Kind<F, R2, O2, E2, B>,
 	) => <R1, O1, E1>(self: Kind<F, R1, O1, E1, A>) => Kind<F, R1 & R2, O1 | O2, E1 | E2, B>
 }
-
-export type FlatMap<F extends TypeLambda> = FlatMapFluent<F> & FlatMapPipable<F>

@@ -2,7 +2,12 @@ import type { Equals } from '../internal/equals.ts'
 import type * as F from '../internal/function.ts'
 import type { TypeLambda } from '../internal/hkt.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
-import type { FlatMapFluent, FlatMapPipable } from '../typeclass/flat-map.ts'
+import type { FlatMapPipeable } from '../typeclass/flat-map.ts'
+import type {
+	FlatMap,
+	// Covariant,
+	// Invariant
+} from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -64,8 +69,7 @@ interface OptionTypeLambda extends TypeLambda {
  * )
  * ```
  */
-export abstract class Option<out A>
-	implements Inspectable, Equals, FlatMapFluent<OptionTypeLambda> {
+export abstract class Option<out A> implements Inspectable, Equals, FlatMap<OptionTypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -144,9 +148,9 @@ export abstract class Option<out A>
 	 * @returns A function that takes an Option and returns the result of applying `f` to this Option's value if the Option is nonempty. Otherwise, returns None.
 	 * @see  Option#flatMap
 	 */
-	public static flatMap: FlatMapPipable<OptionTypeLambda>['flatMap'] =
+	public static flatMap: FlatMapPipeable<OptionTypeLambda>['flatMap'] =
 		<A, B>(f: (a: A) => Option.Type<B>) => (self: Option.Type<A>): Option.Type<B> =>
-			self.isNone() ? Option.None() : f(self.get())
+			Option.isNone(self) ? Option.None() : f(self.get())
 
 	/**
 	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
