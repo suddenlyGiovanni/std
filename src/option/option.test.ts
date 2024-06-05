@@ -209,21 +209,43 @@ describe('Option', () => {
 		})
 	})
 
-	describe('map', () => {
-		test('static', () => {
-			const f: (n: number) => number = (n) => n * 2
-			const g: (n: number) => string = (n) => n.toString()
-			Util.deepStrictEqual(pipe(Option.Some(1), Option.map(f)), Option.Some(2))
-			expectTypeOf(Option.map(f)(Option.Some(1))).toEqualTypeOf<Option.Type<number>>()
+	describe('Covariant', () => {
+		describe('map', () => {
+			test('static', () => {
+				const f: (n: number) => number = (n) => n * 2
+				const g: (n: number) => string = (n) => n.toString()
+				Util.deepStrictEqual(pipe(Option.Some(1), Option.map(f)), Option.Some(2))
+				expectTypeOf(Option.map(f)(Option.Some(1))).toEqualTypeOf<Option.Type<number>>()
 
-			Util.deepStrictEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
-			expectTypeOf(Option.map(g)(Option.Some(1))).toEqualTypeOf<Option.Type<string>>()
+				Util.deepStrictEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
+				expectTypeOf(Option.map(g)(Option.Some(1))).toEqualTypeOf<Option.Type<string>>()
 
-			Util.deepStrictEqual(pipe(Option.None<number>(), Option.map(f)), Option.None<number>())
-			Util.deepStrictEqual(pipe(Option.None<number>(), Option.map(g)), Option.None<string>())
+				Util.deepStrictEqual(
+					pipe(Option.None<number>(), Option.map(f)),
+					Option.None<number>(),
+				)
+				Util.deepStrictEqual(
+					pipe(Option.None<number>(), Option.map(g)),
+					Option.None<string>(),
+				)
+			})
+
+			test.skip('instance', () => {})
 		})
 
-		test.skip('instance', () => {})
+		describe('imap', () => {
+			const f: (n: number) => string = (n) => n.toString()
+			const g: (s: string) => number = (s) => Number(s)
+			const someNumber = Option.of(1)
+			const noneNumber = Option.None<number>()
+
+			test('static', () => {
+				Util.optionEqual(pipe(someNumber, Option.imap(f, g)), Option.of('1'))
+				Util.optionEqual(pipe(noneNumber, Option.imap(f, g)), Option.None<string>())
+			})
+
+			test.skip('instance', () => {})
+		})
 
 		describe('Functor laws', () => {
 			it('Identity ', () => {
