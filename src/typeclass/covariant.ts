@@ -25,3 +25,8 @@ export interface CovariantPipeable<F extends TypeLambda> extends InvariantPipeab
 		f: (a: A) => B,
 	) => <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>
 }
+
+export const imap = <F extends TypeLambda>(
+	map: <A, B>(f: (a: A) => B) => <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>,
+): InvariantPipeable<F>['imap'] =>
+(self, _to) => map(self)

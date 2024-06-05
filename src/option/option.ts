@@ -15,7 +15,10 @@ function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
 }
 
-interface OptionTypeLambda extends TypeLambda {
+/**
+ * @internal
+ */
+export interface OptionTypeLambda extends TypeLambda {
 	readonly type: Option.Type<this['Target']>
 }
 
