@@ -211,6 +211,44 @@ describe('Option', () => {
 		})
 	})
 
+	describe('map', () => {
+		test('static', () => {
+			const f: (n: number) => number = (n) => n * 2
+			const g: (n: number) => string = (n) => n.toString()
+			Util.deepStrictEqual(pipe(Option.Some(1), Option.map(f)), Option.Some(2))
+			expectTypeOf(Option.map(f)(Option.Some(1))).toEqualTypeOf<Option.Type<number>>()
+
+			Util.deepStrictEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
+			expectTypeOf(Option.map(g)(Option.Some(1))).toEqualTypeOf<Option.Type<string>>()
+
+			Util.deepStrictEqual(pipe(Option.None<number>(), Option.map(f)), Option.None<number>())
+			Util.deepStrictEqual(pipe(Option.None<number>(), Option.map(g)), Option.None<string>())
+		})
+
+		test.skip('instance', () => {})
+
+		describe('Functor laws', () => {
+			it('Identity ', () => {
+				const identity = <A>(a: A): A => a
+				const Fa: Option.Type<number> = Option.Some(1)
+				Util.optionEqual(pipe(Fa, Option.map(identity)), Fa)
+			})
+
+			it('Composition ', () => {
+				const Fa: Option.Type<number> = Option.Some(0)
+				const f: (a: number) => string = (a) => String(a)
+				const g: (b: string) => boolean = (b) => Boolean(b)
+				Util.optionEqual(
+					pipe(Fa, Option.map(f), Option.map(g)),
+					pipe(
+						Fa,
+						Option.map((a) => g(f(a))),
+					),
+				)
+			})
+		})
+	})
+
 	describe('flatMap', () => {
 		const f = (n: number) => Option.Some(n * 2)
 		const g = () => Option.None<string>()

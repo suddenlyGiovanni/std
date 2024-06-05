@@ -2,6 +2,7 @@ import type { Equals } from '../internal/equals.ts'
 import type * as F from '../internal/function.ts'
 import type { TypeLambda } from '../internal/hkt.ts'
 import type { Inspectable } from '../internal/inspectable.ts'
+import type { CovariantPipeable } from '../typeclass/covariant.ts'
 import type { FlatMapPipeable } from '../typeclass/flat-map.ts'
 import type {
 	FlatMap,
@@ -321,6 +322,10 @@ export abstract class Option<out A> implements Inspectable, Equals, FlatMap<Opti
 	public static isSome<T>(self: Option.Type<T>): self is Some<T> {
 		return self instanceof Some
 	}
+
+	public static map: CovariantPipeable<OptionTypeLambda>['map'] =
+		<A, B>(f: (a: A) => B) => (self: Option.Type<A>): Option.Type<B> =>
+			Option.isNone(self) ? Option.None() : Option.Some(f(self.get()))
 
 	/**
 	 * Curried pattern matching for `Option` instances.
