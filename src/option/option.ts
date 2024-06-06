@@ -1,19 +1,12 @@
 import type { Equals } from '../internal/equals.ts'
 import type * as F from '../internal/function.ts'
-import type { TypeLambda } from '../internal/hkt.ts'
+import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
 
 import type { Inspectable } from '../internal/inspectable.ts'
 import { Covariant, type FlatMap, type Of } from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
-}
-
-/**
- * @internal
- */
-export interface OptionTypeLambda extends TypeLambda {
-	readonly type: Option.Type<this['Target']>
 }
 
 /**
@@ -72,8 +65,9 @@ export abstract class Option<out A>
 	implements
 		Inspectable,
 		Equals,
-		FlatMap.Fluent<OptionTypeLambda>,
-		Covariant.Fluent<OptionTypeLambda> {
+		FlatMap.Fluent<Option.TypeLambda>,
+		Covariant.Fluent<Option.TypeLambda>
+{
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -154,8 +148,9 @@ export abstract class Option<out A>
 	 * @returns A function that takes an Option and returns the result of applying `f` to this Option's value if the Option is nonempty. Otherwise, returns None.
 	 * @see  Option#flatMap
 	 */
-	public static flatMap: FlatMap.Pipeable<OptionTypeLambda>['flatMap'] =
-		<A, B>(f: (a: A) => Option.Type<B>) => (self: Option.Type<A>): Option.Type<B> =>
+	public static flatMap: FlatMap.Pipeable<Option.TypeLambda>['flatMap'] =
+		<A, B>(f: (a: A) => Option.Type<B>) =>
+		(self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : f(self.get())
 
 	/**
@@ -331,16 +326,16 @@ export abstract class Option<out A>
 	/**
 	 * @see Option#map
 	 */
-	public static map: Covariant.Pipeable<OptionTypeLambda>['map'] =
-		<A, B>(f: (a: A) => B) => (self: Option.Type<A>): Option.Type<B> =>
+	public static map: Covariant.Pipeable<Option.TypeLambda>['map'] =
+		<A, B>(f: (a: A) => B) =>
+		(self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : Option.Some(f(self.get()))
 
 	/**
 	 * @see Option#imap
 	 */
-	public static imap: Covariant.Pipeable<OptionTypeLambda>['imap'] = Covariant.imap<
-		OptionTypeLambda
-	>(Option.map)
+	public static imap: Covariant.Pipeable<Option.TypeLambda>['imap'] =
+		Covariant.imap<Option.TypeLambda>(Option.map)
 
 	/**
 	 * Curried pattern matching for `Option` instances.
@@ -392,7 +387,7 @@ export abstract class Option<out A>
 	 *
 	 * @see Option.Some
 	 */
-	public static of: Of.Pipeable<OptionTypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
+	public static of: Of.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
 
 	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
@@ -457,8 +452,8 @@ export abstract class Option<out A>
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.get(), that.get() as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -696,8 +691,16 @@ export declare namespace Option {
 	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
 	 * ```
 	 */
-	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>]
+		? _A
 		: never
+
+	/**
+	 * @internal
+	 */
+	export interface TypeLambda extends _TypeLambda {
+		readonly type: Type<this['Target']>
+	}
 }
 
 /**
