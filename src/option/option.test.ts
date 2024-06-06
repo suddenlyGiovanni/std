@@ -1,19 +1,11 @@
 import { expectTypeOf } from 'npm:expect-type@0.19.0'
-import { assertEquals, equal } from 'jsr:@std/assert'
+import { equal } from 'jsr:@std/assert'
 import { expect } from 'jsr:@std/expect'
 import { describe, it, test } from 'jsr:@std/testing/bdd'
 
-import { pipe } from '../internal/function.ts'
-import type * as F from '../internal/function.ts'
+import { type Lazy, pipe } from '../internal/function.ts'
+import { Util } from '../test/utils.ts'
 import { Option } from './option.ts'
-
-// deno-lint-ignore no-namespace
-namespace Util {
-	// biome-ignore lint/suspicious/noExportsInTest: <explanation>
-	export const deepStrictEqual = <A>(actual: A, expected: A) => {
-		assertEquals(actual, expected)
-	}
-}
 
 describe('Option', () => {
 	describe('constructors', () => {
@@ -22,6 +14,16 @@ describe('Option', () => {
 				// @ts-expect-error - TSC does not allow instantiation of abstract classes, but what about runtime?
 				new Option()
 			}).toThrow('Option is not meant to be instantiated directly')
+		})
+
+		test('of', () => {
+			const some = Option.of(1)
+			expectTypeOf(some).toEqualTypeOf<Option.Type<number>>()
+			expect(some._tag).toBe('Some')
+			expect(some.get()).toBe(1)
+
+			expectTypeOf(Option.of(null)).toEqualTypeOf<Option.Type<null>>() // should we allow this?
+			expectTypeOf(Option.of(undefined)).toEqualTypeOf<Option.Type<undefined>>() // should we allow this? maybe of should not lift nullable values?
 		})
 
 		test('Some', () => {
@@ -95,7 +97,7 @@ describe('Option', () => {
 
 			const noneOfUnknown = Option.None()
 			const noneOfNumber = Option.None<number>()
-			expectTypeOf<Option.Value<typeof noneOfUnknown>>().toEqualTypeOf<unknown>()
+			expectTypeOf<Option.Value<typeof noneOfUnknown>>().toEqualTypeOf<never>()
 			expectTypeOf<Option.Value<typeof noneOfNumber>>().toEqualTypeOf<number>()
 
 			type Foo = { foo: string }
@@ -133,7 +135,7 @@ describe('Option', () => {
 		})
 
 		test('None', () => {
-			expect(Option.None().getOrElse(() => 2)).toBe(2)
+			expect(Option.None<number>().getOrElse(() => 2)).toBe(2)
 			expect(
 				Option.fromNullable<undefined | { foo: string }>(undefined).getOrElse(() => ({
 					foo: 'baz',
@@ -141,13 +143,13 @@ describe('Option', () => {
 			).toEqual({
 				foo: 'baz',
 			})
-			expect(Option.None().getOrElse(() => null)).toEqual(null)
+			expect(Option.None<null | unknown>().getOrElse(() => null)).toEqual(null)
 		})
 	})
 
 	describe('fold', () => {
 		const fa = (s: string): { length: number } => ({ length: s.length })
-		const ifEmpty: F.Lazy<number> = () => 42
+		const ifEmpty: Lazy<number> = () => 42
 
 		it('returns call the ifEmpty for None cases ', () => {
 			const stringOption = Option.fromNullable<null | string>(null)
@@ -204,6 +206,101 @@ describe('Option', () => {
 			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<
 				number | { length: number }
 			>()
+		})
+	})
+
+	describe('Covariant', () => {
+		describe('map', () => {
+			const f: (n: number) => number = (n) => n * 2
+			const g: (n: number) => string = (n) => n.toString()
+			const someNumber = Option.of(1)
+			const noneNumber = Option.None<number>()
+
+			test('static', () => {
+				Util.optionEqual(pipe(someNumber, Option.map(f)), Option.of(2))
+				expectTypeOf(Option.map(f)(someNumber)).toEqualTypeOf<Option.Type<number>>()
+
+				Util.optionEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
+				expectTypeOf(Option.map(g)(Option.Some(1))).toEqualTypeOf<Option.Type<string>>()
+
+				Util.optionEqual(pipe(noneNumber, Option.map(f)), noneNumber)
+				Util.optionEqual(pipe(noneNumber, Option.map(g)), Option.None<string>())
+			})
+
+			test('instance', () => {
+				Util.optionEqual(someNumber.map(f), Option.of(2))
+				Util.optionEqual(Option.Some(42).map(g), Option.Some('42'))
+				Util.optionEqual(noneNumber.map(f), noneNumber)
+				Util.optionEqual(noneNumber.map(g), Option.None<string>())
+			})
+		})
+
+		describe('imap', () => {
+			const f: (n: number) => string = (n) => n.toString()
+			const g: (s: string) => number = (s) => Number(s)
+			const someNumber = Option.of(1)
+			const noneNumber = Option.None<number>()
+
+			test('static', () => {
+				Util.optionEqual(pipe(someNumber, Option.imap(f, g)), Option.of('1'))
+				Util.optionEqual(pipe(noneNumber, Option.imap(f, g)), Option.None<string>())
+			})
+
+			test('instance', () => {
+				Util.optionEqual(someNumber.imap(f, g), Option.of('1'))
+				Util.optionEqual(noneNumber.imap(f, g), Option.None<string>())
+			})
+		})
+
+		describe('Functor laws', () => {
+			it('Identity ', () => {
+				const identity = <A>(a: A): A => a
+				const Fa: Option.Type<number> = Option.Some(1)
+				Util.optionEqual(pipe(Fa, Option.map(identity)), Fa)
+			})
+
+			it('Composition ', () => {
+				const Fa: Option.Type<number> = Option.Some(0)
+				const f: (a: number) => string = (a) => String(a)
+				const g: (b: string) => boolean = (b) => Boolean(b)
+				Util.optionEqual(
+					pipe(Fa, Option.map(f), Option.map(g)),
+					pipe(
+						Fa,
+						Option.map((a) => g(f(a))),
+					),
+				)
+			})
+		})
+	})
+
+	describe('flatMap', () => {
+		const f = (n: number) => Option.Some(n * 2)
+		const g = () => Option.None<string>()
+
+		test('static', () => {
+			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
+			Util.deepStrictEqual(pipe(Option.None<number>(), Option.flatMap(f)), Option.None())
+			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
+			Util.deepStrictEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
+		})
+
+		test('instance', () => {
+			Util.deepStrictEqual(Option.Some(1).flatMap(f), Option.Some(2))
+			Util.deepStrictEqual(Option.None<number>().flatMap(f), Option.None())
+			Util.deepStrictEqual(Option.Some(1).flatMap(g), Option.None())
+			Util.deepStrictEqual(Option.None().flatMap(g), Option.None())
+		})
+
+		test('associativity law', () => {
+			const Fa: Option.Type<number> = Option.Some(1)
+			const f: (a: number) => Option.Type<string> = (a) => Option.Some(a.toString())
+			const g: (b: string) => Option.Type<boolean> = (b) => Option.Some(Boolean(b))
+			// If ⊕ is associative, then a ⊕ (b ⊕ c) = (a ⊕ b) ⊕ c.
+			Util.optionEqual(
+				Fa.flatMap(f).flatMap(g),
+				Fa.flatMap((a) => f(a).flatMap(g)),
+			)
 		})
 	})
 

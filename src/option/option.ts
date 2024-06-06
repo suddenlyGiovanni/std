@@ -1,6 +1,9 @@
 import type { Equals } from '../internal/equals.ts'
 import type * as F from '../internal/function.ts'
+import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
+
 import type { Inspectable } from '../internal/inspectable.ts'
+import { Covariant, type FlatMap, type Of } from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -12,14 +15,14 @@ function format(x: unknown): string {
  * The most idiomatic way to use an Option instance is to treat it as  monad and use `map`,`flatMap`,` filter`, or `foreach`:
  * These are useful methods that exist for both Some and None:
  * -[ ] `isDefined` : True if not empty
- * - {@linkcode Option#isEmpty} : True if empty
+ * - {@linkcode Option#isEmpty|isEmpty} : True if empty
  * -[ ] `nonEmpty`: True if not empty
  * -[ ] `orElse`: Evaluate and return alternate optional value if empty
- * -[ ] `getOrElse`: Evaluate and return alternate value if empty
- * - {@linkcode Option#get} : Return value, throw exception if empty
- * - {@linkcode Option#fold}: Apply function on optional value, return default if empty
- * -[ ] `map`: Apply a function on the optional value
- * -[ ] `flatMap`: Same as map but function must return an optional value
+ * - {@linkcode Option#getOrElse|getOrElse}: Evaluate and return alternate value if empty
+ * - {@linkcode Option#get|get} : Return value, throw exception if empty
+ * - {@linkcode Option#fold|fold}: Apply function on optional value, return default if empty
+ * - {@linkcode Option#map|map}: Apply a function on the optional value
+ * - {@linkcode  Option#flatMap|flatMap }: Same as map but function must return an optional value
  * -[ ] `foreach`: Apply a procedure on option value
  * -[ ] `collect`: Apply partial pattern match on optional value
  * -[ ] `filter`: An optional value satisfies predicate
@@ -58,7 +61,13 @@ function format(x: unknown): string {
  * )
  * ```
  */
-export abstract class Option<out A> implements Inspectable, Equals {
+export abstract class Option<out A>
+	implements
+		Inspectable,
+		Equals,
+		FlatMap.Fluent<Option.TypeLambda>,
+		Covariant.Fluent<Option.TypeLambda>
+{
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -118,7 +127,7 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @category constructors
 	 */
-	public static None<A>(): Option.Type<A> {
+	public static None<A = never>(): Option.Type<A> {
 		return None.getSingletonInstance<A>()
 	}
 
@@ -127,10 +136,22 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 *
 	 * @param value - The value to wrap.
 	 * @returns An instance of {@linkcode Some(1)} containing the value.
+	 *
+	 * @alias Option.of
 	 */
 	public static Some<T>(value: T): Option.Type<T> {
-		return new Some(value)
+		return Option.of(value)
 	}
+
+	/**
+	 * Applies a function to the value of an Option and flattens the result, if the input is Some.
+	 * @returns A function that takes an Option and returns the result of applying `f` to this Option's value if the Option is nonempty. Otherwise, returns None.
+	 * @see  Option#flatMap
+	 */
+	public static flatMap: FlatMap.Pipeable<Option.TypeLambda>['flatMap'] =
+		<A, B>(f: (a: A) => Option.Type<B>) =>
+		(self: Option.Type<A>): Option.Type<B> =>
+			Option.isNone(self) ? Option.None() : f(self.get())
 
 	/**
 	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
@@ -303,6 +324,20 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
+	 * @see Option#map
+	 */
+	public static map: Covariant.Pipeable<Option.TypeLambda>['map'] =
+		<A, B>(f: (a: A) => B) =>
+		(self: Option.Type<A>): Option.Type<B> =>
+			Option.isNone(self) ? Option.None() : Option.Some(f(self.get()))
+
+	/**
+	 * @see Option#imap
+	 */
+	public static imap: Covariant.Pipeable<Option.TypeLambda>['imap'] =
+		Covariant.imap<Option.TypeLambda>(Option.map)
+
+	/**
 	 * Curried pattern matching for `Option` instances.
 	 * Given a pattern matching object, it will return a function that will match the `Option` instance against the pattern.
 	 *
@@ -342,6 +377,17 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}): (self: Option.Type<A>) => B | C {
 		return Option.fold(cases.onNone, cases.onSome)
 	}
+
+	/**
+	 * lifts a value `A` to in the context of an `Option`
+	 *
+	 * @template A - The type of the value to lift
+	 * @param a - The value to lift
+	 * @returns An instance of {@linkcode Option.Type} containing the value of type `A`.
+	 *
+	 * @see Option.Some
+	 */
+	public static of: Of.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
 
 	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
@@ -406,9 +452,38 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-				Option.isSome(that) &&
-				predicateStrategy(this.get(), that.get() as That)
+					Option.isSome(that) &&
+					predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
+	}
+
+	/**
+	 * Returns the result of applying `f` to `this` Option's value if this Option is nonempty. Returns `None` if this Option is empty.
+	 * Slightly different from `map` in that `f` is expected to return `Option.Type` (which could be None).
+	 *
+	 * @param f – the function to apply
+	 * @returns the result of applying `f` to `this` Option's value if this Option is nonempty. Returns `None` if this Option is empty.
+	 *
+	 *  @remarks
+	 * This is equivalent to:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => Option.Type<B>
+	 *
+	 * option.match({
+	 *  onSome: (x) => f(x),
+	 *  onNone: () => Option.None()
+	 * })
+	 * ```
+	 *
+	 * @see {Option.flatMap}
+	 * @see map
+	 * @see foreach
+	 * @implements {FlatMap}
+	 */
+	public flatMap<A, B>(this: Option.Type<A>, f: (a: A) => Option.Type<B>): Option.Type<B> {
+		return Option.flatMap(f)(this)
 	}
 
 	/**
@@ -468,6 +543,13 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	}
 
 	/**
+	 * @see Option.imap
+	 */
+	public imap<A, B>(this: Option.Type<A>, f: (a: A) => B, g: (b: B) => A): Option.Type<B> {
+		return Option.map(f)(this)
+	}
+
+	/**
 	 * Type guard that returns `true` if the option is None, `false` otherwise.
 	 *
 	 * @returns `true` if the option is None, `false` otherwise.
@@ -495,6 +577,35 @@ export abstract class Option<out A> implements Inspectable, Equals {
 	 */
 	public isSome(this: Option.Type<A>): this is Some<A> {
 		return Option.isSome(this)
+	}
+
+	/**
+	 * Returns a `Some` containing the result of applying `f` to this Option's value if this Option is nonempty.
+	 * Otherwise, return `None`
+	 *
+	 * @param f - The function to apply
+	 * @returns a `Some<B>` if the Option is nonempty, otherwise `None`
+	 *
+	 * @remarks
+	 * This is equivalent to:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => B
+	 *
+	 * option.match({
+	 * 	onSome: (a) => Option.Some(f(a)), // Some<B>
+	 * 	onNone: () => Option.None()
+	 * })
+	 * ```
+	 *
+	 * @remarks
+	 * This is similar to {@linkcode Option#flatMap|flatMap } except here, `f` does not need to wrap its result in an `Option`.
+	 *
+	 * @see Option.map
+	 */
+	public map<A, B>(this: Option.Type<A>, f: (a: A) => B): Option.Type<B> {
+		return Option.map(f)(this)
 	}
 
 	/**
@@ -547,7 +658,6 @@ export abstract class Option<out A> implements Inspectable, Equals {
 /**
  * The type-level namespace for Option
  * @namespace Option
- * @since 0.0.1
  */
 export declare namespace Option {
 	/**
@@ -581,8 +691,16 @@ export declare namespace Option {
 	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
 	 * ```
 	 */
-	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>]
+		? _A
 		: never
+
+	/**
+	 * @internal
+	 */
+	export interface TypeLambda extends _TypeLambda {
+		readonly type: Type<this['Target']>
+	}
 }
 
 /**
