@@ -1,6 +1,6 @@
 {
 	"name": "@suddenly-giovanni/std",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"lock": true,
 	"exports": {
 		"./predicate": "./src/predicate/mod.ts",
@@ -35,8 +35,11 @@
 		"ok": "deno task lint && deno fmt --check && deno task test"
 	},
 	"exclude": [
+		".editorconfig",
 		".git",
+		".github",
 		".idea",
+		".vscode",
 		"biome.jsonc",
 		"cov",
 		"coverage",
