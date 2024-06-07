@@ -52,17 +52,21 @@ describe('Option', () => {
 		})
 
 		test('fromNullable', () => {
-			expect(Option.fromNullable(2).equals(Option.Some(2))).toBe(true)
-			expectTypeOf(Option.fromNullable(2)).toEqualTypeOf<Option.Type<number>>()
+			expect(Option.fromNullable<null | number>(2).equals(Option.Some(2))).toBe(true)
+			expectTypeOf(Option.fromNullable<null | number>(2)).toEqualTypeOf<Option.Type<number>>()
 
 			expect(Option.fromNullable(0).equals(Option.Some(0))).toBe(true)
 			expectTypeOf(Option.fromNullable(0)).toEqualTypeOf<Option.Type<number>>()
 
 			expect(Option.fromNullable('').equals(Option.Some(''))).toBe(true)
-			expectTypeOf(Option.fromNullable('')).toEqualTypeOf<Option.Type<string>>()
+			expectTypeOf(Option.fromNullable<string | undefined>('')).toEqualTypeOf<
+				Option.Type<string>
+			>()
 
 			expect(Option.fromNullable([]).equals(Option.Some([]), equal)).toBe(true)
-			expectTypeOf(Option.fromNullable([])).toEqualTypeOf<Option.Type<never[]>>()
+			expectTypeOf(Option.fromNullable<undefined | number[]>([])).toEqualTypeOf<
+				Option.Type<number[]>
+			>()
 			expectTypeOf(Option.fromNullable(['foo'])).toEqualTypeOf<Option.Type<string[]>>()
 
 			const nullOption = Option.fromNullable(null)
@@ -286,14 +290,14 @@ describe('Option', () => {
 
 		test('static', () => {
 			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
-			Util.deepStrictEqual(pipe(Option.None<number>(), Option.flatMap(f)), Option.None())
+			Util.deepStrictEqual(pipe(Option.None(), Option.flatMap(f)), Option.None())
 			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
 			Util.deepStrictEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
 		})
 
 		test('instance', () => {
 			Util.deepStrictEqual(Option.Some(1).flatMap(f), Option.Some(2))
-			Util.deepStrictEqual(Option.None<number>().flatMap(f), Option.None())
+			Util.deepStrictEqual(Option.None().flatMap(f), Option.None())
 			Util.deepStrictEqual(Option.Some(1).flatMap(g), Option.None())
 			Util.deepStrictEqual(Option.None().flatMap(g), Option.None())
 		})

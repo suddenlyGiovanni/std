@@ -286,8 +286,8 @@ export abstract class Option<out A>
 	 */
 	public static fromNullable<T>(nullableValue: T): Option.Type<NonNullable<T>> {
 		return nullableValue === undefined || nullableValue === null
-			? None.getSingletonInstance<NonNullable<T>>()
-			: Option.Some(nullableValue as NonNullable<T>)
+			? None.getSingletonInstance()
+			: Option.Some(nullableValue)
 	}
 
 	/**
