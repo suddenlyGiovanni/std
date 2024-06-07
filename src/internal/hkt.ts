@@ -1,7 +1,29 @@
+/**
+ * This module provide the tools to implement Higher Kinded Types (HKT) in TypeScript.
+ *
+ * Disclaimer: it is a "copy pasta" 🍝 from the [effect library](https://github.com/Effect-TS/effect/blob/184fed83ac36cba05a75a5a8013f740f9f696e3b/packages/effect/src/HKT.ts); all credits goes to the authors of the library.
+ *
+ * @internal
+ * @module
+ */
+
 import type { Types } from './types.ts'
 
+/**
+ * Represents a URI (Uniform Resource Identifier).
+ *
+ * @typedef {symbol} URI
+ * @description A URI is a unique symbol used to identify a resource on the web.
+ */
 export declare const URI: unique symbol
 
+/**
+ * Represents a class that is parameterized by a type `F`.
+ * The `TypeClass` interface enforces that the implementing class must have an optional property `[URI]`
+ * which is of type `F` to improve inference.
+ *
+ * @template F - The type parameter.
+ */
 export interface TypeClass<F extends TypeLambda> {
 	/**
 	 * To improve inference it is necessary to mention the F parameter inside it otherwise it will be lost, we can do so by adding an optional property
