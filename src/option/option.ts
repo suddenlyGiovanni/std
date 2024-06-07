@@ -66,8 +66,7 @@ export abstract class Option<out A>
 		Inspectable,
 		Equals,
 		FlatMap.Fluent<Option.TypeLambda>,
-		Covariant.Fluent<Option.TypeLambda>
-{
+		Covariant.Fluent<Option.TypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -132,14 +131,41 @@ export abstract class Option<out A>
 	}
 
 	/**
-	 * Creates a new `Option` that wraps the given value.
+	 * Creates a new `Option` that wraps the given non-null value.
 	 *
-	 * @param value - The value to wrap.
-	 * @returns An instance of {@linkcode Some(1)} containing the value.
+	 * @template A - The type of the value to wrap.
+	 * @template B - A subtype of `A` that excludes `null` and `undefined`.
+	 * @param value - The non-null value to wrap.
+	 * @returns An instance of `Option.Type<B>` containing the value.
 	 *
-	 * @alias Option.of
+	 * @remarks
+	 * This method ensures that the wrapped value is not `null` or `undefined`.
+	 * For a more loose typing use cases, see {@link Option.of}.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from './option.ts';
+	 *
+	 * // Wrapping a non-null value
+	 * const someValue = Option.Some(42);
+	 * //       ^?  Some<number>
+	 *
+	 * // Attempting to wrap a nullable value will result in a compile-time error
+	 * const nullableValue: number | null = null;
+	 * // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'NonNullable<number>'
+	 * const optionValue = Option.Some(nullableValue)
+	 * //                                                       ^^^^^^^^^^^^^
+	 *
+	 * // Ensuring a non-null value
+	 * const nullableValue: number | null = null;
+	 * const safeValue = Option.Some(nullableValue ?? 0);
+	 * //        ^?  Some<number>
+	 * ```
+	 *
+	 * @see {@link Option.of}
+	 * @category constructors
 	 */
-	public static Some<T>(value: T): Option.Type<T> {
+	public static Some<A, B extends NonNullable<A>>(value: B): Option.Type<B> {
 		return Option.of(value)
 	}
 
@@ -149,8 +175,7 @@ export abstract class Option<out A>
 	 * @see  Option#flatMap
 	 */
 	public static flatMap: FlatMap.Pipeable<Option.TypeLambda>['flatMap'] =
-		<A, B>(f: (a: A) => Option.Type<B>) =>
-		(self: Option.Type<A>): Option.Type<B> =>
+		<A, B>(f: (a: A) => Option.Type<B>) => (self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : f(self.get())
 
 	/**
@@ -327,15 +352,15 @@ export abstract class Option<out A>
 	 * @see Option#map
 	 */
 	public static map: Covariant.Pipeable<Option.TypeLambda>['map'] =
-		<A, B>(f: (a: A) => B) =>
-		(self: Option.Type<A>): Option.Type<B> =>
-			Option.isNone(self) ? Option.None() : Option.Some(f(self.get()))
+		<A, B>(f: (a: A) => B) => (self: Option.Type<A>): Option.Type<B> =>
+			Option.isNone(self) ? Option.None() : Option.of(f(self.get()))
 
 	/**
 	 * @see Option#imap
 	 */
-	public static imap: Covariant.Pipeable<Option.TypeLambda>['imap'] =
-		Covariant.imap<Option.TypeLambda>(Option.map)
+	public static imap: Covariant.Pipeable<Option.TypeLambda>['imap'] = Covariant.imap<
+		Option.TypeLambda
+	>(Option.map)
 
 	/**
 	 * Curried pattern matching for `Option` instances.
@@ -379,15 +404,40 @@ export abstract class Option<out A>
 	}
 
 	/**
-	 * lifts a value `A` to in the context of an `Option`
+	 * Lifts a value `A` into the context of an `Option`.
 	 *
-	 * @template A - The type of the value to lift
-	 * @param a - The value to lift
-	 * @returns An instance of {@linkcode Option.Type} containing the value of type `A`.
+	 * @template A - The type of the value to lift.
+	 * @param a - The value to lift.
+	 * @returns An instance of `Option.Type<A>` containing the value of type `A`.
 	 *
-	 * @see Option.Some
+	 * @remarks
+	 * This method wraps the provided value in an `Option`.
+	 * Specifically, it creates an instance of `Some` containing the given value.
+	 * If you want to stronger type guarantees that you are not lifting nullable values, consider using {@link Option.Some}.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from './option.ts'
+	 *
+	 * // Lifting a non-null value
+	 * const someValue = Option.of(42)
+	 * //        ^? Some<number>
+	 *
+	 * // Lifting a nullable value
+	 * const nullableValue: number | null = null
+	 * const optionValue = Option.of(nullableValue)
+	 * //        ^? Some<null>
+	 *
+	 * // TypeScript will not throw compile errors, but consider handling nulls explicitly
+	 * const safeValue = Option.of(nullableValue ?? 0)
+	 * //        ^? Some<number>
+	 * ```
+	 *
+	 * @see {@link Option.Some}
+	 * @category Constructors
 	 */
-	public static of: Of.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
+	public static of: Of.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> =>
+		new Some(a)
 
 	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
@@ -452,8 +502,8 @@ export abstract class Option<out A>
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.get(), that.get() as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -691,8 +741,7 @@ export declare namespace Option {
 	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
 	 * ```
 	 */
-	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>]
-		? _A
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
 		: never
 
 	/**

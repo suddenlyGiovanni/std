@@ -30,6 +30,12 @@ describe('Option', () => {
 			const some = Option.Some(1)
 			expect(some._tag).toBe('Some')
 			expect(some.get()).toBe(1)
+
+			// @ts-expect-error - should not allow null or undefined
+			expectTypeOf(Option.Some(null)).not.toEqualTypeOf<Option.Type<null>>()
+
+			// @ts-expect-error - should not allow null or undefined
+			expectTypeOf(Option.Some(undefined)).not.toEqualTypeOf<Option.Type<undefined>>()
 		})
 
 		describe('None', () => {
