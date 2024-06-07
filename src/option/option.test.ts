@@ -289,17 +289,17 @@ describe('Option', () => {
 		const g = () => Option.None<string>()
 
 		test('static', () => {
-			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
-			Util.deepStrictEqual(pipe(Option.None(), Option.flatMap(f)), Option.None())
-			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
-			Util.deepStrictEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
+			Util.optionEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
+			Util.optionEqual(pipe(Option.None(), Option.flatMap(f)), Option.None())
+			Util.optionEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
+			Util.optionEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
 		})
 
 		test('instance', () => {
-			Util.deepStrictEqual(Option.Some(1).flatMap(f), Option.Some(2))
-			Util.deepStrictEqual(Option.None().flatMap(f), Option.None())
-			Util.deepStrictEqual(Option.Some(1).flatMap(g), Option.None())
-			Util.deepStrictEqual(Option.None().flatMap(g), Option.None())
+			Util.optionEqual(Option.Some(1).flatMap(f), Option.Some(2))
+			Util.optionEqual(Option.None().flatMap(f), Option.None())
+			Util.optionEqual(Option.Some(1).flatMap(g), Option.None())
+			Util.optionEqual(Option.None().flatMap(g), Option.None())
 		})
 
 		test('associativity law', () => {
@@ -345,12 +345,12 @@ describe('Option', () => {
 		})
 
 		describe('isNone', () => {
-			test('on Option static method ', () => {
+			test('static', () => {
 				expect(pipe(Option.None(), Option.isNone)).toBe(true)
 				expect(pipe(Option.Some(1), Option.isNone)).toBe(false)
 			})
 
-			test('on Option instances: Some and None ', () => {
+			test('instance', () => {
 				expect(Option.fromNullable(42).isNone()).toBe(false)
 				expect(Option.fromNullable(undefined).isNone()).toBe(true)
 			})
