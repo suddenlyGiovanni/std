@@ -411,6 +411,34 @@ export abstract class Option<out A>
 			Option.isNone(self) ? Option.None() : Option.of(f(self.get()))
 
 	/**
+	 * Transform an `Option<A>` into an `Option<B>` by providing a transformation from `A` to `B` and one from `B` to `A`.
+	 * This method is curried, meaning it takes the transformation functions first and returns a new function that expects the `Option` instance.
+	 * This is its type signature:
+	 * ```ts no-eval no-assert
+	 * <A, B>(to: (a: A) => B, from: (b: B) => A) => <R, O, E>(self: Option.Type<A>) => Option.Type<B>
+	 * ```
+	 * @typeParam A - The source type of the value within the `Option`.
+	 * @typeParam B - The target type of the value within the `Option`.
+	 * @param to - The function  from `A` to `B` to apply to the value of the `Option` if it is nonempty.
+	 * @param from - The function from `B` to `A` to apply to the value of the `Option` if it is nonempty.
+	 * @returns A function that takes an `Option<A>` and returns an `Option<B>`.
+	 *
+	 * @example
+	 * ```ts
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * const to = (n: number): string => `Number is ${n}`
+	 * const from = (s: string): number => parseInt(s.split(' ')[2])
+	 *
+	 * const result = pipe(
+	 *   Option.Some(5),
+	 *   Option.imap(to, from)
+	 * );
+	 *
+	 * console.log(result); // Outputs: Some("Number is 5")
+	 * ```
+	 *
 	 * @see Option#imap
 	 */
 	public static imap: Covariant.Pipeable<Option.TypeLambda>['imap'] = Covariant.imap<
