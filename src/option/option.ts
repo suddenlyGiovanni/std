@@ -676,6 +676,14 @@ export abstract class Option<out A>
 	}
 
 	/**
+	 * Transform an `Option<A>` into an `Option<B>` by providing a transformation from `A` to `B` and one from `B` to `A`.
+	 *
+	 * @typeParam A - The source type of the value within the `Option`.
+	 * @typeParam B - The target type of the value within the `Option`.
+	 * @param to - The function  from `A` to `B` to apply to the value of the `Option` if it is nonempty.
+	 * @param from - The function from `B` to `A` to apply to the value of the `Option` if it is nonempty.
+	 * @returns An `Option<B>` containing the result of applying `to` to the value of the `Option` if it is nonempty.
+	 *
 	 * @see Option.imap
 	 */
 	public imap<A, B>(this: Option.Type<A>, f: (a: A) => B, _g: (b: B) => A): Option.Type<B> {
