@@ -349,6 +349,61 @@ export abstract class Option<out A>
 	}
 
 	/**
+	 * Returns a curried function that, when invoked with an `Option<A>`, applies the provided function `f` to the value within the `Option` (if it exists) and wraps the result in a `Some`. If the `Option` is `None`, it returns `None`.
+	 * This is equivalent to:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * declare const option: Option.Type<unknown>
+	 * declare const f: <A, B>(a: A) => B
+	 *
+	 * option.match({
+	 * 	onSome: (x) => Option.Some(f(x)),
+	 * 	onNone: () => Option.None(),
+	 * })
+	 * ```
+	 *
+	 * @typeParam A - The type of the value within the `Option`.
+	 * @typeParam B - The type of the value that the function `f` returns.
+	 * @param f - The function to apply that has a type signature that goes from an `A` to  a `B`
+	 * @returns A curried function that takes an `Option<A>` and returns a new `Option<B>` with the result of applying `f` to the original `Option`'s value, if it was `Some`. If the original `Option` was `None`, it returns `None`.
+	 *
+	 *
+
+	 * @remarks
+	 * This method is curried to support partial application and pipelining. The `Option` instance to operate on is provided last.
+	 * This is similar to the instance method {@linkcode Option#map|map}, but is designed to be used in a functional programming style where data is provided last.
+	 * Unlike {@linkcode Option.flatMap|flatMap}, `f` does not need to return an `Option`; the result is automatically wrapped in a `Some`.
+	 *
+	 * @example
+	 * Operating on Some:
+	 * ```ts
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * const result = pipe(
+	 * 	Option.Some(5),
+	 * 	Option.map(value => value + 1)
+	 * 	)
+	 *
+	 * console.log(result) // Some(6)
+	 * ```
+	 *
+	 * @example
+	 *  Operating on None:
+	 *  ```ts
+	 *  import { Option } from './option.ts'
+	 *  import { pipe } from '../internal/function.ts'
+	 *
+	 *  const result = pipe(
+	 *  	Option.None(),
+	 *  	Option.map(value => value + 1)
+	 *  	)
+	 *
+	 *  console.log(result) // None
+	 *  ```
+	 *
+	 * @see Option.flatMap
+	 * @see Option.forEach
 	 * @see Option#map
 	 */
 	public static map: Covariant.Pipeable<Option.TypeLambda>['map'] =
