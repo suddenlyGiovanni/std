@@ -143,21 +143,26 @@ export abstract class Option<out A>
 	 * For a more loose typing use cases, see {@link Option.of}.
 	 *
 	 * @example
+	 * non-null value
 	 * ```ts
 	 * import { Option } from './option.ts';
 	 *
 	 * // Wrapping a non-null value
-	 * const someValue = Option.Some(42);
+	 * const someValue = Option.Some(42)
 	 * //       ^?  Some<number>
+	 * ```
 	 *
-	 * // Attempting to wrap a nullable value will result in a compile-time error
-	 * const nullableValue: number | null = null;
+	 * @example
+	 * Attempting to wrap a nullable value will result in a compile-time error
+	 * ```ts
+	 * import { Option } from './option.ts';
+	 *
+	 * const nullableValue: number | null = null
 	 * // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'NonNullable<number>'
 	 * const optionValue = Option.Some(nullableValue)
 	 * //                                                       ^^^^^^^^^^^^^
 	 *
 	 * // Ensuring a non-null value
-	 * const nullableValue: number | null = null;
 	 * const safeValue = Option.Some(nullableValue ?? 0);
 	 * //        ^?  Some<number>
 	 * ```
@@ -202,7 +207,7 @@ export abstract class Option<out A>
 	 * declare const f: <A, B>(a: A) => B
 	 * declare const ifEmpty: <B>() => B
 	 *
-	 * option.map(f).getOrElse(ifEmpty())
+	 * option.map(f).getOrElse(ifEmpty)
 	 * ```
 	 *
 	 * @param ifEmpty - The expression to evaluate if empty.
@@ -353,8 +358,8 @@ export abstract class Option<out A>
 	 * This is equivalent to:
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * declare const option: Option.Type<unknown>
-	 * declare const f: <A, B>(a: A) => B
+	 * declare const option: Option.Type<number>
+	 * declare const f: (a: number) => string
 	 *
 	 * option.match({
 	 * 	onSome: (x) => Option.Some(f(x)),
@@ -414,9 +419,7 @@ export abstract class Option<out A>
 	 * Transform an `Option<A>` into an `Option<B>` by providing a transformation from `A` to `B` and one from `B` to `A`.
 	 * This method is curried, meaning it takes the transformation functions first and returns a new function that expects the `Option` instance.
 	 * This is its type signature:
-	 * ```ts no-eval no-assert
-	 * <A, B>(to: (a: A) => B, from: (b: B) => A) => <R, O, E>(self: Option.Type<A>) => Option.Type<B>
-	 * ```
+	 * `<A, B>(to: (a: A) => B, from: (b: B) => A) => <R, O, E>(self: Option.Type<A>) => Option.Type<B>`
 	 * @typeParam A - The source type of the value within the `Option`.
 	 * @typeParam B - The target type of the value within the `Option`.
 	 * @param to - The function  from `A` to `B` to apply to the value of the `Option` if it is nonempty.
@@ -731,8 +734,8 @@ export abstract class Option<out A>
 	 * This is equivalent to:
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * declare const option: Option.Type<unknown>
-	 * declare const f: <A, B>(a: A) => B
+	 * declare const option: Option.Type<Array<number>>
+	 * declare const f: (a: number[]) => boolean[]
 	 *
 	 * option.match({
 	 * 	onSome: (a) => Option.Some(f(a)), // Some<B>
