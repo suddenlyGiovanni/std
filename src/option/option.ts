@@ -595,7 +595,7 @@ export abstract class Option<out A>
 	/**
 	 * @see Option.imap
 	 */
-	public imap<A, B>(this: Option.Type<A>, f: (a: A) => B, g: (b: B) => A): Option.Type<B> {
+	public imap<A, B>(this: Option.Type<A>, f: (a: A) => B, _g: (b: B) => A): Option.Type<B> {
 		return Option.map(f)(this)
 	}
 
