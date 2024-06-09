@@ -15,18 +15,39 @@ import type { Invariant } from './invariant.ts'
  * `fa.map(f).map(g) = fa.map(f.andThen(g))`
  */
 export declare namespace Covariant {
+	/**
+	 * Fluent interface for Covariant
+	 */
 	export interface Fluent<F extends TypeLambda> extends Invariant.Fluent<F> {
+		/**
+		 * Map function for Fluent interface
+		 */
 		map<R, O, E, A, B>(this: Kind<F, R, O, E, A>, f: (a: A) => B): Kind<F, R, O, E, B>
 	}
 
+	/**
+	 * Pipeable interface for Covariant
+	 */
 	export interface Pipeable<F extends TypeLambda> extends Invariant.Pipeable<F> {
+		/**
+		 * Map function for Pipeable interface
+		 */
 		map<A, B>(f: (a: A) => B): <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>
 	}
 }
 
+/**
+ * Covariant companion object
+ *
+ */
 export const Covariant = {
-	imap: <F extends TypeLambda>(
-		map: <A, B>(f: (a: A) => B) => <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>,
-	): Invariant.Pipeable<F>['imap'] =>
-	(self, _to) => map(self),
+	/**
+	 * imap function for Covariant object
+	 */
+	imap:
+		<F extends TypeLambda>(
+			map: <A, B>(f: (a: A) => B) => <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>,
+		): Invariant.Pipeable<F>['imap'] =>
+		(self, _to) =>
+			map(self),
 } as const
