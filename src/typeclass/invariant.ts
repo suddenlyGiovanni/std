@@ -14,7 +14,13 @@ import type { Kind, TypeClass, TypeLambda } from '../internal/hkt.ts'
  * ```
  */
 export declare namespace Invariant {
+	/**
+	 * Fluent interface for Invariant
+	 */
 	export interface Fluent<F extends TypeLambda> extends TypeClass<F> {
+		/**
+		 * imap method for Fluent interface
+		 */
 		imap<R, O, E, A, B>(
 			this: Kind<F, R, O, E, A>,
 			to: (a: A) => B,
@@ -22,7 +28,13 @@ export declare namespace Invariant {
 		): Kind<F, R, O, E, B>
 	}
 
+	/**
+	 * Pipeable interface for Invariant
+	 */
 	export interface Pipeable<F extends TypeLambda> extends TypeClass<F> {
+		/**
+		 * imap method for Pipeable interface
+		 */
 		imap<A, B>(
 			to: (a: A) => B,
 			from: (b: B) => A,

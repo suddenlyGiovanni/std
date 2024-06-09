@@ -30,6 +30,12 @@ describe('Option', () => {
 			const some = Option.Some(1)
 			expect(some._tag).toBe('Some')
 			expect(some.get()).toBe(1)
+
+			// @ts-expect-error - should not allow null or undefined
+			expectTypeOf(Option.Some(null)).not.toEqualTypeOf<Option.Type<null>>()
+
+			// @ts-expect-error - should not allow null or undefined
+			expectTypeOf(Option.Some(undefined)).not.toEqualTypeOf<Option.Type<undefined>>()
 		})
 
 		describe('None', () => {
@@ -46,17 +52,21 @@ describe('Option', () => {
 		})
 
 		test('fromNullable', () => {
-			expect(Option.fromNullable(2).equals(Option.Some(2))).toBe(true)
-			expectTypeOf(Option.fromNullable(2)).toEqualTypeOf<Option.Type<number>>()
+			expect(Option.fromNullable<null | number>(2).equals(Option.Some(2))).toBe(true)
+			expectTypeOf(Option.fromNullable<null | number>(2)).toEqualTypeOf<Option.Type<number>>()
 
 			expect(Option.fromNullable(0).equals(Option.Some(0))).toBe(true)
 			expectTypeOf(Option.fromNullable(0)).toEqualTypeOf<Option.Type<number>>()
 
 			expect(Option.fromNullable('').equals(Option.Some(''))).toBe(true)
-			expectTypeOf(Option.fromNullable('')).toEqualTypeOf<Option.Type<string>>()
+			expectTypeOf(Option.fromNullable<string | undefined>('')).toEqualTypeOf<
+				Option.Type<string>
+			>()
 
 			expect(Option.fromNullable([]).equals(Option.Some([]), equal)).toBe(true)
-			expectTypeOf(Option.fromNullable([])).toEqualTypeOf<Option.Type<never[]>>()
+			expectTypeOf(Option.fromNullable<undefined | number[]>([])).toEqualTypeOf<
+				Option.Type<number[]>
+			>()
 			expectTypeOf(Option.fromNullable(['foo'])).toEqualTypeOf<Option.Type<string[]>>()
 
 			const nullOption = Option.fromNullable(null)
@@ -279,17 +289,17 @@ describe('Option', () => {
 		const g = () => Option.None<string>()
 
 		test('static', () => {
-			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
-			Util.deepStrictEqual(pipe(Option.None<number>(), Option.flatMap(f)), Option.None())
-			Util.deepStrictEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
-			Util.deepStrictEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
+			Util.optionEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
+			Util.optionEqual(pipe(Option.None(), Option.flatMap(f)), Option.None())
+			Util.optionEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
+			Util.optionEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
 		})
 
 		test('instance', () => {
-			Util.deepStrictEqual(Option.Some(1).flatMap(f), Option.Some(2))
-			Util.deepStrictEqual(Option.None<number>().flatMap(f), Option.None())
-			Util.deepStrictEqual(Option.Some(1).flatMap(g), Option.None())
-			Util.deepStrictEqual(Option.None().flatMap(g), Option.None())
+			Util.optionEqual(Option.Some(1).flatMap(f), Option.Some(2))
+			Util.optionEqual(Option.None().flatMap(f), Option.None())
+			Util.optionEqual(Option.Some(1).flatMap(g), Option.None())
+			Util.optionEqual(Option.None().flatMap(g), Option.None())
 		})
 
 		test('associativity law', () => {
@@ -335,12 +345,12 @@ describe('Option', () => {
 		})
 
 		describe('isNone', () => {
-			test('on Option static method ', () => {
+			test('static', () => {
 				expect(pipe(Option.None(), Option.isNone)).toBe(true)
 				expect(pipe(Option.Some(1), Option.isNone)).toBe(false)
 			})
 
-			test('on Option instances: Some and None ', () => {
+			test('instance', () => {
 				expect(Option.fromNullable(42).isNone()).toBe(false)
 				expect(Option.fromNullable(undefined).isNone()).toBe(true)
 			})

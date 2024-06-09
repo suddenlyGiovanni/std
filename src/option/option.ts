@@ -66,8 +66,7 @@ export abstract class Option<out A>
 		Inspectable,
 		Equals,
 		FlatMap.Fluent<Option.TypeLambda>,
-		Covariant.Fluent<Option.TypeLambda>
-{
+		Covariant.Fluent<Option.TypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -132,14 +131,46 @@ export abstract class Option<out A>
 	}
 
 	/**
-	 * Creates a new `Option` that wraps the given value.
+	 * Creates a new `Option` that wraps the given non-null value.
 	 *
-	 * @param value - The value to wrap.
-	 * @returns An instance of {@linkcode Some(1)} containing the value.
+	 * @template A - The type of the value to wrap.
+	 * @template B - A subtype of `A` that excludes `null` and `undefined`.
+	 * @param value - The non-null value to wrap.
+	 * @returns An instance of `Option.Type<B>` containing the value.
 	 *
-	 * @alias Option.of
+	 * @remarks
+	 * This method ensures that the wrapped value is not `null` or `undefined`.
+	 * For a more loose typing use cases, see {@link Option.of}.
+	 *
+	 * @example
+	 * non-null value
+	 * ```ts
+	 * import { Option } from './option.ts';
+	 *
+	 * // Wrapping a non-null value
+	 * const someValue = Option.Some(42)
+	 * //       ^?  Some<number>
+	 * ```
+	 *
+	 * @example
+	 * Attempting to wrap a nullable value will result in a compile-time error
+	 * ```ts
+	 * import { Option } from './option.ts';
+	 *
+	 * const nullableValue: number | null = null
+	 * // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'NonNullable<number>'
+	 * const optionValue = Option.Some(nullableValue)
+	 * //                                                       ^^^^^^^^^^^^^
+	 *
+	 * // Ensuring a non-null value
+	 * const safeValue = Option.Some(nullableValue ?? 0);
+	 * //        ^?  Some<number>
+	 * ```
+	 *
+	 * @see {@link Option.of}
+	 * @category constructors
 	 */
-	public static Some<T>(value: T): Option.Type<T> {
+	public static Some<A, B extends NonNullable<A>>(value: B): Option.Type<B> {
 		return Option.of(value)
 	}
 
@@ -149,8 +180,7 @@ export abstract class Option<out A>
 	 * @see  Option#flatMap
 	 */
 	public static flatMap: FlatMap.Pipeable<Option.TypeLambda>['flatMap'] =
-		<A, B>(f: (a: A) => Option.Type<B>) =>
-		(self: Option.Type<A>): Option.Type<B> =>
+		<A, B>(f: (a: A) => Option.Type<B>) => (self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : f(self.get())
 
 	/**
@@ -177,7 +207,7 @@ export abstract class Option<out A>
 	 * declare const f: <A, B>(a: A) => B
 	 * declare const ifEmpty: <B>() => B
 	 *
-	 * option.map(f).getOrElse(ifEmpty())
+	 * option.map(f).getOrElse(ifEmpty)
 	 * ```
 	 *
 	 * @param ifEmpty - The expression to evaluate if empty.
@@ -261,8 +291,8 @@ export abstract class Option<out A>
 	 */
 	public static fromNullable<T>(nullableValue: T): Option.Type<NonNullable<T>> {
 		return nullableValue === undefined || nullableValue === null
-			? None.getSingletonInstance<NonNullable<T>>()
-			: Option.Some(nullableValue as NonNullable<T>)
+			? None.getSingletonInstance()
+			: Option.Some(nullableValue)
 	}
 
 	/**
@@ -324,18 +354,99 @@ export abstract class Option<out A>
 	}
 
 	/**
+	 * Returns a curried function that, when invoked with an `Option<A>`, applies the provided function `f` to the value within the `Option` (if it exists) and wraps the result in a `Some`. If the `Option` is `None`, it returns `None`.
+	 * This is equivalent to:
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * declare const option: Option.Type<number>
+	 * declare const f: (a: number) => string
+	 *
+	 * option.match({
+	 * 	onSome: (x) => Option.Some(f(x)),
+	 * 	onNone: () => Option.None(),
+	 * })
+	 * ```
+	 *
+	 * @typeParam A - The type of the value within the `Option`.
+	 * @typeParam B - The type of the value that the function `f` returns.
+	 * @param f - The function to apply that has a type signature that goes from an `A` to  a `B`
+	 * @returns A curried function that takes an `Option<A>` and returns a new `Option<B>` with the result of applying `f` to the original `Option`'s value, if it was `Some`. If the original `Option` was `None`, it returns `None`.
+	 *
+	 *
+
+	 * @remarks
+	 * This method is curried to support partial application and pipelining. The `Option` instance to operate on is provided last.
+	 * This is similar to the instance method {@linkcode Option#map|map}, but is designed to be used in a functional programming style where data is provided last.
+	 * Unlike {@linkcode Option.flatMap|flatMap}, `f` does not need to return an `Option`; the result is automatically wrapped in a `Some`.
+	 *
+	 * @example
+	 * Operating on Some:
+	 * ```ts
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * const result = pipe(
+	 * 	Option.Some(5),
+	 * 	Option.map(value => value + 1)
+	 * 	)
+	 *
+	 * console.log(result) // Some(6)
+	 * ```
+	 *
+	 * @example
+	 *  Operating on None:
+	 *  ```ts
+	 *  import { Option } from './option.ts'
+	 *  import { pipe } from '../internal/function.ts'
+	 *
+	 *  const result = pipe(
+	 *  	Option.None(),
+	 *  	Option.map(value => value + 1)
+	 *  	)
+	 *
+	 *  console.log(result) // None
+	 *  ```
+	 *
+	 * @see Option.flatMap
+	 * @see Option.forEach
 	 * @see Option#map
 	 */
 	public static map: Covariant.Pipeable<Option.TypeLambda>['map'] =
-		<A, B>(f: (a: A) => B) =>
-		(self: Option.Type<A>): Option.Type<B> =>
-			Option.isNone(self) ? Option.None() : Option.Some(f(self.get()))
+		<A, B>(f: (a: A) => B) => (self: Option.Type<A>): Option.Type<B> =>
+			Option.isNone(self) ? Option.None() : Option.of(f(self.get()))
 
 	/**
+	 * Transform an `Option<A>` into an `Option<B>` by providing a transformation from `A` to `B` and one from `B` to `A`.
+	 * This method is curried, meaning it takes the transformation functions first and returns a new function that expects the `Option` instance.
+	 * This is its type signature:
+	 * `<A, B>(to: (a: A) => B, from: (b: B) => A) => <R, O, E>(self: Option.Type<A>) => Option.Type<B>`
+	 * @typeParam A - The source type of the value within the `Option`.
+	 * @typeParam B - The target type of the value within the `Option`.
+	 * @param to - The function  from `A` to `B` to apply to the value of the `Option` if it is nonempty.
+	 * @param from - The function from `B` to `A` to apply to the value of the `Option` if it is nonempty.
+	 * @returns A function that takes an `Option<A>` and returns an `Option<B>`.
+	 *
+	 * @example
+	 * ```ts
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * const to = (n: number): string => `Number is ${n}`
+	 * const from = (s: string): number => parseInt(s.split(' ')[2])
+	 *
+	 * const result = pipe(
+	 *   Option.Some(5),
+	 *   Option.imap(to, from)
+	 * );
+	 *
+	 * console.log(result); // Outputs: Some("Number is 5")
+	 * ```
+	 *
 	 * @see Option#imap
 	 */
-	public static imap: Covariant.Pipeable<Option.TypeLambda>['imap'] =
-		Covariant.imap<Option.TypeLambda>(Option.map)
+	public static imap: Covariant.Pipeable<Option.TypeLambda>['imap'] = Covariant.imap<
+		Option.TypeLambda
+	>(Option.map)
 
 	/**
 	 * Curried pattern matching for `Option` instances.
@@ -379,15 +490,40 @@ export abstract class Option<out A>
 	}
 
 	/**
-	 * lifts a value `A` to in the context of an `Option`
+	 * Lifts a value `A` into the context of an `Option`.
 	 *
-	 * @template A - The type of the value to lift
-	 * @param a - The value to lift
-	 * @returns An instance of {@linkcode Option.Type} containing the value of type `A`.
+	 * @template A - The type of the value to lift.
+	 * @param a - The value to lift.
+	 * @returns An instance of `Option.Type<A>` containing the value of type `A`.
 	 *
-	 * @see Option.Some
+	 * @remarks
+	 * This method wraps the provided value in an `Option`.
+	 * Specifically, it creates an instance of `Some` containing the given value.
+	 * If you want to stronger type guarantees that you are not lifting nullable values, consider using {@link Option.Some}.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from './option.ts'
+	 *
+	 * // Lifting a non-null value
+	 * const someValue = Option.of(42)
+	 * //        ^? Some<number>
+	 *
+	 * // Lifting a nullable value
+	 * const nullableValue: number | null = null
+	 * const optionValue = Option.of(nullableValue)
+	 * //        ^? Some<null>
+	 *
+	 * // TypeScript will not throw compile errors, but consider handling nulls explicitly
+	 * const safeValue = Option.of(nullableValue ?? 0)
+	 * //        ^? Some<number>
+	 * ```
+	 *
+	 * @see {@link Option.Some}
+	 * @category Constructors
 	 */
-	public static of: Of.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> => new Some(a)
+	public static of: Of.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> =>
+		new Some(a)
 
 	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
@@ -452,8 +588,8 @@ export abstract class Option<out A>
 	): boolean {
 		return this.isSome()
 			? Option.isOption(that) &&
-					Option.isSome(that) &&
-					predicateStrategy(this.get(), that.get() as That)
+				Option.isSome(that) &&
+				predicateStrategy(this.get(), that.get() as That)
 			: Option.isOption(that) && Option.isNone(that)
 	}
 
@@ -543,9 +679,17 @@ export abstract class Option<out A>
 	}
 
 	/**
+	 * Transform an `Option<A>` into an `Option<B>` by providing a transformation from `A` to `B` and one from `B` to `A`.
+	 *
+	 * @typeParam A - The source type of the value within the `Option`.
+	 * @typeParam B - The target type of the value within the `Option`.
+	 * @param to - The function  from `A` to `B` to apply to the value of the `Option` if it is nonempty.
+	 * @param from - The function from `B` to `A` to apply to the value of the `Option` if it is nonempty.
+	 * @returns An `Option<B>` containing the result of applying `to` to the value of the `Option` if it is nonempty.
+	 *
 	 * @see Option.imap
 	 */
-	public imap<A, B>(this: Option.Type<A>, f: (a: A) => B, g: (b: B) => A): Option.Type<B> {
+	public imap<A, B>(this: Option.Type<A>, f: (a: A) => B, _g: (b: B) => A): Option.Type<B> {
 		return Option.map(f)(this)
 	}
 
@@ -590,8 +734,8 @@ export abstract class Option<out A>
 	 * This is equivalent to:
 	 * ```ts
 	 * import { Option } from  './option.ts'
-	 * declare const option: Option.Type<unknown>
-	 * declare const f: <A, B>(a: A) => B
+	 * declare const option: Option.Type<Array<number>>
+	 * declare const f: (a: number[]) => boolean[]
 	 *
 	 * option.match({
 	 * 	onSome: (a) => Option.Some(f(a)), // Some<B>
@@ -691,8 +835,7 @@ export declare namespace Option {
 	 * const test2: Option.Value<typeof someOfNumber> = "42" // 💥ts error!
 	 * ```
 	 */
-	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>]
-		? _A
+	export type Value<T extends Option.Type<unknown>> = [T] extends [Option.Type<infer _A>] ? _A
 		: never
 
 	/**
