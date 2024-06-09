@@ -38,16 +38,13 @@ export declare namespace Covariant {
 
 /**
  * Covariant companion object
- *
  */
 export const Covariant = {
 	/**
 	 * imap function for Covariant object
 	 */
-	imap:
-		<F extends TypeLambda>(
-			map: <A, B>(f: (a: A) => B) => <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>,
-		): Invariant.Pipeable<F>['imap'] =>
-		(self, _to) =>
-			map(self),
+	imap: <F extends TypeLambda>(
+		map: <A, B>(f: (a: A) => B) => <R, O, E>(self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, B>,
+	): Invariant.Pipeable<F>['imap'] =>
+	(self, _to) => map(self),
 } as const
