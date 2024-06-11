@@ -597,3 +597,35 @@ export function flow(
 	}
 	return
 }
+
+/**
+ * The identity function, i.e. A function that returns its input argument.
+ *
+ * @typeParam A - The type of the input argument.
+ * @param a - The input argument.
+ * @returns The input argument.
+ *
+ * @example
+ * ```ts
+ * import { assertStrictEquals } from 'jsr:@std/assert'
+ * import { identity } from './function.ts'
+ *
+ * assertStrictEquals(identity(5), 5)
+ * ```
+ *
+ * @example
+ * ```ts
+ * import { identity } from './function.ts'
+ *
+ * declare const array: ReadonlyArray<ReadonlyArray<number>>
+ *
+ * const test1 = array.map(identity)
+ *  //        ^? ReadonlyArray<ReadonlyArray<number>>
+ *
+ * const test2 = array.flatMap(identity)
+ *  //        ^? ReadonlyArray<number>
+ * ```
+ */
+export function identity<A>(a: A): A {
+	return a
+}
