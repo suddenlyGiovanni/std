@@ -284,22 +284,36 @@ describe('Option', () => {
 		})
 	})
 
-	describe('flatMap', () => {
-		const f = (n: number) => Option.Some(n * 2)
-		const g = () => Option.None<string>()
+	describe('FlatMap', () => {
+		describe('flatMap', () => {
+			const f = (n: number) => Option.Some(n * 2)
+			const g = () => Option.None<string>()
 
-		test('static', () => {
-			Util.optionEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
-			Util.optionEqual(pipe(Option.None(), Option.flatMap(f)), Option.None())
-			Util.optionEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
-			Util.optionEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
+			test('static', () => {
+				Util.optionEqual(pipe(Option.Some(1), Option.flatMap(f)), Option.Some(2))
+				Util.optionEqual(pipe(Option.None(), Option.flatMap(f)), Option.None())
+				Util.optionEqual(pipe(Option.Some(1), Option.flatMap(g)), Option.None())
+				Util.optionEqual(pipe(Option.None(), Option.flatMap(g)), Option.None())
+			})
+
+			test('instance', () => {
+				Util.optionEqual(Option.Some(1).flatMap(f), Option.Some(2))
+				Util.optionEqual(Option.None().flatMap(f), Option.None())
+				Util.optionEqual(Option.Some(1).flatMap(g), Option.None())
+				Util.optionEqual(Option.None().flatMap(g), Option.None())
+			})
 		})
 
-		test('instance', () => {
-			Util.optionEqual(Option.Some(1).flatMap(f), Option.Some(2))
-			Util.optionEqual(Option.None().flatMap(f), Option.None())
-			Util.optionEqual(Option.Some(1).flatMap(g), Option.None())
-			Util.optionEqual(Option.None().flatMap(g), Option.None())
+		describe('flatten', () => {
+			test('static', () => {
+				Util.optionEqual(pipe(Option.Some(Option.Some(1)), Option.flatten), Option.Some(1))
+				Util.optionEqual(pipe(Option.Some(Option.None()), Option.flatten), Option.None())
+			})
+
+			test('instance', () => {
+				Util.optionEqual(Option.Some(Option.Some(1)).flatten(), Option.Some(1))
+				Util.optionEqual(Option.Some(Option.None()).flatten(), Option.None())
+			})
 		})
 
 		test('associativity law', () => {
