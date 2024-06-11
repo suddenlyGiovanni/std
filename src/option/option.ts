@@ -1,5 +1,5 @@
 import type { Equals } from '../internal/equals.ts'
-import type * as F from '../internal/function.ts'
+import * as F from '../internal/function.ts'
 import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
 
 import type { Inspectable } from '../internal/inspectable.ts'
@@ -182,6 +182,34 @@ export abstract class Option<out A>
 	public static flatMap: FlatMap.Pipeable<Option.TypeLambda>['flatMap'] =
 		<A, B>(f: (a: A) => Option.Type<B>) => (self: Option.Type<A>): Option.Type<B> =>
 			Option.isNone(self) ? Option.None() : f(self.get())
+
+	/**
+	 * Flattens a nested Option by one level.
+	 *
+	 * @param ffa - The nested Option to flatten;
+	 * @returns The flattened Option.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
+	 * import { pipe } from '../internal/function.ts'
+	 *
+	 * assertStrictEquals(
+	 * 	pipe(
+	 * 		Option.Some(Option.Some(1)),
+	 * 		Option.flatten
+	 * 	),
+	 * 	Option.Some(1)
+	 * )
+	 * ```
+	 *
+	 * @see Option#flatten
+	 * @see Option#flatMap
+	 */
+	static flatten: FlatMap.Pipeable<Option.TypeLambda>['flatten'] = <A>(
+		ffa: Option.Type<Option.Type<A>>,
+	): Option.Type<A> => ffa.flatMap(F.identity)
 
 	/**
 	 * Returns a new function that takes an Option and returns the result of applying `f` to Option's value if the Option is nonempty. Otherwise, evaluates expression `ifEmpty`.
@@ -620,6 +648,35 @@ export abstract class Option<out A>
 	 */
 	public flatMap<A, B>(this: Option.Type<A>, f: (a: A) => Option.Type<B>): Option.Type<B> {
 		return Option.flatMap(f)(this)
+	}
+
+	/**
+	 * Flatten a nested `Option` of `Option` structure into a single-layer `Option` structure.
+	 *
+	 * @template A - The type of value wrapped in the Option type.
+	 * @this Option.Type<Option.Type<A>> - The nested Option to flatten.
+	 * @returns The flattened Option type.
+	 *
+	 * @example
+	 * ```ts
+	 * import { Option } from  './option.ts'
+	 * import { assertStrictEquals } from 'jsr:@std/assert'
+	 *
+	 * assertStrictEquals(
+	 *  Option.Some(Option.Some(1)).flatten(),
+	 *  Option.Some(1)
+	 * )
+	 *
+	 * assertStrictEquals(
+	 *  Option.Some(Option.None()).flatten(),
+	 *  Option.None()
+	 * )
+	 * ```
+	 * @see Option.flatten
+	 * @see Option.flatMap
+	 */
+	public flatten<A>(this: Option.Type<Option.Type<A>>): Option.Type<A> {
+		return this.flatMap(F.identity)
 	}
 
 	/**
