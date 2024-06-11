@@ -3,7 +3,7 @@ import type * as F from '../internal/function.ts'
 import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
 
 import type { Inspectable } from '../internal/inspectable.ts'
-import { Covariant, type FlatMap, type Of } from '../typeclass/mod.ts'
+import { Covariant, type FlatMap, type Pointed } from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -66,7 +66,7 @@ export abstract class Option<out A>
 		Inspectable,
 		Equals,
 		FlatMap.Fluent<Option.TypeLambda>,
-		Covariant.Fluent<Option.TypeLambda> {
+		Pointed.Fluent<Option.TypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -522,7 +522,7 @@ export abstract class Option<out A>
 	 * @see {@link Option.Some}
 	 * @category Constructors
 	 */
-	public static of: Of.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> =>
+	public static of: Pointed.Pipeable<Option.TypeLambda>['of'] = <A>(a: A): Option.Type<A> =>
 		new Some(a)
 
 	/**
