@@ -441,7 +441,7 @@ export abstract class Option<out A>
 	 */
 	public static map: Covariant.Pipeable<Option.TypeLambda>['map'] =
 		<A, B>(f: (a: A) => B) => (self: Option.Type<A>): Option.Type<B> =>
-			Option.isNone(self) ? Option.None() : Option.of(f(self.get()))
+			Option.flatMap((a: A) => Option.of(f(a)))(self)
 
 	/**
 	 * Transform an `Option<A>` into an `Option<B>` by providing a transformation from `A` to `B` and one from `B` to `A`.
