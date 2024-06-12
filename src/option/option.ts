@@ -3,7 +3,7 @@ import * as F from '../internal/function.ts'
 import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
 
 import type { Inspectable } from '../internal/inspectable.ts'
-import { Covariant, type FlatMap, type Pointed } from '../typeclass/mod.ts'
+import { Covariant, type FlatMap, type Foldable, type Pointed } from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -66,7 +66,8 @@ export abstract class Option<out A>
 		Inspectable,
 		Equals,
 		FlatMap.Fluent<Option.TypeLambda>,
-		Pointed.Fluent<Option.TypeLambda> {
+		Pointed.Fluent<Option.TypeLambda>,
+		Foldable.Fluent<Option.TypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -554,6 +555,13 @@ export abstract class Option<out A>
 		new Some(a)
 
 	/**
+	 * @see Option#reduce
+	 */
+	public static reduce: Foldable.Pipable<Option.TypeLambda>['reduce'] =
+		<A, B>(b: B, f: (b: B, a: A) => B) => (self: Option.Type<A>): B =>
+			Option.isNone(self) ? b : f(b, self.get())
+
+	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
 	 *
 	 * @param that - the value to compare
@@ -853,6 +861,14 @@ export abstract class Option<out A>
 		},
 	): B | C {
 		return Option.match(cases)(this)
+	}
+
+	/**
+	 * @see Option.reduce
+	 * @see Option#fold
+	 */
+	public reduce<A, B>(this: Option.Type<A>, b: B, f: (b: B, a: A) => B): B {
+		return Option.reduce(b, f)(this)
 	}
 }
 

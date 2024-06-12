@@ -157,6 +157,20 @@ describe('Option', () => {
 		})
 	})
 
+	describe('Foldable', () => {
+		const f = (number: number, string: string): number => string.length + number
+
+		it('static ', () => {
+			expect(pipe(Option.of('foo'), Option.reduce(0, f))).toBe(3)
+			expect(pipe(Option.None(), Option.reduce(0, f))).toBe(0)
+		})
+
+		it('instance', () => {
+			expect(Option.of('FooBarBaz').reduce(0, f)).toBe(9)
+			expect(Option.None().reduce(0, f)).toBe(0)
+		})
+	})
+
 	describe('fold', () => {
 		const fa = (s: string): { length: number } => ({ length: s.length })
 		const ifEmpty: Lazy<number> = () => 42
