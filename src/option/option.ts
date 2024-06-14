@@ -149,7 +149,7 @@ export abstract class Option<out A>
 	 *
 	 * // Wrapping a non-null value
 	 * const someValue = Option.Some(42)
-	 * //       ^?  Some<number>
+	 * //    ^?  Some<number>
 	 * ```
 	 *
 	 * @example
@@ -160,11 +160,11 @@ export abstract class Option<out A>
 	 * const nullableValue: number | null = null
 	 * // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'NonNullable<number>'
 	 * const optionValue = Option.Some(nullableValue)
-	 * //                                                       ^^^^^^^^^^^^^
+	 * //                              ^^^^^^^^^^^^^
 	 *
 	 * // Ensuring a non-null value
 	 * const safeValue = Option.Some(nullableValue ?? 0);
-	 * //        ^?  Some<number>
+	 * //    ^?  Some<number>
 	 * ```
 	 *
 	 * @see {@link Option.of}
@@ -740,8 +740,8 @@ export abstract class Option<out A>
 	 *
 	 * @typeParam A - The source type of the value within the `Option`.
 	 * @typeParam B - The target type of the value within the `Option`.
-	 * @param to - The function  from `A` to `B` to apply to the value of the `Option` if it is nonempty.
-	 * @param from - The function from `B` to `A` to apply to the value of the `Option` if it is nonempty.
+	 * @param f - The function `A` TO `B` to apply to the value of the `Option` if it is nonempty.
+	 * @param _g - The function `A` FROM `B` to apply to the value of the `Option` if it is nonempty.
 	 * @returns An `Option<B>` containing the result of applying `to` to the value of the `Option` if it is nonempty.
 	 *
 	 * @see Option.imap
