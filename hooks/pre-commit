@@ -36,64 +36,38 @@ allownonascii=$(git config --type=bool hooks.allownonascii)
 # Redirect output to stderr.
 exec 1>&2
 
+checkCommand() {
+    command=$1
+    failureMessage=$2
+
+		echo "${WIP} ${YELLOW}$1${NC}"
+    $command > /dev/null
+    if [ $? -ne 0 ]; then
+        echo "${ERROR} ${RED}$failureMessage${NC}\n"
+        exit 1
+    else
+    		echo "${SUCCESS}\n"
+    fi
+}
+
+
 denoCheck() {
     echo "${WIP} ${YELLOW}Running Deno checks...${NC} \n"
 
-
-    echo "${WIP} ${YELLOW}check for formatting errors${NC}"
-    deno fmt --check
-    if [ $? -ne 0 ]; then
-      echo "${ERROR} ${RED}Formatting errors found.${NC}"
-      exit 1
-    else
-			echo "${SUCCESS} ${GREEN}No formatting errors found.${NC} \n"
-    fi
-
-
-		echo "${WIP} ${YELLOW}check for static typing errors${NC}"
-    deno check --all src/**/*.ts
-    if [ $? -ne 0 ]; then
-      echo "${ERROR} ${RED}Static typing errors found.${NC}"
-      exit 1
-    else
-			echo "${SUCCESS} ${GREEN}No static typing errors found.${NC} \n"
-    fi
-
-		echo "${WIP} ${YELLOW}check for linting errors${NC}"
-    deno lint                             # check for linting errors
-    if [ $? -ne 0 ]; then
-      echo "${ERROR} ${RED}Linting errors found.${NC}"
-      exit 1
-    else
-    	echo "${SUCCESS} ${GREEN}No linting errors found.${NC} \n"
-    fi
-
-    echo "${WIP} ${YELLOW}check for documentation linting errors${NC}"
-		deno doc --lint ./src/**/*.ts
-		if [ $? -ne 0 ]; then
-			echo "${ERROR} ${RED}Documentation linting errors found.${NC}"
-			exit 1
-		else
-			echo "${SUCCESS} ${GREEN}No Documentation linting errors found.${NC} \n"
+ 		# Check for Deno installation
+		if ! command -v deno &> /dev/null
+		then
+				echo "${ERROR} ${RED}Deno could not be found. Please install Deno and try again.${NC}"
+				exit 1
 		fi
 
-		echo "${WIP} ${YELLOW}check for unit test failing${NC}"
-    deno test > /dev/null
-    if [ $? -ne 0 ]; then
-      echo "${ERROR} ${RED}Unit tests failed.${NC}"
-      exit 1
-    else
-    	echo "${SUCCESS} ${GREEN}All unit tests passed.${NC} \n"
-    fi
 
-		echo "${WIP} ${YELLOW}check for broken documentation examples${NC}"
-    deno test -q --doc ./src/**/*.ts > /dev/null
-    if [ $? -ne 0 ]; then
-      echo "${ERROR} ${RED}JSDoc @example tag failed${NC}"
-      exit 1
-    else
-    	echo "${SUCCESS} ${GREEN}All Docs assertions have passed.${NC} \n"
-    fi
+    checkCommand "deno fmt --check" "Formatting errors found."
+		checkCommand "deno check --all src/**/*.ts" "Static typing errors found."
+		checkCommand "deno lint" "Linting errors found."
+		checkCommand "deno doc --lint ./src/**/*.ts" "Documentation linting errors found."
+		checkCommand "deno test" "Unit tests failed."
+		checkCommand "deno test -q --doc ./src/**/*.ts" "JSDoc @example tag failed"
 
     echo "${SUCCESS} ${GREEN}All checks passed.${NC} \n"
 }
