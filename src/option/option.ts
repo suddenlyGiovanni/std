@@ -555,6 +555,17 @@ export abstract class Option<out A>
 		new Some(a)
 
 	/**
+	 * This curried static method allows you to fold an Option to a summary value.
+	 *
+	 * @template A The type of the values in the Option.
+	 * @template B The type of the result after folding.
+	 * @param b - The initial value for the folding operation.
+	 * @param f - The folding function that takes the accumulated value and the current value
+	 * and returns the new accumulated value.
+	 * @returns a function that takes an Option of type A and returns the result of applying the f function to it.
+	 *
+	 * @remarks
+	 * It implements the {@linkcode Foldable.Pipable} type class interface.
 	 * @see Option#reduce
 	 */
 	public static reduce: Foldable.Pipable<Option.TypeLambda>['reduce'] =
