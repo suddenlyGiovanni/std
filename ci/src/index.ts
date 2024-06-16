@@ -45,21 +45,48 @@ class Std {
 	 */
 	@func()
 	buildEnv(source: Directory): Container {
-		return dag
-			.container()
-			.from('denoland/deno:alpine-1.44.2')
-			.withEnvVariable('DENO_FUTURE', '1')
-			.withUser('deno')
-			.withDirectory(
-				'/src',
-				source
-					.withoutDirectory('.github/')
-					.withoutDirectory('.idea/')
-					.withoutDirectory('.vscode/')
-					.withoutDirectory('ci/')
-					.withoutDirectory('hooks/')
-					.withoutFile('env'),
-			)
-			.withWorkdir('/src')
+		return (
+			dag
+				.container()
+				.from('denoland/deno:alpine-1.44.2')
+				.withEnvVariable('DENO_FUTURE', '1')
+				// .withUser('deno')
+				.withDirectory(
+					'/src',
+					source
+						.withoutDirectory('.github/')
+						.withoutDirectory('.idea/')
+						.withoutDirectory('.vscode/')
+						.withoutDirectory('ci/')
+						.withoutDirectory('hooks/')
+						.withoutFile('env'),
+				)
+				.withWorkdir('/src')
+				.withExec(['deno', 'add', 'npm:@biomejs/biome'])
+		)
+	}
+
+	/**
+	 * Executes the test command for the specified source directory.
+	 *
+	 * @param {Directory} source - The source directory to run the tests on.
+	 */
+	@func()
+	test(source: Directory): Container {
+		return this.buildEnv(source).withExec(['deno', 'task', 'test'])
+	}
+
+	@func()
+	checkFormat(source: Directory, formatter: 'deno' | 'biome' = 'deno'): Container {
+		const container = this.buildEnv(source)
+
+		switch (formatter) {
+			case 'deno':
+				return container.withExec(['deno', 'fmt', '--check'])
+			case 'biome':
+				return container.withExec(['deno run -A npm:@biomejs/biome format --check ./src'])
+			default:
+				throw new Error(`Unknown formatter: ${formatter}`)
+		}
 	}
 }
