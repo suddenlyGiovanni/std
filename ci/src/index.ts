@@ -50,7 +50,16 @@ class Std {
 			.from('denoland/deno:alpine-1.44.2')
 			.withEnvVariable('DENO_FUTURE', '1')
 			.withUser('deno')
-			.withDirectory('/src', source)
+			.withDirectory(
+				'/src',
+				source
+					.withoutDirectory('.github/')
+					.withoutDirectory('.idea/')
+					.withoutDirectory('.vscode/')
+					.withoutDirectory('ci/')
+					.withoutDirectory('hooks/')
+					.withoutFile('env'),
+			)
 			.withWorkdir('/src')
 	}
 }
