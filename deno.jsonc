@@ -24,8 +24,8 @@
 		"exclude": []
 	},
 	"tasks": {
-		"format": "deno run -A npm:@biomejs/biome format --write ./src",
-		"lint": "deno run -A npm:@biomejs/biome lint ./src",
+		"format": "biome format --write ./src",
+		"lint": "biome lint ./src",
 		"test": "deno test --allow-all --unstable ./src",
 		"test:ci": "deno test --allow-all --parallel --coverage --unstable ./src",
 		"doc:lint": "deno doc --lint ./src/**/*.ts",
