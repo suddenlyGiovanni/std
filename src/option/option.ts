@@ -875,6 +875,18 @@ export abstract class Option<out A>
 	}
 
 	/**
+	 * Instance method that applies a function to each element in the Option and reduces them to a single value.
+	 *
+	 * @template A - The type of the values in the Option.
+	 * @template B - The type of the result after folding.
+	 * @param b - The initial value for the reduction.
+	 * @param f - The reducing function that takes the accumulated value and the current element as arguments.
+	 * @returns The result of the reduction.
+	 * @this Option.Type<A> - The Option to reduce.
+	 *
+	 * @remarks
+	 * It Implements the {@linkcode Foldable.Fluent} type class interface.
+	 *
 	 * @see Option.reduce
 	 * @see Option#fold
 	 */
