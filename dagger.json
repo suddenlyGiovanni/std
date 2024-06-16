@@ -1,0 +1,6 @@
+{
+  "name": "std",
+  "sdk": "typescript",
+  "source": "ci",
+  "engineVersion": "v0.11.6"
+}

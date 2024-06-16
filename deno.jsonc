@@ -35,6 +35,7 @@
 		"ok": "deno task lint && deno fmt --check && deno task test"
 	},
 	"exclude": [
+	  	"ci",
 		".editorconfig",
 		".git",
 		".github",
