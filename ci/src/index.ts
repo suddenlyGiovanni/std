@@ -38,4 +38,19 @@ class Std {
 			.withExec(['grep', '-R', pattern, '.'])
 			.stdout()
 	}
+
+	/**
+	 * Build a ready-to-use development environment
+	 * @param source - The source directory to be mounted in the container
+	 */
+	@func()
+	buildEnv(source: Directory): Container {
+		return dag
+			.container()
+			.from('denoland/deno:alpine-1.44.2')
+			.withEnvVariable('DENO_FUTURE', '1')
+			.withUser('deno')
+			.withDirectory('/src', source)
+			.withWorkdir('/src')
+	}
 }
