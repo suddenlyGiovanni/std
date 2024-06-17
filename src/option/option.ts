@@ -3,7 +3,13 @@ import * as F from '../internal/function.ts'
 import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
 
 import type { Inspectable } from '../internal/inspectable.ts'
-import { Covariant, type FlatMap, type Pointed } from '../typeclass/mod.ts'
+import {
+	Covariant,
+	type FlatMap,
+	type Foldable,
+	type Monad,
+	type Pointed,
+} from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -66,7 +72,9 @@ export abstract class Option<out A>
 		Inspectable,
 		Equals,
 		FlatMap.Fluent<Option.TypeLambda>,
-		Pointed.Fluent<Option.TypeLambda> {
+		Pointed.Fluent<Option.TypeLambda>,
+		Foldable.Fluent<Option.TypeLambda>,
+		Monad.Fluent<Option.TypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -554,6 +562,24 @@ export abstract class Option<out A>
 		new Some(a)
 
 	/**
+	 * This curried static method allows you to fold an Option to a summary value.
+	 *
+	 * @template A The type of the values in the Option.
+	 * @template B The type of the result after folding.
+	 * @param b - The initial value for the folding operation.
+	 * @param f - The folding function that takes the accumulated value and the current value
+	 * and returns the new accumulated value.
+	 * @returns a function that takes an Option of type A and returns the result of applying the f function to it.
+	 *
+	 * @remarks
+	 * It implements the {@linkcode Foldable.Pipable} type class interface.
+	 * @see Option#reduce
+	 */
+	public static reduce: Foldable.Pipable<Option.TypeLambda>['reduce'] =
+		<A, B>(b: B, f: (b: B, a: A) => B) => (self: Option.Type<A>): B =>
+			Option.isNone(self) ? b : f(b, self.get())
+
+	/**
 	 * Implements the {@linkcode Equals} interface, providing a way to compare two this Option instance with another unknown value that may be an Option or not.
 	 *
 	 * @param that - the value to compare
@@ -853,6 +879,26 @@ export abstract class Option<out A>
 		},
 	): B | C {
 		return Option.match(cases)(this)
+	}
+
+	/**
+	 * Instance method that applies a function to each element in the Option and reduces them to a single value.
+	 *
+	 * @template A - The type of the values in the Option.
+	 * @template B - The type of the result after folding.
+	 * @param b - The initial value for the reduction.
+	 * @param f - The reducing function that takes the accumulated value and the current element as arguments.
+	 * @returns The result of the reduction.
+	 * @this Option.Type<A> - The Option to reduce.
+	 *
+	 * @remarks
+	 * It Implements the {@linkcode Foldable.Fluent} type class interface.
+	 *
+	 * @see Option.reduce
+	 * @see Option#fold
+	 */
+	public reduce<A, B>(this: Option.Type<A>, b: B, f: (b: B, a: A) => B): B {
+		return Option.reduce(b, f)(this)
 	}
 }
 
