@@ -171,6 +171,46 @@ describe('Option', () => {
 		})
 	})
 
+	describe('Monad', () => {
+		test('of', () => {
+			expect(Option.isOption(Option.of(1))).toBe(true)
+		})
+
+		test('flatMap', () => {
+			Util.optionEqual(Option.of(Option.of(0)).flatten(), Option.of(0))
+		})
+
+		describe('laws', () => {
+			test('Left identity', () => {
+				type A = number
+				type B = string
+				const a: A = 1
+				const f = (a: A): Option.Type<B> => Option.of(a.toString())
+
+				Util.optionEqual(Option.of(a).flatMap(f), f(a))
+			})
+
+			test('Right identity', () => {
+				const Fa = Option.Some(1)
+				Util.optionEqual(Fa.flatMap(Option.of), Fa)
+			})
+			test('Associativity', () => {
+				type A = number
+				type B = string
+				type C = boolean
+
+				const Fa = Option.of(1)
+				const f = (a: A): Option.Type<B> => Option.of(a.toString())
+				const g = (b: B): Option.Type<C> => Option.of(Boolean(b))
+
+				Util.optionEqual(
+					Fa.flatMap(f).flatMap(g),
+					Fa.flatMap((a) => f(a).flatMap(g)),
+				)
+			})
+		})
+	})
+
 	describe('fold', () => {
 		const fa = (s: string): { length: number } => ({ length: s.length })
 		const ifEmpty: Lazy<number> = () => 42

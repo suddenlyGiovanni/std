@@ -3,7 +3,13 @@ import * as F from '../internal/function.ts'
 import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
 
 import type { Inspectable } from '../internal/inspectable.ts'
-import { Covariant, type FlatMap, type Foldable, type Pointed } from '../typeclass/mod.ts'
+import {
+	Covariant,
+	type FlatMap,
+	type Foldable,
+	type Monad,
+	type Pointed,
+} from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
 	return JSON.stringify(x, null, 2)
@@ -67,7 +73,8 @@ export abstract class Option<out A>
 		Equals,
 		FlatMap.Fluent<Option.TypeLambda>,
 		Pointed.Fluent<Option.TypeLambda>,
-		Foldable.Fluent<Option.TypeLambda> {
+		Foldable.Fluent<Option.TypeLambda>,
+		Monad.Fluent<Option.TypeLambda> {
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */

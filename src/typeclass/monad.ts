@@ -16,8 +16,6 @@ import type { Pointed } from './pointed.ts'
  * - `flatMap` | `join` - `F(F(v)) → F(v)` = Means that we can join/flatten the two containers in one; Chains
  * together functions that return a monadic type.
  *
- *
- *
  * Allows composition of dependent effectful functions.
  * See: {@link http://homepages.inf.ed.ac.uk/wadler/papers/marktoberdorf/baastad.pdf|Monads for functional programming}
  *
@@ -33,7 +31,6 @@ import type { Pointed } from './pointed.ts'
  * - Associativity:
  * Given `fa` is a monadic type `F<A>` and `f` and `g` are functions that return a monadic type `f: (a:A) => F<B>` and `g: (b:B) => F<C>`.
  * Then `fa.flatMap(f).flatMap(g) === fa.flatMap(a => f(a).flatMap(g))`.
- *
  */
 export declare namespace Monad {
 	/**
@@ -47,6 +44,5 @@ export declare namespace Monad {
 	 * @template F TypeLambda
 	 */
 	export interface Pipeable<F extends TypeLambda>
-		extends FlatMap.Pipeable<F>,
-			Pointed.Pipeable<F> {}
+		extends FlatMap.Pipeable<F>, Pointed.Pipeable<F> {}
 }
