@@ -1028,3 +1028,17 @@ export class Some<out A> extends Option<A> {
 		Object.freeze(this)
 	}
 }
+
+/**
+ * constrains option to implement all its Pipeable interfaces And type-class methods
+ * @internal
+ */
+function assertPipableOption<
+	T extends
+		& FlatMap.Pipeable<Option.TypeLambda>
+		& Pointed.Pipeable<Option.TypeLambda>
+		& Monad.Pipeable<Option.TypeLambda>,
+>(_option: T): void {
+	return
+}
+assertPipableOption(Option)
