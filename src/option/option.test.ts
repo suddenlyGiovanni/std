@@ -171,6 +171,34 @@ describe('Option', () => {
 		})
 	})
 
+	describe('Semiproduct', () => {
+		describe('laws', () => {
+			test('Associativity', () => {
+				// testing the associativity law of semiproduct of Option instances
+				// If ⊗ is associative, then a ⊗ (b ⊗ c) = (a ⊗ b) ⊗ c.
+				type A = string
+				const a: A = '0'
+				const Fa = Option.of<A>(a)
+
+				type B = number
+				const b: B = 0
+				const Fb = Option.of<B>(b)
+
+				type C = boolean
+				const c: C = false
+				const Fc = Option.of<C>(c)
+
+				// a ⊗ (b ⊗ c)
+				const lhs = Option.product(Fa, Option.product(Fb, Fc))
+				expectTypeOf(lhs).toEqualTypeOf<Option.Type<[A, [B, C]]>>(Option.of([a, [b, c]]))
+
+				// (a ⊗ b) ⊗ c
+				const rhs = Option.product(Option.product(Fa, Fb), Fc)
+				expectTypeOf(rhs).toEqualTypeOf<Option.Type<[[A, B], C]>>(Option.of([[a, b], c]))
+			})
+		})
+	})
+
 	describe('Monad', () => {
 		test('of', () => {
 			expect(Option.isOption(Option.of(1))).toBe(true)

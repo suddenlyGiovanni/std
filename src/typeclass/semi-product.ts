@@ -8,9 +8,12 @@ import type { Invariant } from './invariant.ts'
  * calling `product` with `map` allows one to apply a function of arbitrary arity to multiple
  * independent effectful values.
  *
+ * > [!NOTE]
+ * > While {@linkcode Semigroup} allows us to join values, {@linkcode SemiProduct} or Semigroupal allows us to join
+ * > contexts.
+ *
  * @alias Semigroupal
  */
-
 export declare namespace SemiProduct {
 	/**
 	 * Fluent interface API for SemiProduct type class
@@ -42,8 +45,9 @@ export declare namespace SemiProduct {
 		 * Combine an F<A> and an F<B> into an F<[A, B]> that maintains the effects of both `fa` and `fb`.
 		 */
 		product<R1, O1, E1, A, R2, O2, E2, B>(
+			self: Kind<F, R1, O1, E1, A>,
 			that: Kind<F, R2, O2, E2, B>,
-		): (self: Kind<F, R1, O1, E1, A>) => Kind<F, R1 & R2, O1 | O2, E1 | E2, [A, B]>
+		): Kind<F, R1 & R2, O1 | O2, E1 | E2, [A, B]>
 
 		/**
 		 * Combines an `F<A>` from 'self' and an iterable collection of `F<A>` into an `F<[A, ...Array<A>]>`.

@@ -1,7 +1,6 @@
 import type { Equals } from '../internal/equals.ts'
 import * as F from '../internal/function.ts'
 import type { TypeLambda as _TypeLambda } from '../internal/hkt.ts'
-
 import type { Inspectable } from '../internal/inspectable.ts'
 import {
 	Covariant,
@@ -9,6 +8,7 @@ import {
 	type Foldable,
 	type Monad,
 	type Pointed,
+	type SemiProduct,
 } from '../typeclass/mod.ts'
 
 function format(x: unknown): string {
@@ -75,6 +75,118 @@ export abstract class Option<out A>
 		Pointed.Fluent<Option.TypeLambda>,
 		Foldable.Fluent<Option.TypeLambda>,
 		Monad.Fluent<Option.TypeLambda> {
+	/**
+	 * Represents the cartesian product of two Options.
+	 *
+	 * @typeParam A
+	 * @typeParam B
+	 * @param self - The option of type `A` to be combined with.
+	 * @param that - The option of type `B` to be combined with.
+	 * @returns the result of combining the two options.
+	 *
+	 * @remarks
+	 * It implements the {@linkcode SemiProduct#Pipeable#product} type class interface.
+	 *
+	 * @example
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 * 	Option.product(Option.Some(1), Option.Some(2)),
+	 * 	Option.Some([1, 2])
+	 * )
+	 *
+	 * assertEquals(
+	 * 	Option.product(Option.Some('a'), Option.None()),
+	 * 	Option.None()
+	 * )
+	 * ```
+	 */
+	public static readonly product: SemiProduct.Pipeable<Option.TypeLambda>['product'] = <A, B>(
+		self: Option.Type<A>,
+		that: Option.Type<B>,
+	): Option.Type<[A, B]> =>
+		Option.isSome(self) && Option.isSome(that)
+			? Option.of([self.get(), that.get()])
+			: Option.None()
+
+	/**
+	 * Combines an `Option<A>` from 'self' and an iterable collection of `Option<A>` into an `Option<[A, ...Array<A>]>`.
+	 * If any of the options are `None`, the result will be `None`.
+	 *
+	 * @typeParam A
+	 * @param collection - The {@linkcode Iterable} options of type A to combine with the `self` option.
+	 * @returns a function that takes an `Option<A>` and returns the result of combining the `self` option with the collection of options.
+	 *
+	 * @remarks
+	 * This method is curried, so it can be partially applied.
+	 * It implements the {@linkcode SemiProduct#Pipeable#productMany} type class interface.
+	 *
+	 * @example
+	 * Some(1).productMany([Some(2), Some(3)]) // Some([1, 2, 3])
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 *  pipe(
+	 *      Option.Some(1),
+	 *      Option.productMany([Option.Some(2), Option.Some(3)])
+	 *    ),
+	 *    Option.Some([1, 2, 3])
+	 * )
+	 * ```
+	 *
+	 * @example
+	 * Some(1).productMany([None(), Some(3)]) // None
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 *  pipe(
+	 *    Option.Some(1),
+	 *    Option.productMany([Option.None(), Option.Some(3)])
+	 *  ),
+	 *  Option.None()
+	 * )
+	 * ```
+	 *
+	 * @example
+	 * Some('string').productMany([Some(2)]) // type error
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * pipe(
+	 * 	// @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
+	 * 	Option.Some('a'),
+	 * 	Option.productMany([Option.Some(2), Option.Some(3)]),
+	 * )
+	 * ```
+	 */
+	public static readonly productMany: SemiProduct.Pipeable<Option.TypeLambda>['productMany'] =
+		<A>(collection: Iterable<Option.Type<A>>) =>
+		(self: Option.Type<A>): Option.Type<[A, ...Array<A>]> => {
+			if (Option.isNone(self)) {
+				return Option.None()
+			}
+			const out: [A, ...Array<A>] = [self.get()]
+
+			for (const option of collection) {
+				if (Option.isNone(option)) {
+					return Option.None()
+				}
+				out.push(option.get())
+			}
+			return Option.of(out)
+		}
+
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -572,7 +684,7 @@ export abstract class Option<out A>
 	 * @returns a function that takes an Option of type A and returns the result of applying the f function to it.
 	 *
 	 * @remarks
-	 * It implements the {@linkcode Foldable.Pipable} type class interface.
+	 * It implements the {@linkcode Foldable} type class interface.
 	 * @see Option#reduce
 	 */
 	public static reduce: Foldable.Pipable<Option.TypeLambda>['reduce'] =
@@ -1037,7 +1149,8 @@ function assertPipableOption<
 	T extends
 		& FlatMap.Pipeable<Option.TypeLambda>
 		& Pointed.Pipeable<Option.TypeLambda>
-		& Monad.Pipeable<Option.TypeLambda>,
+		& Monad.Pipeable<Option.TypeLambda>
+		& SemiProduct.Pipeable<Option.TypeLambda>,
 >(_option: T): void {
 	return
 }
