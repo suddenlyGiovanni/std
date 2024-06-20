@@ -128,14 +128,10 @@ export abstract class Option<out A>
 	 * Some(1).productMany([Some(2), Some(3)]) // Some([1, 2, 3])
 	 * ```ts
 	 * import { assertEquals } from 'jsr:@std/assert'
-	 * import { pipe } from '../internal/function.ts'
 	 * import { Option } from './option.ts'
 	 *
 	 * assertEquals(
-	 *  pipe(
-	 *      Option.Some(1),
-	 *      Option.productMany([Option.Some(2), Option.Some(3)])
-	 *    ),
+	 *    Option.productMany(Option.Some(1), [Option.Some(2), Option.Some(3)]),
 	 *    Option.Some([1, 2, 3])
 	 * )
 	 * ```
@@ -144,14 +140,10 @@ export abstract class Option<out A>
 	 * Some(1).productMany([None(), Some(3)]) // None
 	 * ```ts
 	 * import { assertEquals } from 'jsr:@std/assert'
-	 * import { pipe } from '../internal/function.ts'
 	 * import { Option } from './option.ts'
 	 *
 	 * assertEquals(
-	 *  pipe(
-	 *    Option.Some(1),
-	 *    Option.productMany([Option.None(), Option.Some(3)])
-	 *  ),
+	 *  Option.productMany(Option.Some(1), [Option.None(), Option.Some(3)]),
 	 *  Option.None()
 	 * )
 	 * ```
@@ -159,33 +151,31 @@ export abstract class Option<out A>
 	 * @example
 	 * Some('string').productMany([Some(2)]) // type error
 	 * ```ts
-	 * import { assertEquals } from 'jsr:@std/assert'
-	 * import { pipe } from '../internal/function.ts'
 	 * import { Option } from './option.ts'
 	 *
-	 * pipe(
-	 * 	// @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
-	 * 	Option.Some('a'),
-	 * 	Option.productMany([Option.Some(2), Option.Some(3)]),
-	 * )
+	 * // @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
+	 * Option.productMany(Option.Some('a'), [Option.Some(2), Option.Some(3)])
 	 * ```
 	 */
-	public static readonly productMany: SemiProduct.Pipeable<Option.TypeLambda>['productMany'] =
-		<A>(collection: Iterable<Option.Type<A>>) =>
-		(self: Option.Type<A>): Option.Type<[A, ...Array<A>]> => {
-			if (Option.isNone(self)) {
+	public static readonly productMany: SemiProduct.Pipeable<Option.TypeLambda>['productMany'] = <
+		A,
+	>(
+		self: Option.Type<A>,
+		collection: Iterable<Option.Type<A>>,
+	): Option.Type<[A, ...Array<A>]> => {
+		if (Option.isNone(self)) {
+			return Option.None()
+		}
+		const out: [A, ...Array<A>] = [self.get()]
+
+		for (const option of collection) {
+			if (Option.isNone(option)) {
 				return Option.None()
 			}
-			const out: [A, ...Array<A>] = [self.get()]
-
-			for (const option of collection) {
-				if (Option.isNone(option)) {
-					return Option.None()
-				}
-				out.push(option.get())
-			}
-			return Option.of(out)
+			out.push(option.get())
 		}
+		return Option.of(out)
+	}
 
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
