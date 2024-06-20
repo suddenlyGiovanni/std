@@ -183,7 +183,36 @@ describe('Option', () => {
 			Util.optionEqual(Option.product(Option.None(), Option.None()), Option.None())
 		})
 
-		test.skip('productMany', () => {})
+		test('productMany', () => {
+			// productMany with all Some
+			Util.optionEqual(
+				Option.productMany(Option.Some(1), [Option.Some(2), Option.Some(3)]),
+				Option.Some([1, 2, 3]),
+			)
+
+			Util.optionEqual(
+				Option.productMany(Option.Some(1), new Set([Option.Some(2), Option.Some(3)])),
+				Option.Some([1, 2, 3]),
+			)
+
+			// productMany with one None
+			Util.optionEqual(
+				Option.productMany(Option.Some(1), [Option.None(), Option.Some(3)]),
+				Option.None(),
+			)
+			// productMany with empty collection
+			Util.optionEqual(Option.productMany(Option.Some(1), []), Option.Some([1]))
+
+			// productMany with self None
+			Util.optionEqual(
+				Option.productMany(Option.None(), [Option.Some(2), Option.Some(3)]),
+				Option.None(),
+			)
+
+			// productMany with different types
+			// @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
+			Option.productMany(Option.Some('a'), [Option.Some(2), Option.Some(3)])
+		})
 
 		describe('laws', () => {
 			test('Associativity', () => {
