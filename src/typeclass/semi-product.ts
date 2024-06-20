@@ -54,8 +54,9 @@ export declare namespace SemiProduct {
 		 * This preserves the effects of 'self' and each element in 'collection'.
 		 */
 		productMany<R, O, E, A>(
+			self: Kind<F, R, O, E, A>,
 			collection: Iterable<Kind<F, R, O, E, A>>,
-		): (self: Kind<F, R, O, E, A>) => Kind<F, R, O, E, [A, ...Array<A>]>
+		): Kind<F, R, O, E, [A, ...Array<A>]>
 	}
 
 	/**
