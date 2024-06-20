@@ -46,6 +46,7 @@
 		"crypto/_wasm/target",
 		"docs",
 		"front_matter/testdata",
+		"hooks/",
 		"jsonc/testdata"
 	]
 }
