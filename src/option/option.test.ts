@@ -172,6 +172,19 @@ describe('Option', () => {
 	})
 
 	describe('Semiproduct', () => {
+		test('product', () => {
+			Util.optionEqual(
+				Option.product(Option.Some(42), Option.Some('meaning of life')),
+				Option.of([42, 'meaning of life']),
+			)
+
+			Util.optionEqual(Option.product(Option.Some('a'), Option.None()), Option.None())
+			Util.optionEqual(Option.product(Option.None(), Option.of('b')), Option.None())
+			Util.optionEqual(Option.product(Option.None(), Option.None()), Option.None())
+		})
+
+		test.skip('productMany', () => {})
+
 		describe('laws', () => {
 			test('Associativity', () => {
 				// testing the associativity law of semiproduct of Option instances
