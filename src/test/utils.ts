@@ -1,4 +1,4 @@
-import { assertEquals, assertStrictEquals } from 'jsr:@std/assert'
+import { assertEquals, assertStrictEquals, equal } from 'jsr:@std/assert'
 import type { Option } from '../option/option.ts'
 
 /**
@@ -17,6 +17,6 @@ export class Util {
 	 * Compares two Option.Type instances for equality and asserts that they are equal.
 	 */
 	public static readonly optionEqual = <A>(actual: Option.Type<A>, expected: Option.Type<A>) => {
-		assertStrictEquals(actual.equals(expected), true)
+		assertStrictEquals(actual.equals(expected, equal), true)
 	}
 }
