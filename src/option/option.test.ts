@@ -181,14 +181,14 @@ describe('Option', () => {
 
 			const none: Option.Type<never> = Option.None()
 
-			test('Static', () => {
+			test('static', () => {
 				Util.optionEqual(Option.product(someA, someB), Option.of([a, b]))
 				Util.optionEqual(Option.product(someB, none), none)
 				Util.optionEqual(Option.product(none, someB), none)
 				Util.optionEqual(Option.product(none, none), none)
 			})
 
-			test('Instance', () => {
+			test('instance', () => {
 				Util.optionEqual(someA.product(someB), Option.of([a, b]))
 				Util.optionEqual(someB.product(none), none)
 				Util.optionEqual(none.product(someB), none)
@@ -196,35 +196,58 @@ describe('Option', () => {
 			})
 		})
 
-		test('productMany', () => {
-			// productMany with all Some
-			Util.optionEqual(
-				Option.productMany(Option.Some(1), [Option.Some(2), Option.Some(3)]),
-				Option.Some([1, 2, 3]),
-			)
+		describe('productMany', () => {
+			const a: number = 1
+			const someA: Option.Type<number> = Option.Some(a)
 
-			Util.optionEqual(
-				Option.productMany(Option.Some(1), new Set([Option.Some(2), Option.Some(3)])),
-				Option.Some([1, 2, 3]),
-			)
+			const b: number = 2
+			const someB: Option.Type<number> = Option.Some(b)
 
-			// productMany with one None
-			Util.optionEqual(
-				Option.productMany(Option.Some(1), [Option.None(), Option.Some(3)]),
-				Option.None(),
-			)
-			// productMany with empty collection
-			Util.optionEqual(Option.productMany(Option.Some(1), []), Option.Some([1]))
+			const c: number = 3
+			const someC: Option.Type<number> = Option.Some(c)
 
-			// productMany with self None
-			Util.optionEqual(
-				Option.productMany(Option.None(), [Option.Some(2), Option.Some(3)]),
-				Option.None(),
-			)
+			const none: Option.Type<unknown> = Option.None()
 
-			// productMany with different types
-			// @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
-			Option.productMany(Option.Some('a'), [Option.Some(2), Option.Some(3)])
+			test('static', () => {
+				// productMany with all Some
+				Util.optionEqual(Option.productMany(someA, [someB, someC]), Option.Some([a, b, c]))
+
+				Util.optionEqual(
+					Option.productMany(someA, new Set([someB, someC])),
+					Option.Some([a, b, c]),
+				)
+
+				// productMany with one None
+				Util.optionEqual(Option.productMany(someA, [none, someC]), none)
+				// productMany with empty collection
+				Util.optionEqual(Option.productMany(someA, []), Option.Some([a]))
+
+				// productMany with self None
+				Util.optionEqual(Option.productMany(none, [someB, someC]), none)
+
+				// productMany with different types
+				// @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
+				Option.productMany(Option.Some('a'), [someB, someC])
+			})
+
+			test('instance', () => {
+				// productMany with all Some
+				Util.optionEqual(someA.productMany([someB, someC]), Option.Some([a, b, c]))
+
+				Util.optionEqual(someA.productMany(new Set([someB, someC])), Option.Some([a, b, c]))
+
+				// productMany with one None
+				Util.optionEqual(someA.productMany([none, someC]), none)
+				// productMany with empty collection
+				Util.optionEqual(someA.productMany([]), Option.Some([a]))
+
+				// productMany with self None
+				Util.optionEqual(none.productMany([someB, someC]), none)
+
+				// productMany with different types
+				// @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
+				Option.Some('a').productMany([someB, someC])
+			})
 		})
 
 		describe('laws', () => {

@@ -975,6 +975,17 @@ export abstract class Option<out A>
 		return Option.product(this, that)
 	}
 
+	/**
+	 * Calculates the product of an Option with multiple Options in a collection.
+	 *
+	 * @template A - The type of the values in the Options.
+	 * @this {Option.Type<A>} - The Option to calculate the product with.
+	 * @param collection - The collection of Options to calculate the product with; it must be an iterable collection.
+	 * @returns An Option that represents the product of the Option with the Options in the collection.
+	 *
+	 * @see Option.productMany
+	 * @see Option#product
+	 */
 	public productMany<A>(
 		this: Option.Type<A>,
 		collection: Iterable<Option.Type<A>>,
