@@ -172,15 +172,28 @@ describe('Option', () => {
 	})
 
 	describe('Semiproduct', () => {
-		test('product', () => {
-			Util.optionEqual(
-				Option.product(Option.Some(42), Option.Some('meaning of life')),
-				Option.of([42, 'meaning of life']),
-			)
+		describe('product', () => {
+			const a: number = 42
+			const someA: Option.Type<number> = Option.Some(a)
 
-			Util.optionEqual(Option.product(Option.Some('a'), Option.None()), Option.None())
-			Util.optionEqual(Option.product(Option.None(), Option.of('b')), Option.None())
-			Util.optionEqual(Option.product(Option.None(), Option.None()), Option.None())
+			const b: string = 'meaning of life'
+			const someB: Option.Type<string> = Option.Some(b)
+
+			const none: Option.Type<never> = Option.None()
+
+			test('Static', () => {
+				Util.optionEqual(Option.product(someA, someB), Option.of([a, b]))
+				Util.optionEqual(Option.product(someB, none), none)
+				Util.optionEqual(Option.product(none, someB), none)
+				Util.optionEqual(Option.product(none, none), none)
+			})
+
+			test('Instance', () => {
+				Util.optionEqual(someA.product(someB), Option.of([a, b]))
+				Util.optionEqual(someB.product(none), none)
+				Util.optionEqual(none.product(someB), none)
+				Util.optionEqual(none.product(none), none)
+			})
 		})
 
 		test('productMany', () => {

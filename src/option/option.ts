@@ -74,109 +74,8 @@ export abstract class Option<out A>
 		FlatMap.Fluent<Option.TypeLambda>,
 		Pointed.Fluent<Option.TypeLambda>,
 		Foldable.Fluent<Option.TypeLambda>,
+		SemiProduct.Fluent<Option.TypeLambda>,
 		Monad.Fluent<Option.TypeLambda> {
-	/**
-	 * Represents the cartesian product of two Options.
-	 *
-	 * @typeParam A
-	 * @typeParam B
-	 * @param self - The option of type `A` to be combined with.
-	 * @param that - The option of type `B` to be combined with.
-	 * @returns the result of combining the two options.
-	 *
-	 * @remarks
-	 * It implements the {@linkcode SemiProduct#Pipeable#product} type class interface.
-	 *
-	 * @example
-	 * ```ts
-	 * import { assertEquals } from 'jsr:@std/assert'
-	 * import { pipe } from '../internal/function.ts'
-	 * import { Option } from './option.ts'
-	 *
-	 * assertEquals(
-	 * 	Option.product(Option.Some(1), Option.Some(2)),
-	 * 	Option.Some([1, 2])
-	 * )
-	 *
-	 * assertEquals(
-	 * 	Option.product(Option.Some('a'), Option.None()),
-	 * 	Option.None()
-	 * )
-	 * ```
-	 */
-	public static readonly product: SemiProduct.Pipeable<Option.TypeLambda>['product'] = <A, B>(
-		self: Option.Type<A>,
-		that: Option.Type<B>,
-	): Option.Type<[A, B]> =>
-		Option.isSome(self) && Option.isSome(that)
-			? Option.of([self.get(), that.get()])
-			: Option.None()
-
-	/**
-	 * Combines an `Option<A>` from 'self' and an iterable collection of `Option<A>` into an `Option<[A, ...Array<A>]>`.
-	 * If any of the options are `None`, the result will be `None`.
-	 *
-	 * @typeParam A
-	 * @param collection - The {@linkcode Iterable} options of type A to combine with the `self` option.
-	 * @returns a function that takes an `Option<A>` and returns the result of combining the `self` option with the collection of options.
-	 *
-	 * @remarks
-	 * This method is curried, so it can be partially applied.
-	 * It implements the {@linkcode SemiProduct#Pipeable#productMany} type class interface.
-	 *
-	 * @example
-	 * Some(1).productMany([Some(2), Some(3)]) // Some([1, 2, 3])
-	 * ```ts
-	 * import { assertEquals } from 'jsr:@std/assert'
-	 * import { Option } from './option.ts'
-	 *
-	 * assertEquals(
-	 *    Option.productMany(Option.Some(1), [Option.Some(2), Option.Some(3)]),
-	 *    Option.Some([1, 2, 3])
-	 * )
-	 * ```
-	 *
-	 * @example
-	 * Some(1).productMany([None(), Some(3)]) // None
-	 * ```ts
-	 * import { assertEquals } from 'jsr:@std/assert'
-	 * import { Option } from './option.ts'
-	 *
-	 * assertEquals(
-	 *  Option.productMany(Option.Some(1), [Option.None(), Option.Some(3)]),
-	 *  Option.None()
-	 * )
-	 * ```
-	 *
-	 * @example
-	 * Some('string').productMany([Some(2)]) // type error
-	 * ```ts
-	 * import { Option } from './option.ts'
-	 *
-	 * // @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
-	 * Option.productMany(Option.Some('a'), [Option.Some(2), Option.Some(3)])
-	 * ```
-	 */
-	public static readonly productMany: SemiProduct.Pipeable<Option.TypeLambda>['productMany'] = <
-		A,
-	>(
-		self: Option.Type<A>,
-		collection: Iterable<Option.Type<A>>,
-	): Option.Type<[A, ...Array<A>]> => {
-		if (Option.isNone(self)) {
-			return Option.None()
-		}
-		const out: [A, ...Array<A>] = [self.get()]
-
-		for (const option of collection) {
-			if (Option.isNone(option)) {
-				return Option.None()
-			}
-			out.push(option.get())
-		}
-		return Option.of(out)
-	}
-
 	/**
 	 * The discriminant property that identifies the type of the `Option` instance.
 	 */
@@ -205,30 +104,6 @@ export abstract class Option<out A>
 	 */
 	public get [Symbol.toStringTag](): string {
 		return `Option.${this._tag}`
-	}
-
-	/**
-	 * Overloads default serialization behavior when using JSON stringify method
-	 * @override
-	 */
-	public toJSON(this: Option.Type<A>): {
-		_id: 'Option'
-		_tag: 'None' | 'Some'
-		value?: A
-	} {
-		return {
-			_id: 'Option',
-			_tag: this._tag,
-			...(this.isSome() ? { value: this.get() } : {}),
-		}
-	}
-
-	/**
-	 * Overloads default {@linkcode Object.prototype.toString} method allowing Option to return a custom string representation of the boxed value
-	 * @override
-	 */
-	public toString(this: Option.Type<A>): string {
-		return format(this.toJSON())
 	}
 
 	/**
@@ -664,6 +539,108 @@ export abstract class Option<out A>
 		new Some(a)
 
 	/**
+	 * Represents the cartesian product of two Options.
+	 *
+	 * @typeParam A
+	 * @typeParam B
+	 * @param self - The option of type `A` to be combined with.
+	 * @param that - The option of type `B` to be combined with.
+	 * @returns the result of combining the two options.
+	 *
+	 * @remarks
+	 * It implements the {@linkcode SemiProduct#Pipeable#product} type class interface.
+	 *
+	 * @example
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { pipe } from '../internal/function.ts'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 * 	Option.product(Option.Some(1), Option.Some(2)),
+	 * 	Option.Some([1, 2])
+	 * )
+	 *
+	 * assertEquals(
+	 * 	Option.product(Option.Some('a'), Option.None()),
+	 * 	Option.None()
+	 * )
+	 * ```
+	 */
+	public static readonly product: SemiProduct.Pipeable<Option.TypeLambda>['product'] = <A, B>(
+		self: Option.Type<A>,
+		that: Option.Type<B>,
+	): Option.Type<[A, B]> =>
+		Option.isSome(self) && Option.isSome(that)
+			? Option.of([self.get(), that.get()])
+			: Option.None()
+
+	/**
+	 * Combines an `Option<A>` from 'self' and an iterable collection of `Option<A>` into an `Option<[A, ...Array<A>]>`.
+	 * If any of the options are `None`, the result will be `None`.
+	 *
+	 * @typeParam A
+	 * @param collection - The {@linkcode Iterable} options of type A to combine with the `self` option.
+	 * @returns a function that takes an `Option<A>` and returns the result of combining the `self` option with the collection of options.
+	 *
+	 * @remarks
+	 * This method is curried, so it can be partially applied.
+	 * It implements the {@linkcode SemiProduct#Pipeable#productMany} type class interface.
+	 *
+	 * @example
+	 * Some(1).productMany([Some(2), Some(3)]) // Some([1, 2, 3])
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 *    Option.productMany(Option.Some(1), [Option.Some(2), Option.Some(3)]),
+	 *    Option.Some([1, 2, 3])
+	 * )
+	 * ```
+	 *
+	 * @example
+	 * Some(1).productMany([None(), Some(3)]) // None
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 *  Option.productMany(Option.Some(1), [Option.None(), Option.Some(3)]),
+	 *  Option.None()
+	 * )
+	 * ```
+	 *
+	 * @example
+	 * Some('string').productMany([Some(2)]) // type error
+	 * ```ts
+	 * import { Option } from './option.ts'
+	 *
+	 * // @ts-expect-error Option.Type<string> is not assignable to type Option.Type<number>
+	 * Option.productMany(Option.Some('a'), [Option.Some(2), Option.Some(3)])
+	 * ```
+	 */
+	public static readonly productMany: SemiProduct.Pipeable<Option.TypeLambda>['productMany'] = <
+		A,
+	>(
+		self: Option.Type<A>,
+		collection: Iterable<Option.Type<A>>,
+	): Option.Type<[A, ...Array<A>]> => {
+		if (Option.isNone(self)) {
+			return Option.None()
+		}
+		const out: [A, ...Array<A>] = [self.get()]
+
+		for (const option of collection) {
+			if (Option.isNone(option)) {
+				return Option.None()
+			}
+			out.push(option.get())
+		}
+		return Option.of(out)
+	}
+
+	/**
 	 * This curried static method allows you to fold an Option to a summary value.
 	 *
 	 * @template A The type of the values in the Option.
@@ -984,6 +961,28 @@ export abstract class Option<out A>
 	}
 
 	/**
+	 * Returns an Option containing a tuple of values from two Option objects.
+	 *
+	 * @template A - The type of the values in the first Option.
+	 * @template B - The type of the values in the second Option.
+	 * @this {Option.Type<A>} - The first Option object.
+	 * @param that - The second Option object.
+	 * @returns An Option object containing a tuple of values from the two Option objects.
+	 *
+	 * @see Option.product
+	 */
+	public product<A, B>(this: Option.Type<A>, that: Option.Type<B>): Option.Type<[A, B]> {
+		return Option.product(this, that)
+	}
+
+	public productMany<A>(
+		this: Option.Type<A>,
+		collection: Iterable<Option.Type<A>>,
+	): Option.Type<[A, ...A[]]> {
+		return Option.productMany(this, collection)
+	}
+
+	/**
 	 * Instance method that applies a function to each element in the Option and reduces them to a single value.
 	 *
 	 * @template A - The type of the values in the Option.
@@ -1001,6 +1000,30 @@ export abstract class Option<out A>
 	 */
 	public reduce<A, B>(this: Option.Type<A>, b: B, f: (b: B, a: A) => B): B {
 		return Option.reduce(b, f)(this)
+	}
+
+	/**
+	 * Overloads default serialization behavior when using JSON stringify method
+	 * @override
+	 */
+	public toJSON(this: Option.Type<A>): {
+		_id: 'Option'
+		_tag: 'None' | 'Some'
+		value?: A
+	} {
+		return {
+			_id: 'Option',
+			_tag: this._tag,
+			...(this.isSome() ? { value: this.get() } : {}),
+		}
+	}
+
+	/**
+	 * Overloads default {@linkcode Object.prototype.toString} method allowing Option to return a custom string representation of the boxed value
+	 * @override
+	 */
+	public toString(this: Option.Type<A>): string {
+		return format(this.toJSON())
 	}
 }
 
@@ -1062,13 +1085,6 @@ export class None<out A> extends Option<A> {
 	public readonly _tag = 'None' as const
 
 	/**
-	 * @inheritDoc
-	 */
-	public get(): never {
-		throw new Error('None.get')
-	}
-
-	/**
 	 * Creates a new immutable `None` instance.
 	 *
 	 * @returns An instance of `None`
@@ -1096,6 +1112,13 @@ export class None<out A> extends Option<A> {
 		}
 		return None.#instance as None<B>
 	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public get(): never {
+		throw new Error('None.get')
+	}
 }
 
 /**
@@ -1106,14 +1129,6 @@ export class None<out A> extends Option<A> {
  */
 export class Some<out A> extends Option<A> {
 	public readonly _tag = 'Some' as const
-
-	/**
-	 * @inheritDoc
-	 */
-	public get(): A {
-		return this.#value
-	}
-
 	readonly #value: A
 
 	/**
@@ -1128,6 +1143,13 @@ export class Some<out A> extends Option<A> {
 		super()
 		this.#value = value
 		Object.freeze(this)
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public get(): A {
+		return this.#value
 	}
 }
 
