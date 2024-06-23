@@ -3,12 +3,12 @@ import type { Kind, TypeClass, TypeLambda } from '../internal/hkt.ts'
 /**
  * The `Of` type class is used to lifts any value into a context.
  *
- * | Name                      | Given   | To                    |
- * |                                 |             |                          |
- * | **of**                     | `A`      | `F<A>`             |
- * | ~ofComposition~  | ~`A`~ | ~`F<G<A>>`~ |
- * | ~unit~                    |            | ~`F<void>`~     |
- * | ~Do~                     |            | ~`F<{}>`~          |
+ * | Name            | Given | To          |
+ * |-----------------|-------|-------------|
+ * | **of**          | `A`   | `F<A>`      |
+ * | ~ofComposition~ | ~`A`~ | ~`F<G<A>>`~ |
+ * | ~unit~          |       | ~`F<void>`~ |
+ * | ~Do~            |       | ~`F<{}>`~   |
  *
  * @module
  * @category typeclass

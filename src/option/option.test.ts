@@ -277,6 +277,22 @@ describe('Option', () => {
 		})
 	})
 
+	describe('Product', () => {
+		test('Some', () => {
+			Util.optionEqual(
+				Option.productAll([Option.Some(1), Option.Some(2), Option.Some(3)]),
+				Option.Some([1, 2, 3]),
+			)
+		})
+
+		test('None', () => {
+			Util.optionEqual(
+				Option.productAll([Option.Some(1), Option.None(), Option.Some(3)]),
+				Option.None(),
+			)
+		})
+	})
+
 	describe('Monad', () => {
 		test('of', () => {
 			expect(Option.isOption(Option.of(1))).toBe(true)

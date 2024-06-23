@@ -8,6 +8,7 @@ import {
 	type Foldable,
 	type Monad,
 	type Pointed,
+	type Product,
 	type SemiProduct,
 } from '../typeclass/mod.ts'
 
@@ -574,6 +575,53 @@ export abstract class Option<out A>
 		Option.isSome(self) && Option.isSome(that)
 			? Option.of([self.get(), that.get()])
 			: Option.None()
+
+	/**
+	 * Takes a structure of Options and returns an Option of values with the same structure.
+	 *
+	 * @typeParam A - The type of the values in the Options.
+	 * @param optionCollection - The structure of Options to combine.
+	 * @returns An Option of values with the same structure.
+	 *
+	 * @remarks
+	 * It implements the {@linkcode Product#Pipeable#productAll} type class interface.
+	 *
+	 * @example
+	 * All Some
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 * 	Option.productAll([Option.Some(1), Option.Some(2), Option.Some(3)]),
+	 * 	Option.Some([1, 2, 3])
+	 * )
+	 * ```
+	 *
+	 * @example
+	 * Some and None
+	 * ```ts
+	 * import { assertEquals } from 'jsr:@std/assert'
+	 * import { Option } from './option.ts'
+	 *
+	 * assertEquals(
+	 * 	Option.productAll([Option.Some(1), Option.None(), Option.Some(3)]),
+	 * 	Option.None()
+	 * )
+	 * ```
+	 */
+	public static readonly productAll: Product.Pipeable<Option.TypeLambda>['productAll'] = <A>(
+		optionCollection: Iterable<Option.Type<A>>,
+	): Option.Type<Array<A>> => {
+		const out: A[] = []
+		for (const option of optionCollection) {
+			if (Option.isNone(option)) {
+				return Option.None()
+			}
+			out.push(option.get())
+		}
+		return Option.of(out)
+	}
 
 	/**
 	 * Combines an `Option<A>` from 'self' and an iterable collection of `Option<A>` into an `Option<[A, ...Array<A>]>`.
@@ -1173,7 +1221,8 @@ function assertPipableOption<
 		& FlatMap.Pipeable<Option.TypeLambda>
 		& Pointed.Pipeable<Option.TypeLambda>
 		& Monad.Pipeable<Option.TypeLambda>
-		& SemiProduct.Pipeable<Option.TypeLambda>,
+		& SemiProduct.Pipeable<Option.TypeLambda>
+		& Product.Pipeable<Option.TypeLambda>,
 >(_option: T): void {
 	return
 }
