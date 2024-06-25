@@ -5,6 +5,7 @@ import { describe, it, test } from 'jsr:@std/testing/bdd'
 
 import { type Lazy, pipe } from '../internal/function.ts'
 import { Util } from '../test/utils.ts'
+import { type Invariant, InvariantLaws } from '../typeclass/invariant.ts'
 import { Option } from './option.ts'
 
 describe('Option', () => {
@@ -113,6 +114,26 @@ describe('Option', () => {
 			type Foo = { foo: string }
 			const someOfRecord = Option.Some({ foo: 'bar' } satisfies Foo)
 			expectTypeOf<Option.Value<typeof someOfRecord>>().toEqualTypeOf<Foo>()
+		})
+	})
+
+	describe('Invariant Laws', () => {
+		const OptionInvariant: Invariant.Pipeable<Option.TypeLambda> = Option
+		const optionInvariantLaws = new InvariantLaws(OptionInvariant)
+
+		test('identity', () => {
+			optionInvariantLaws.assertIdentity(Option.of(42))
+			optionInvariantLaws.assertIdentity(Option.None())
+		})
+
+		test('Composition', () => {
+			const f1 = (a: number): string => String(a)
+			const f2 = (b: string): number => Number(b)
+			const g1 = (b: string): boolean => Boolean(b)
+			const g2 = (c: boolean): string => (c ? '1' : '0')
+
+			optionInvariantLaws.assertComposition(Option.of<0 | 1>(1), f1, f2, g1, g2)
+			optionInvariantLaws.assertComposition(Option.None<0 | 1>(), f1, f2, g1, g2)
 		})
 	})
 

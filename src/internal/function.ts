@@ -1,4 +1,15 @@
 // deno-lint-ignore-file ban-types
+import type { Types } from '../internal/types.ts'
+
+/**
+ * Applies a function to a value and returns the original value.
+ */
+export function tap<A>(f: Types.Contravariant<NoInfer<A>>): (a: A) => A {
+	return (a) => {
+		f(a)
+		return a
+	}
+}
 
 /**
  * A lazy computation that can be used to defer the evaluation of an expression.
@@ -389,7 +400,6 @@ export function pipe<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
 	st: (s: S) => T,
 ): T
 
-/** @inheritdoc */
 export function pipe<A>(...args: readonly [A, ...Function[]]): unknown {
 	const [a, ...fns] = args
 	switch (fns.length) {
