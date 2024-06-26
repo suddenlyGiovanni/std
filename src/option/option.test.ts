@@ -5,7 +5,8 @@ import { describe, it, test } from 'jsr:@std/testing/bdd'
 
 import { type Lazy, pipe } from '../internal/function.ts'
 import { Util } from '../test/utils.ts'
-import { type Invariant, InvariantLaws } from '../typeclass/invariant.ts'
+import { InvariantLaws } from '../typeclass/Invariant-laws.test.ts'
+import type { Invariant } from '../typeclass/invariant.ts'
 import { Option } from './option.ts'
 
 describe('Option', () => {
