@@ -6,6 +6,8 @@ import { describe, it, test } from 'jsr:@std/testing/bdd'
 import { type Lazy, pipe } from '../internal/function.ts'
 import { Util } from '../test/utils.ts'
 import { InvariantLaws } from '../typeclass/Invariant-laws.test.ts'
+import { CovariantLaws } from '../typeclass/covariant-laws.test.ts'
+import type { Covariant } from '../typeclass/covariant.ts'
 import type { Invariant } from '../typeclass/invariant.ts'
 import { Option } from './option.ts'
 
@@ -161,6 +163,27 @@ describe('Option', () => {
 
 				optionInvariantLaws.assertComposition(Option.of<0 | 1>(1), f1, f2, g1, g2)
 				optionInvariantLaws.assertComposition(Option.None<0 | 1>(), f1, f2, g1, g2)
+			})
+		})
+	})
+
+	describe('Covariant', () => {
+		describe('laws', () => {
+			const CovariantOption: Covariant.Pipeable<Option.TypeLambda> = Option
+			const optionCovariantLaws = new CovariantLaws(CovariantOption)
+			it('identity', () => {
+				optionCovariantLaws.assertIdentity(Option.of(6 * 7))
+				optionCovariantLaws.assertIdentity(Option.of(['hello', 'world']))
+				optionCovariantLaws.assertIdentity(Option.of({ foo: 'bar' }))
+				optionCovariantLaws.assertIdentity(Option.None())
+			})
+
+			it('composition', () => {
+				const f = (a: number): string => String(a)
+				const g = (b: string): number => Number(b)
+
+				optionCovariantLaws.assertComposition(Option.of(6 * 7), f, g)
+				optionCovariantLaws.assertComposition(Option.None(), f, g)
 			})
 		})
 	})

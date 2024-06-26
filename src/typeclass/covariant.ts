@@ -2,7 +2,7 @@ import type { Kind, TypeLambda } from '../internal/hkt.ts'
 import type { Invariant } from './invariant.ts'
 
 /**
- * Covariant is a type class that abstracts over type constructors that can be mapped over.
+ * Covariant a.k.a. Functor is a type class that abstracts over type constructors that can be mapped over.
  * Examples of such type constructors in Scala are `List`, `Option`, and `Future`.
  *
  * @remarks
