@@ -9,6 +9,8 @@ import { InvariantLaws } from '../typeclass/Invariant-laws.test.ts'
 import { CovariantLaws } from '../typeclass/covariant-laws.test.ts'
 import type { Covariant } from '../typeclass/covariant.ts'
 import type { Invariant } from '../typeclass/invariant.ts'
+import { SemiProductLaws } from '../typeclass/semi-product-laws.test.ts'
+import type { SemiProduct } from '../typeclass/semi-product.ts'
 import { Option } from './option.ts'
 
 describe('Option', () => {
@@ -366,27 +368,16 @@ describe('Option', () => {
 
 		describe('laws', () => {
 			test('Associativity', () => {
-				// testing the associativity law of semiproduct of Option instances
-				// If ⊗ is associative, then a ⊗ (b ⊗ c) = (a ⊗ b) ⊗ c.
-				type A = string
-				const a: A = '0'
-				const Fa = Option.of<A>(a)
+				// arrange
+				const semiProductOption: SemiProduct.Pipeable<Option.TypeLambda> = Option
+				const semiProductLawsOption = new SemiProductLaws(semiProductOption)
 
-				type B = number
-				const b: B = 0
-				const Fb = Option.of<B>(b)
-
-				type C = boolean
-				const c: C = false
-				const Fc = Option.of<C>(c)
-
-				// a ⊗ (b ⊗ c)
-				const lhs = Option.product(Fa, Option.product(Fb, Fc))
-				expectTypeOf(lhs).toEqualTypeOf<Option.Type<[A, [B, C]]>>(Option.of([a, [b, c]]))
-
-				// (a ⊗ b) ⊗ c
-				const rhs = Option.product(Option.product(Fa, Fb), Fc)
-				expectTypeOf(rhs).toEqualTypeOf<Option.Type<[[A, B], C]>>(Option.of([[a, b], c]))
+				// act & assert
+				semiProductLawsOption.assertAssociativity(
+					Option.of(1),
+					Option.of('1'),
+					Option.of(true),
+				)
 			})
 		})
 	})
