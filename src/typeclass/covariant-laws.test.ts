@@ -1,7 +1,7 @@
 import { assertEquals } from 'jsr:@std/assert'
 import { describe, it } from 'jsr:@std/testing/bdd'
 
-import { flow, identity, pipe } from '../internal/function.ts'
+import { identity, pipe } from '../internal/function.ts'
 import type { Kind, TypeLambda } from '../internal/hkt.ts'
 import { Option } from '../option/option.ts'
 import { Util } from '../test/utils.ts'
@@ -37,12 +37,15 @@ export class CovariantLaws<F extends TypeLambda> {
 	 */
 	public assertComposition<In, Out2, Out1, A, B, C>(
 		Fa: Kind<F, In, Out2, Out1, A>,
-		ab: (a: A) => B,
-		bc: (b: B) => C,
+		f: (a: A) => B,
+		g: (b: B) => C,
 	): void {
 		assertEquals(
-			pipe(Fa, this.F.map(ab), this.F.map(bc)), //
-			pipe(Fa, this.F.map(flow(ab, bc))),
+			pipe(Fa, this.F.map(f), this.F.map(g)),
+			pipe(
+				Fa,
+				this.F.map((a) => g(f(a))),
+			),
 		)
 	}
 }

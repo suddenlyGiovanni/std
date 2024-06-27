@@ -167,18 +167,60 @@ describe('Option', () => {
 		})
 	})
 
-	describe('Covariant', () => {
+	describe('Covariant extends Invariant', () => {
+		describe('map', () => {
+			const f: (n: number) => number = (n) => n * 2
+			const g: (n: number) => string = (n) => n.toString()
+			const someNumber = Option.of(1)
+			const noneNumber = Option.None<number>()
+
+			test('static', () => {
+				Util.optionEqual(pipe(someNumber, Option.map(f)), Option.of(2))
+				expectTypeOf(Option.map(f)(someNumber)).toEqualTypeOf<Option.Type<number>>()
+
+				Util.optionEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
+				expectTypeOf(Option.map(g)(Option.Some(1))).toEqualTypeOf<Option.Type<string>>()
+
+				Util.optionEqual(pipe(noneNumber, Option.map(f)), noneNumber)
+				Util.optionEqual(pipe(noneNumber, Option.map(g)), Option.None<string>())
+			})
+
+			test('instance', () => {
+				Util.optionEqual(someNumber.map(f), Option.of(2))
+				Util.optionEqual(Option.Some(42).map(g), Option.Some('42'))
+				Util.optionEqual(noneNumber.map(f), noneNumber)
+				Util.optionEqual(noneNumber.map(g), Option.None<string>())
+			})
+		})
+
+		describe('imap', () => {
+			const f: (n: number) => string = (n) => n.toString()
+			const g: (s: string) => number = (s) => Number(s)
+			const someNumber = Option.of(1)
+			const noneNumber = Option.None<number>()
+
+			test('static', () => {
+				Util.optionEqual(pipe(someNumber, Option.imap(f, g)), Option.of('1'))
+				Util.optionEqual(pipe(noneNumber, Option.imap(f, g)), Option.None<string>())
+			})
+
+			test('instance', () => {
+				Util.optionEqual(someNumber.imap(f, g), Option.of('1'))
+				Util.optionEqual(noneNumber.imap(f, g), Option.None<string>())
+			})
+		})
+
 		describe('laws', () => {
 			const CovariantOption: Covariant.Pipeable<Option.TypeLambda> = Option
 			const optionCovariantLaws = new CovariantLaws(CovariantOption)
-			it('identity', () => {
+			test('identity', () => {
 				optionCovariantLaws.assertIdentity(Option.of(6 * 7))
 				optionCovariantLaws.assertIdentity(Option.of(['hello', 'world']))
 				optionCovariantLaws.assertIdentity(Option.of({ foo: 'bar' }))
 				optionCovariantLaws.assertIdentity(Option.None())
 			})
 
-			it('composition', () => {
+			test('composition', () => {
 				const f = (a: number): string => String(a)
 				const g = (b: string): number => Number(b)
 
@@ -464,71 +506,6 @@ describe('Option', () => {
 			expectTypeOf(Option.fold(ifEmpty, fa)(stringOption)).toEqualTypeOf<
 				number | { length: number }
 			>()
-		})
-	})
-
-	describe('Covariant', () => {
-		describe('map', () => {
-			const f: (n: number) => number = (n) => n * 2
-			const g: (n: number) => string = (n) => n.toString()
-			const someNumber = Option.of(1)
-			const noneNumber = Option.None<number>()
-
-			test('static', () => {
-				Util.optionEqual(pipe(someNumber, Option.map(f)), Option.of(2))
-				expectTypeOf(Option.map(f)(someNumber)).toEqualTypeOf<Option.Type<number>>()
-
-				Util.optionEqual(pipe(Option.Some(42), Option.map(g)), Option.Some('42'))
-				expectTypeOf(Option.map(g)(Option.Some(1))).toEqualTypeOf<Option.Type<string>>()
-
-				Util.optionEqual(pipe(noneNumber, Option.map(f)), noneNumber)
-				Util.optionEqual(pipe(noneNumber, Option.map(g)), Option.None<string>())
-			})
-
-			test('instance', () => {
-				Util.optionEqual(someNumber.map(f), Option.of(2))
-				Util.optionEqual(Option.Some(42).map(g), Option.Some('42'))
-				Util.optionEqual(noneNumber.map(f), noneNumber)
-				Util.optionEqual(noneNumber.map(g), Option.None<string>())
-			})
-		})
-
-		describe('imap', () => {
-			const f: (n: number) => string = (n) => n.toString()
-			const g: (s: string) => number = (s) => Number(s)
-			const someNumber = Option.of(1)
-			const noneNumber = Option.None<number>()
-
-			test('static', () => {
-				Util.optionEqual(pipe(someNumber, Option.imap(f, g)), Option.of('1'))
-				Util.optionEqual(pipe(noneNumber, Option.imap(f, g)), Option.None<string>())
-			})
-
-			test('instance', () => {
-				Util.optionEqual(someNumber.imap(f, g), Option.of('1'))
-				Util.optionEqual(noneNumber.imap(f, g), Option.None<string>())
-			})
-		})
-
-		describe('Functor laws', () => {
-			it('Identity ', () => {
-				const identity = <A>(a: A): A => a
-				const Fa: Option.Type<number> = Option.Some(1)
-				Util.optionEqual(pipe(Fa, Option.map(identity)), Fa)
-			})
-
-			it('Composition ', () => {
-				const Fa: Option.Type<number> = Option.Some(0)
-				const f: (a: number) => string = (a) => String(a)
-				const g: (b: string) => boolean = (b) => Boolean(b)
-				Util.optionEqual(
-					pipe(Fa, Option.map(f), Option.map(g)),
-					pipe(
-						Fa,
-						Option.map((a) => g(f(a))),
-					),
-				)
-			})
 		})
 	})
 
