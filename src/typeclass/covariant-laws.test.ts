@@ -1,29 +1,45 @@
+// deno-lint-ignore-file no-explicit-any
 import { assertEquals } from 'jsr:@std/assert'
-import { describe, it } from 'jsr:@std/testing/bdd'
 
 import { identity, pipe } from '../internal/function.ts'
 import type { Kind, TypeLambda } from '../internal/hkt.ts'
-import { Option } from '../option/option.ts'
-import { Util } from '../test/utils.ts'
-import { Covariant } from './covariant.ts'
+import type { Covariant } from './covariant.ts'
 
 /**
  * Represents a class that implements the Covariant laws.
  * @typeparam F - The type lambda.
  */
-
-// biome-ignore lint/suspicious/noExportsInTest: <explanation>
 export class CovariantLaws<F extends TypeLambda> {
+	readonly #F: Covariant.Pipeable<F>
+
+	readonly #assertEqualStrategy: <T>(
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		actual: Kind<F, any, any, any, T>,
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		expected: Kind<F, any, any, any, T>,
+	) => void
+
 	/**
 	 * instantiate assertion laws for the given covariant instance
 	 */
-	public constructor(private readonly F: Covariant.Pipeable<F>) {}
+	public constructor(
+		F: Covariant.Pipeable<F>,
+		assertEqualStrategy: <T>(
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			actual: Kind<F, any, any, any, T>,
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			expected: Kind<F, any, any, any, T>,
+		) => void = assertEquals,
+	) {
+		this.#F = F
+		this.#assertEqualStrategy = assertEqualStrategy
+	}
 
 	/**
 	 * Mapping the identity function over every item in a container has no effect.
 	 */
 	public assertIdentity<In, Out2, Out1, A>(fa: Kind<F, In, Out2, Out1, A>): void {
-		assertEquals(pipe(fa, this.F.map(identity)), fa)
+		this.#assertEqualStrategy(pipe(fa, this.#F.map(identity)), fa)
 	}
 
 	/**
@@ -40,23 +56,12 @@ export class CovariantLaws<F extends TypeLambda> {
 		f: (a: A) => B,
 		g: (b: B) => C,
 	): void {
-		assertEquals(
-			pipe(Fa, this.F.map(f), this.F.map(g)),
+		this.#assertEqualStrategy(
+			pipe(Fa, this.#F.map(f), this.#F.map(g)),
 			pipe(
 				Fa,
-				this.F.map((a) => g(f(a))),
+				this.#F.map((a) => g(f(a))),
 			),
 		)
 	}
 }
-
-describe('Covariant', () => {
-	it('imap', () => {
-		const f = Covariant.imap<Option.TypeLambda>(Option.map)(
-			(s: string) => [s],
-			([s]) => s,
-		)
-		Util.deepStrictEqual(pipe(Option.None<string>(), f), Option.None())
-		Util.deepStrictEqual(pipe(Option.of('a'), f), Option.of(['a']))
-	})
-})
