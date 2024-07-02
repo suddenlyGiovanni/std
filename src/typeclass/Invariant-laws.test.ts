@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { assertEquals } from 'jsr:@std/assert'
 
 import { flow, identity, pipe, tap } from '../internal/function.ts'
@@ -9,10 +10,30 @@ import type { Invariant } from './invariant.ts'
  * @typeparam F - The type lambda.
  */
 export class InvariantLaws<F extends TypeLambda> {
+	readonly #F: Invariant.Pipeable<F>
+
+	readonly #assertEqualStrategy: <T>(
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		actual: Kind<F, any, any, any, T>,
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		expected: Kind<F, any, any, any, T>,
+	) => void
+
 	/**
 	 * instantiate assertion laws for the given invariant instance
 	 */
-	public constructor(private readonly F: Invariant.Pipeable<F>) {}
+	public constructor(
+		F: Invariant.Pipeable<F>,
+		assertEqualStrategy: <T>(
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			actual: Kind<F, any, any, any, T>,
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			expected: Kind<F, any, any, any, T>,
+		) => void = assertEquals,
+	) {
+		this.#F = F
+		this.#assertEqualStrategy = assertEqualStrategy
+	}
 
 	/**
 	 * Asserts that the given method returns the same value when passed through identity mapping.
@@ -22,7 +43,7 @@ export class InvariantLaws<F extends TypeLambda> {
 	 * ```
 	 */
 	public assertIdentity<In, Out2, Out1, A>(fa: Kind<F, In, Out2, Out1, A>): void {
-		assertEquals(pipe(fa, this.F.imap(identity, identity)), fa)
+		this.#assertEqualStrategy(pipe(fa, this.#F.imap(identity, identity)), fa)
 	}
 
 	/**
@@ -48,9 +69,9 @@ export class InvariantLaws<F extends TypeLambda> {
 				console.group('left hand side:')
 				console.log('Fa:', _fa.toString())
 			}),
-			this.F.imap(f1, f2),
+			this.#F.imap(f1, f2),
 			tap((fb) => console.log('Fb:', fb.toString())),
-			this.F.imap(g1, g2),
+			this.#F.imap(g1, g2),
 			tap((fc) => {
 				console.log('Fc:', fc.toString())
 				console.groupEnd()
@@ -63,7 +84,7 @@ export class InvariantLaws<F extends TypeLambda> {
 				console.group('right hand side:')
 				console.log('Fa:', _fa.toString())
 			}),
-			this.F.imap(flow(f1, g1), flow(g2, f2)),
+			this.#F.imap(flow(f1, g1), flow(g2, f2)),
 			tap((fc) => {
 				console.log('Fc:', fc.toString())
 				console.groupEnd()
@@ -71,6 +92,6 @@ export class InvariantLaws<F extends TypeLambda> {
 		)
 
 		console.groupEnd()
-		assertEquals(lhs, rhs)
+		this.#assertEqualStrategy(lhs, rhs)
 	}
 }

@@ -149,7 +149,7 @@ describe('Option', () => {
 
 		describe('Laws', () => {
 			const OptionInvariant: Invariant.Pipeable<Option.TypeLambda> = Option
-			const optionInvariantLaws = new InvariantLaws(OptionInvariant)
+			const optionInvariantLaws = new InvariantLaws(OptionInvariant, Util.optionEqual)
 
 			test('identity', () => {
 				optionInvariantLaws.assertIdentity(Option.of(42))
