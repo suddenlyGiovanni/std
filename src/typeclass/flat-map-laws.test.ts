@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { assertEquals } from 'jsr:@std/assert'
 
 import { pipe } from '../internal/function.ts'
