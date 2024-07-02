@@ -7,10 +7,9 @@ import { type Lazy, pipe } from '../internal/function.ts'
 import { Util } from '../test/utils.ts'
 import { InvariantLaws } from '../typeclass/Invariant-laws.test.ts'
 import { CovariantLaws } from '../typeclass/covariant-laws.test.ts'
-import type { Covariant } from '../typeclass/covariant.ts'
-import type { Invariant } from '../typeclass/invariant.ts'
+import { FlatMapLaws } from '../typeclass/flat-map-laws.test.ts'
+import type { Covariant, FlatMap, Invariant, SemiProduct } from '../typeclass/mod.ts'
 import { SemiProductLaws } from '../typeclass/semi-product-laws.test.ts'
-import type { SemiProduct } from '../typeclass/semi-product.ts'
 import { Option } from './option.ts'
 
 describe('Option', () => {
@@ -532,15 +531,22 @@ describe('Option', () => {
 			})
 		})
 
-		test('associativity law', () => {
-			const Fa: Option.Type<number> = Option.Some(1)
-			const f: (a: number) => Option.Type<string> = (a) => Option.Some(a.toString())
-			const g: (b: string) => Option.Type<boolean> = (b) => Option.Some(Boolean(b))
-			// If ⊕ is associative, then a ⊕ (b ⊕ c) = (a ⊕ b) ⊕ c.
-			Util.optionEqual(
-				Fa.flatMap(f).flatMap(g),
-				Fa.flatMap((a) => f(a).flatMap(g)),
-			)
+		describe('laws', () => {
+			test('associativity', () => {
+				const OptionFlatMap: FlatMap.Pipeable<Option.TypeLambda> = Option
+				const optionFlatMapLaws = new FlatMapLaws(OptionFlatMap, Util.optionEqual)
+
+				const f: (a: number) => Option.Type<string> = (a) => Option.Some(a.toString())
+				const g: (b: string) => Option.Type<boolean> = (b) => Option.Some(Boolean(b))
+
+				optionFlatMapLaws.assertAssociativity(Option.of(1), f, g)
+				optionFlatMapLaws.assertAssociativity(Option.None<number>(), f, g)
+				optionFlatMapLaws.assertAssociativity(
+					Option.of('the meaning of life'),
+					(a) => Option.of(a.length),
+					(g) => (g >= 1 ? Option.of(true) : Option.of(false)),
+				)
+			})
 		})
 	})
 
