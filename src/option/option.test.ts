@@ -369,7 +369,10 @@ describe('Option', () => {
 			test('Associativity', () => {
 				// arrange
 				const semiProductOption: SemiProduct.Pipeable<Option.TypeLambda> = Option
-				const semiProductLawsOption = new SemiProductLaws(semiProductOption)
+				const semiProductLawsOption = new SemiProductLaws(
+					semiProductOption,
+					Util.optionEqual,
+				)
 
 				// act & assert
 				semiProductLawsOption.assertAssociativity(
