@@ -6,17 +6,17 @@ import type { Semigroup } from './semigroup.ts'
  */
 export class SemigroupLaws<A> {
 	readonly #F: Semigroup<A>
-	readonly #assertEquals: <T>(actual: T, expected: T) => void
+	readonly #assertEqualStrategy: <T>(actual: T, expected: T) => void
 
 	/**
 	 * instantiate assertion laws for the given covariant instance
 	 */
 	public constructor(
 		F: Semigroup<A>,
-		_assertEquals: <T>(actual: T, expected: T) => void = assertEquals,
+		assertEqualStrategy: <T>(actual: T, expected: T) => void = assertEquals,
 	) {
 		this.#F = F
-		this.#assertEquals = _assertEquals
+		this.#assertEqualStrategy = assertEqualStrategy
 	}
 
 	/**
@@ -27,6 +27,6 @@ export class SemigroupLaws<A> {
 	public assertAssociativity(a: A, b: A, c: A): void {
 		const lhs = this.#F.combine(this.#F.combine(a, b), c)
 		const rhs = this.#F.combine(a, this.#F.combine(b, c))
-		this.#assertEquals(lhs, rhs)
+		this.#assertEqualStrategy(lhs, rhs)
 	}
 }
